@@ -65,8 +65,6 @@ runTreatmentPathways <- FALSE
 debug <- FALSE # Use this when you'd like to emit the SQL for debugging 
 exportResults <- FALSE
 
-minCellCount <- 5
-
 # ------------------------------------------------------------------------ 
 # Run the study
 # ------------------------------------------------------------------------
@@ -99,8 +97,7 @@ for (sourceId in 1:length(cdmDatabaseSchemaList)) {
     runTreatmentPathways = runTreatmentPathways,
     debug = debug,
     exportResults = exportResults,
-    debugSqlFile = debugSqlFile,
-    minCellCount = minCellCount
+    debugSqlFile = debugSqlFile
   )
   }
 

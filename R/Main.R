@@ -24,7 +24,6 @@ execute <- function(connection = NULL,
                     observationPeriodTable = "observation_period",
                     cdmPersonSchema = cdmDatabaseSchema,
                     personTable = "person",
-                    minCellCount = 5,
                     debug = FALSE,
                     debugSqlFile = "") {
   
@@ -75,6 +74,8 @@ execute <- function(connection = NULL,
   }
   
   if (runSunburstPlot) {
+    
+    # Select cohorts included
     pathToCsv <- "output/cohort.csv"
     cohortIds <- readr::read_csv(pathToCsv, col_types = readr::cols())
     targetCohortId <- cohortIds[cohortIds$cohortType == "target", ]$cohortId
@@ -82,22 +83,37 @@ execute <- function(connection = NULL,
     select <- "mono"
     outcomeCohortIds <- cohortIds[cohortIds$cohortType == "outcome" & grepl(select, cohortIds$cohortName), ]$cohortId
     
+    # Analyis settings
+    studyName = "txpath"
+    minEraDuration <- 0
+    combinationWindow <- 30
+    eraCollapseSize <- 30
+    firstTreatment <- FALSE # Select to only include first encounter of each outcome cohort
+
+    # Result settings
+    maxPathLength <- 7 # Maximum number of treatment layers
+    minCellCount <- 5 # Minimum number of people in treatment path
+    
+    # Preparation for analysis
     cohortIds$cohortName <- paste("'", cohortIds$cohortName, "'")
     labels <-  apply(cohortIds[,1:2],1, paste, collapse = ",")
     labels <- paste("(", paste(str_replace_all(labels, select, ""), collapse = "),("), ")")
     
-    studyFile <- renderStudySpecificSql2(minCellCount, cdmDatabaseSchema, cohortDatabaseSchema, targetCohortId, outcomeCohortIds, cohortTable, labels)
+    studyFile <- renderStudySpecificSql(minCellCount, cdmDatabaseSchema, cohortDatabaseSchema, targetCohortId, outcomeCohortIds, cohortTable, labels,  dbms = "postgresql", studyName = studyName, minEraDuration = minEraDuration, combinationWindow = combinationWindow, eraCollapseSize = eraCollapseSize, firstTreatment = firstTreatment)
     
     # TODO: check sometimes an "regular expression is invalid UTF-8" error/warning that does not cause problems but appears
+   
+    # Run analysis
     conn <- DatabaseConnector::connect(connectionDetails)
     DatabaseConnector::executeSql(conn,SqlRender::readSql(studyFile))
     
-    extractAndWriteToFile(conn, tableName = "summary", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, "txpath")
-    extractAndWriteToFile(conn, tableName = "person_cnt", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, "txpath")
-    extractAndWriteToFile(conn, tableName = "seq_cnt", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, "txpath")
+    # Get results
+    extractAndWriteToFile(conn, tableName = "summary", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = "postgresql")
+    extractAndWriteToFile(conn, tableName = "person_cnt", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = "postgresql")
+    extractAndWriteToFile(conn, tableName = "seq_cnt", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = "postgresql")
    
-    transformFile(tableName = "seq_cnt", studyName = "txpath", max_layer = 7)
-    
+    # Process results to input in sunburst plot
+    transformFile(tableName = "seq_cnt", studyName = studyName, maxPathLength = maxPathLength, minCellCount = minCellCount)
   
      
   }
