@@ -19,7 +19,7 @@ createCohorts <- function(createCohortTable = TRUE,
   # Create study cohort table structure
   if(createCohortTable){
     ParallelLogger::logInfo("Creating table for the cohorts")
-    sql <- loadRenderTranslateSql(sqlFilename = "CreateCohortTable.sql",
+    sql <- loadRenderTranslateSql(sql = "CreateCohortTable.sql",
                                   oracleTempSchema = oracleTempSchema,
                                   cohort_database_schema = cohortDatabaseSchema,
                                   cohort_table = cohortTable)
@@ -29,7 +29,7 @@ createCohorts <- function(createCohortTable = TRUE,
   # In case of custom definitions: create concept sets
   if (createCustomCohorts) {
     ParallelLogger::logInfo("Creating concept sets for the custom cohorts")
-    sql <- loadRenderTranslateSql(sqlFilename = "CreateDrugClassesSkratch.sql",
+    sql <- loadRenderTranslateSql(sql = "CreateDrugClassesSkratch.sql",
                                   oracleTempSchema = oracleTempSchema,
                                   cohort_database_schema = cohortDatabaseSchema)
     DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
@@ -37,7 +37,7 @@ createCohorts <- function(createCohortTable = TRUE,
   }
   
   # Loade custom definitions
-  sql <- loadRenderTranslateSql(sqlFilename = "GetDrugClasses.sql",
+  sql <- loadRenderTranslateSql(sql = "GetDrugClasses.sql",
                                 oracleTempSchema = oracleTempSchema,
                                 cohort_database_schema = cohortDatabaseSchema
   )
@@ -52,7 +52,7 @@ createCohorts <- function(createCohortTable = TRUE,
     writeLines(paste0("Creating cohort:", cohortsToCreate$cohortName[i], " ", cohortsToCreate$cohortDefinition[i]))
     
     if (cohortsToCreate$cohortDefinition[i] == "ATLAS") {
-      sql <- loadRenderTranslateSql(sqlFilename = paste0(cohortsToCreate$cohortName[i], ".sql"),
+      sql <- loadRenderTranslateSql(sql = paste0(cohortsToCreate$cohortName[i], ".sql"),
                                     oracleTempSchema = oracleTempSchema,
                                     cdm_database_schema = cdmDatabaseSchema,
                                     vocabulary_database_schema = vocabularyDatabaseSchema,
@@ -73,7 +73,7 @@ createCohorts <- function(createCohortTable = TRUE,
       }
 
       # Insert concept set in SQL template to create cohort
-      sql <- loadRenderTranslateSql(sqlFilename = "CohortTemplate.sql",
+      sql <- loadRenderTranslateSql(sql = "CohortTemplate.sql",
                                     oracleTempSchema = oracleTempSchema,
                                     cdm_database_schema = cdmDatabaseSchema,
                                     vocabulary_database_schema = vocabularyDatabaseSchema,
@@ -98,7 +98,7 @@ createCohorts <- function(createCohortTable = TRUE,
     
     # Check number of subjects per cohort
     # ParallelLogger::logInfo("Counting cohorts")
-    # sql <- loadRenderTranslateSql(sqlFilename = "get_counts.sql",
+    # sql <- loadRenderTranslateSql(sql = "get_counts.sql",
     #                               oracleTempSchema = oracleTempSchema,
     #                               cdm_database_schema = cdmDatabaseSchema,
     #                               work_database_schema = cohortDatabaseSchema,
@@ -117,7 +117,7 @@ indexCohortTable <- function(connection,
                              cohortTable,
                              oracleTempSchema) {
   writeLines(paste("Indexing cohort table:", paste(cohortDatabaseSchema, cohortTable, sep=".")))
-  sql <- loadRenderTranslateSql(sqlFilename = "create_cohort_table_index.sql",
+  sql <- loadRenderTranslateSql(sql = "create_cohort_table_index.sql",
                                 oracleTempSchema = oracleTempSchema,
                                 cohort_database_schema = cohortDatabaseSchema,
                                 cohort_table = cohortTable)

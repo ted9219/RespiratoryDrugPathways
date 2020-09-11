@@ -44,8 +44,7 @@ execute <- function(connection = NULL,
   # Create cohorts: either predefined in ATLAS or using custom concept sets created in SQL inserted into template
   if (runCreateCohorts) {
     ParallelLogger::addDefaultFileLogger(file.path(outputFolder, "log.txt"))
-    # on.exit(ParallelLogger::unregisterLogger("DEFAULT"))
-    
+   
     ParallelLogger::logInfo("Creating cohorts")
     createCohorts(connection = connection,
                   connectionDetails = connectionDetails,
@@ -65,12 +64,10 @@ execute <- function(connection = NULL,
   }
   
   if (runCheckCohorts) {
-    
     # Number of concepts in each cohort
     # Number of overlapping concepts between cohorts
     # Total exposure counts in database (in a specified period)
     # Validate cohorts with concept information (description + dose form etc.)
-    
   }
   
   if (runSunburstPlot) {
@@ -85,28 +82,156 @@ execute <- function(connection = NULL,
     
     # Analyis settings
     studyName = "txpath"
-    minEraDuration <- 0
+    minEraDuration <- 7 # 7
+    eraCollapseSize <- 40
     combinationWindow <- 30
-    eraCollapseSize <- 30
     firstTreatment <- FALSE # Select to only include first encounter of each outcome cohort
 
     # Result settings
     maxPathLength <- 7 # Maximum number of treatment layers
     minCellCount <- 5 # Minimum number of people in treatment path
     
-    # Preparation for analysis
-    cohortIds$cohortName <- paste("'", cohortIds$cohortName, "'")
-    labels <-  apply(cohortIds[,1:2],1, paste, collapse = ",")
-    labels <- paste("(", paste(str_replace_all(labels, select, ""), collapse = "),("), ")")
+    # Load cohorts and pre-processing in SQL
+    sql <- loadRenderTranslateSql(sql = "CreateTreatmentSequence.sql",
+                                  oracleTempSchema = oracleTempSchema,
+                                  resultsSchema=cohortDatabaseSchema,
+                                  studyName=studyName, 
+                                  targetCohortId=targetCohortId,
+                                  outcomeCohortIds=outcomeCohortIds,
+                                  cohortTable=cohortTable)
+    DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
+  
+    sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.dbo.@studyName_@tableName",
+                                  oracleTempSchema = oracleTempSchema,
+                                  resultsSchema=cohortDatabaseSchema,
+                                  studyName=studyName, 
+                                  tableName="drug_seq")
+    all_data <- DatabaseConnector::querySql(connection, sql)
     
-    studyFile <- renderStudySpecificSql(minCellCount, cdmDatabaseSchema, cohortDatabaseSchema, targetCohortId, outcomeCohortIds, cohortTable, labels,  dbms = "postgresql", studyName = studyName, minEraDuration = minEraDuration, combinationWindow = combinationWindow, eraCollapseSize = eraCollapseSize, firstTreatment = firstTreatment)
+    # Apply analysis settings
+    data <- as.data.table(all_data)
+    print(paste0("Original: ", nrow(data)))
+
+    # -- minEraDuration
+    # filter out rows with duration_era < minEraDuration
+    data <- data[DURATION_ERA >= minEraDuration,]
+    print(paste0("After minEraDuration: ", nrow(data)))
+
+    # -- eraCollapseSize
+    # order data by person_id, drug_concept_id, drug_start_date, drug_end_date
+    data <- data[order(PERSON_ID, DRUG_CONCEPT_ID,DRUG_START_DATE, DRUG_END_DATE),]
     
-    # TODO: check sometimes an "regular expression is invalid UTF-8" error/warning that does not cause problems but appears
+    # find all rows with gap_same < eraCollapseSize
+    rows <- which(data$GAP_SAME < eraCollapseSize)
+    
+    # for all rows, modify the row preceding, loop backwards in case more than one collapse
+    for (r in rev(rows)) {
+      data[r - 1,"DRUG_END_DATE"] <- data[r,DRUG_END_DATE]
+    }
+    
+    # remove all rows with  gap_same < eraCollapseSize
+    data <- data[!rows,]
+    data[,GAP_SAME:=NULL]
+    print(paste0("After eraCollapseSize: ", nrow(data)))
+    
+    # re-calculate duration_era
+    data[,DURATION_ERA:=difftime(DRUG_END_DATE , DRUG_START_DATE, units = "days")]
+    
+    # -- combinationWindow
+    data$DRUG_CONCEPT_ID <- as.character(data$DRUG_CONCEPT_ID)
+    
+    # order data by person_id, drug_start_date, drug_end_date
+    data <- data[order(PERSON_ID, DRUG_START_DATE, DRUG_END_DATE),]
+    
+    # calculate gap with previous treatment
+    data[,GAP_PREVIOUS:=difftime(DRUG_START_DATE, shift(DRUG_END_DATE, type = "lag"), units = "days"), by = PERSON_ID]
+    data$GAP_PREVIOUS <- as.integer(data$GAP_PREVIOUS)
+    
+    # find all rows with gap_previous < 0
+    data[data$GAP_PREVIOUS < 0, SELECT_INDEX:=which(data$GAP_PREVIOUS < 0)]
+    
+    # select one row per iteration for each person
+    rows <- data[!is.na(SELECT_INDEX),head(.SD,1), by=PERSON_ID]$SELECT_INDEX
+    data[,SELECT_INDEX:=NULL]
+    
+    # while rows exist:
+    while(!(length(rows)==0)) {
+      print(length(rows))
+      
+      for (r in rows) {
+        # switch
+        if (-data$GAP_PREVIOUS[r] < combinationWindow) {
+          data[r - 1,"DRUG_END_DATE"] <- data[r,DRUG_START_DATE]
+        }
+        
+        # combination
+        else if (-data$GAP_PREVIOUS[r] >= combinationWindow) {
+          if (data[r - 1, DRUG_END_DATE] <= data[r, DRUG_END_DATE]) {
+            # add combination as new row
+            new_row <- data[r,]
+            new_row[, "DRUG_END_DATE"]  <- data[r - 1, DRUG_END_DATE]
+            new_row[, "DRUG_CONCEPT_ID"] <- paste0(data[r - 1, "DRUG_CONCEPT_ID"], "+", data[r, "DRUG_CONCEPT_ID"])
+            
+            data <- rbindlist(list(data, new_row))
+            
+            # adjust current rows
+            temp <- data[r-1,DRUG_END_DATE]
+            data[r - 1,"DRUG_END_DATE"] <- data[r,DRUG_START_DATE]
+            data[r,"DRUG_START_DATE"] <- temp
+          }
+          
+          else if (data[r - 1, DRUG_END_DATE] > data[r, DRUG_END_DATE]) {
+            # adjust row for combination
+            data[r,"DRUG_CONCEPT_ID"] <- paste0(data[r - 1, "DRUG_CONCEPT_ID"], "+", data[r, "DRUG_CONCEPT_ID"])
+        
+            
+            # split row in two by adding new row 
+            data[r - 1,"DRUG_END_DATE"] <- data[r,DRUG_START_DATE]
+            
+            new_row <- data[r - 1,]
+            new_row[, "DRUG_START_DATE"]  <- data[r, DRUG_END_DATE]
+
+            data <- rbindlist(list(data, new_row))
+          }
+        }
+      }
+      
+      # re-calculate duration_era
+      data[,DURATION_ERA:=difftime(DRUG_END_DATE, DRUG_START_DATE, units = "days")]
+      
+      # -- minEraDuration
+      # filter out rows with duration_era < minEraDuration
+      data <- data[DURATION_ERA >= minEraDuration,]
+
+      # order data by person_id, drug_start_date, drug_end_date
+      data <- data[order(PERSON_ID, DRUG_START_DATE, DRUG_END_DATE),]
+      
+      # calculate gap with previous treatment
+      data[,GAP_PREVIOUS:=difftime(DRUG_START_DATE, shift(DRUG_END_DATE, type = "lag"), units = "days"), by = PERSON_ID]
+      data$GAP_PREVIOUS <- as.integer(data$GAP_PREVIOUS)
+      
+      # find all rows with gap_previous < 0
+      data[data$GAP_PREVIOUS < 0, SELECT_INDEX:=which(data$GAP_PREVIOUS < 0)]
+      
+      # select one row per iteration for each person
+      rows <- data[!is.na(SELECT_INDEX),head(.SD,1), by=PERSON_ID]$SELECT_INDEX
+      data[,SELECT_INDEX:=NULL]
+      
+      print(paste0("After iteration combinationWindow: ", nrow(data)))
+    }
+    
+    # add drug_seq
+    data[, DRUG_SEQ:=seq_len(.N), by= .(PERSON_ID)]
+  
+    # -- firstTreatment
+    if (firstTreatment == TRUE) {
+      data <- data[, head(.SD,1), by=.(PERSON_ID, DRUG_CONCEPT_ID)]
+    }
    
-    # Run analysis
-    conn <- DatabaseConnector::connect(connectionDetails)
-    DatabaseConnector::executeSql(conn,SqlRender::readSql(studyFile))
-    
+    # Add labels
+    # cohortIds$cohortName <- paste("'", cohortIds$cohortName, "'")
+    data <- merge(data, cohortIds, by.x = "DRUG_CONCEPT_ID", by.y = "cohortId")
+  
     # Get results
     extractAndWriteToFile(conn, tableName = "summary", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = "postgresql")
     extractAndWriteToFile(conn, tableName = "person_cnt", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = "postgresql")
@@ -114,9 +239,9 @@ execute <- function(connection = NULL,
    
     # Process results to input in sunburst plot
     transformFile(tableName = "seq_cnt", studyName = studyName, maxPathLength = maxPathLength, minCellCount = minCellCount)
-  
-     
   }
+  
+  
   
   
   if (runIncidencePrevalance) {

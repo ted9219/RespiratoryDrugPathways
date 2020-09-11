@@ -1,21 +1,30 @@
-loadRenderTranslateSql <- function(sqlFilename,
+loadRenderTranslateSql <- function(sql,
+                                   oracleTempSchema = oracleTempSchema,
                                    dbms = "postgresql",
-                                   ...,
-                                   cdm_version = cdmVersion,
-                                   oracleTempSchema,
-                                   warnOnMissingParameters = TRUE) {
-  pathToSql <- paste("inst/SQL/", sqlFilename, sep ="")
+                                   # cdm_version = cdmVersion,
+                                   warnOnMissingParameters = TRUE,
+                                   output = FALSE,
+                                   outputFile,
+                                   ...) {
+  if (grepl('.sql', sql)) {
+    pathToSql <- paste("inst/SQL/", sql, sep ="")
+    parameterizedSql <- readChar(pathToSql, file.info(pathToSql)$size)[1]
+  } else {
+    parameterizedSql <- sql
+  }
   
-  parameterizedSql <- readChar(pathToSql, file.info(pathToSql)$size)
-  
-  renderedSql <- render(sql = parameterizedSql[1], warnOnMissingParameters = warnOnMissingParameters, ...)
-  
+  renderedSql <- render(sql = parameterizedSql, warnOnMissingParameters = warnOnMissingParameters, ...)
   renderedSql <- translate(sql = renderedSql, targetDialect = dbms, oracleTempSchema = oracleTempSchema)
+  
+  if (output == TRUE) {
+    SqlRender::writeSql(renderedSql,outputFile)
+    writeLines(paste("Created file '",outputFile,"'",sep=""))
+  }
   
   return(renderedSql)
 }
 
-
+## TODO<: REMOVE THIS FUNCTION!!
 renderStudySpecificSql <- function(minCellCount, cdmDatabaseSchema, cohortDatabaseSchema, targetCohortId, outcomeCohortIds, cohortTable, labels, dbms = "postgresql", studyName, minEraDuration,combinationWindow, eraCollapseSize, firstTreatment){
   inputFile <- "inst/SQL/ConstructTxPaths.sql"
   outputFile <- paste("output/TxPath_autoTranslate_", dbms,".sql",sep="")
