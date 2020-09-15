@@ -56,10 +56,10 @@ debugSqlFile <- "resp_drug_study.dsql"
 cohortTable <- "resp_drug_study_cohorts"
 
 runCreateCohorts <- FALSE
-runCohortCharacterization <- FALSE
+runCohortCharacterization <- TRUE
 runCheckCohorts <- FALSE
 addIndex <- TRUE  # Use this for PostgreSQL and other dialects that support creating indices
-runSunburstPlot <- TRUE
+runSunburstPlot <- FALSE
 runIncidencePrevalance <- FALSE
 runTreatmentPathways <- FALSE
 debug <- FALSE # Use this when you'd like to emit the SQL for debugging 
