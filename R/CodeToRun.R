@@ -8,6 +8,8 @@ library(scales)
 library(gridExtra)
 library(data.table)
 library(stringr)
+library(glue)
+library(DatabaseConnector)
 
 source('~/RespiratoryDrugStudies/R/TreatmentPathway.R', echo=TRUE)
 source('~/RespiratoryDrugStudies/R/CreateCohort.R', echo=TRUE)
@@ -56,14 +58,16 @@ debugSqlFile <- "resp_drug_study.dsql"
 cohortTable <- "resp_drug_study_cohorts"
 
 runCreateCohorts <- FALSE
-runCohortCharacterization <- TRUE
+runCohortCharacterization <- FALSE
 runCheckCohorts <- FALSE
-addIndex <- TRUE  # Use this for PostgreSQL and other dialects that support creating indices
-runSunburstPlot <- FALSE
+addIndex <- TRUE  # TODO: add and use this for PostgreSQL and other dialects that support creating indices
+runSunburstPlot <- TRUE
 runIncidencePrevalance <- FALSE
 runTreatmentPathways <- FALSE
 debug <- FALSE # Use this when you'd like to emit the SQL for debugging 
 exportResults <- FALSE
+
+study_settings <- data.frame(readr::read_csv("inst/Settings/study_settings.csv", col_types = readr::cols()))
 
 # ------------------------------------------------------------------------ 
 # Run the study
@@ -97,7 +101,8 @@ for (sourceId in 1:length(cdmDatabaseSchemaList)) {
     runTreatmentPathways = runTreatmentPathways,
     debug = debug,
     exportResults = exportResults,
-    debugSqlFile = debugSqlFile
+    debugSqlFile = debugSqlFile,
+    study_settings = study_settings
   )
   }
 

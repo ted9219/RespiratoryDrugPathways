@@ -13,7 +13,7 @@ createCohorts <- function(createCohortTable = TRUE,
   # Load cohorts to create
   pathToCsv <- "inst/settings/cohorts_to_create.csv"
   cohortsToCreate <- readr::read_csv(pathToCsv, col_types = readr::cols())
-  # cohortsToCreate <- cohortsToCreate[cohortsToCreate$cohortId %in% c(1,3,6),]
+  # cohortsToCreate <- cohortsToCreate[cohortsToCreate$cohortId %in% c(34, 35, 36, 37),]
   write.csv(cohortsToCreate, file.path(outputFolder, "cohort.csv"), row.names = FALSE)
   
   # Create study cohort table structure
@@ -36,11 +36,10 @@ createCohorts <- function(createCohortTable = TRUE,
     
   }
   
-  # Loade custom definitions
-  sql <- loadRenderTranslateSql(sql = "GetDrugClasses.sql",
+  # Load custom definitions
+  sql <- loadRenderTranslateSql(sql = "SELECT * FROM @cohort_database_schema.drug_classes",
                                 oracleTempSchema = oracleTempSchema,
-                                cohort_database_schema = cohortDatabaseSchema
-  )
+                                cohort_database_schema = cohortDatabaseSchema)
   custom_definitions <- DatabaseConnector::querySql(connection, sql, snakeCaseToCamelCase = TRUE)
   
   # TODO: add check if concept set "closed" with } -> complete
