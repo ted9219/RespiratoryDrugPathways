@@ -1,0 +1,10 @@
+param,analysis1,analysis2
+studyName,txpath1,txpath2
+targetCohortId,1,1
+outcomeCohortIds,"5,6,12,13,16,17,21,24,25,30,32,34,35,36,37","5,6,12,13,16,17,21,24,25,30,32,34,35,36,37"
+minEraDuration,0,0
+eraCollapseSize,30,30
+combinationWindow,30,30
+firstTreatment,TRUE,FALSE
+maxPathLength,3,3
+minCellCount,5,5
