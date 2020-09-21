@@ -34,7 +34,7 @@ extractAndWriteToFile <- function(connection, tableName, cdmSchema, resultsSchem
   writeLines(paste("Created file '",outputFile,"'",sep=""))
 }
 
-transformFile <- function(tableName,studyName, maxPathLength, minCellCount) {
+transformFile <- function(tableName,studyName, maxPathLength, minCellCount, addNoPaths) {
   
   inputFile <- paste("output/",studyName, "/", studyName,"_",tableName,".csv",sep='') 
   outputFile <- paste("output/",studyName, "/", studyName,"_transformed_",tableName,".csv",sep='') 
@@ -45,14 +45,26 @@ transformFile <- function(tableName,studyName, maxPathLength, minCellCount) {
   file_noyear <- file[,.(freq=sum(NUM_PERSONS)), by=group]
   
   # todo: not remove minCellCount but aggregate pathway to other path
+  writeLines(paste("Remove ", sum(file_noyear$freq < minCellCount), " paths with too low frequency"))
   file_noyear <- file_noyear[freq >= minCellCount,]
-  
+
   transformed_file <- apply(file_noyear[,..group],1, paste, collapse = "-")
   transformed_file <- str_replace_all(transformed_file, "-NA", "")
   transformed_file <- paste0(transformed_file, "-End")
-  transformed_file <- data.frame(path=transformed_file, freq=file_noyear$freq)
+  transformed_file <- data.frame(path=transformed_file, freq=file_noyear$freq, stringsAsFactors = FALSE)
+  
+  summary_counts <- read.csv(paste("output/",studyName, "/", studyName,"_summary.csv",sep=''), stringsAsFactors = FALSE)
+  summary_counts <- rbind(summary_counts, c(4,   'Number of pathways final (after minCellCount)', sum(transformed_file$freq)  ))
+  write.table(summary_counts,file=paste("output/",studyName, "/", studyName,"_summary.csv",sep=''), sep = ",", row.names = FALSE, col.names = TRUE)
+  
+  if (addNoPaths) {
+    noPath <- as.integer(summary_counts[summary_counts$COUNT_TYPE == "Number of persons in target cohort", "NUM_PERSONS"]) - sum(transformed_file$freq)
+    transformed_file <- rbind(transformed_file, c("End", noPath))
+  }
   
   # The order of the resulting file is important for functioning and good interpretation
+  transformed_file$path <- as.factor(transformed_file$path)
+  transformed_file$freq <- as.integer(transformed_file$freq)
   write.table(transformed_file[order(-transformed_file$freq, transformed_file$path),],file=outputFile, sep = ",", row.names = FALSE, col.names = FALSE)
   writeLines(paste("Created file '",outputFile,"'",sep=""))
    

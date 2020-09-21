@@ -258,6 +258,12 @@ SELECT
   count(DISTINCT person_id)            AS num_persons
 FROM @studyName_targetcohort;
 
+INSERT INTO @resultsSchema.dbo.@studyName_summary (count_type, num_persons)
+SELECT
+  'Number of pathways preliminary' AS count_type,
+  sum(num_persons)            AS num_persons
+FROM @studyName_drug_seq_summary;
+
 -- Count total persons with a treatment, by year
 IF OBJECT_ID('@studyName_person_cnt', 'U') IS NOT NULL
 DROP TABLE @studyName_person_cnt;
