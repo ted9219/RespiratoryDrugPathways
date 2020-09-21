@@ -85,41 +85,20 @@ createCohorts <- function(createCohortTable = TRUE,
     } else {
       warning("Cohort definition not implemented, specify ATLAS or Custom")
     }
-    
-    
-    # Index cohort table if specified
-    # if (addIndex) {
-    #   indexCohortTable(connection = connection,
-    #                    cohortDatabaseSchema = cohortDatabaseSchema,
-    #                    cohortTable = cohortTable,
-    #                    oracleTempSchema = oracleTempSchema)
-    # }
-    
-    # Check number of subjects per cohort
-    # ParallelLogger::logInfo("Counting cohorts")
-    # sql <- loadRenderTranslateSql(sql = "get_counts.sql",
-    #                               oracleTempSchema = oracleTempSchema,
-    #                               cdm_database_schema = cdmDatabaseSchema,
-    #                               work_database_schema = cohortDatabaseSchema,
-    #                               study_cohort_table = cohortTable)
-    # counts <- DatabaseConnector::querySql(connection, sql)
-    # colnames(counts) <- SqlRender::snakeCaseToCamelCase(colnames(counts))
-    # counts <- addCohortNames(counts)
-    # write.csv(counts, file.path(outputFolder, "cohort_counts.csv"), row.names = FALSE)
 
   }
-  DatabaseConnector::disconnect(connection)
-}
-
-indexCohortTable <- function(connection,
-                             cohortDatabaseSchema,
-                             cohortTable,
-                             oracleTempSchema) {
-  writeLines(paste("Indexing cohort table:", paste(cohortDatabaseSchema, cohortTable, sep=".")))
-  sql <- loadRenderTranslateSql(sql = "create_cohort_table_index.sql",
+  
+  # TODO: test this
+  # Check number of subjects per cohort
+  ParallelLogger::logInfo("Counting cohorts")
+  sql <- loadRenderTranslateSql(sql = "CohortCounts.sql",
                                 oracleTempSchema = oracleTempSchema,
-                                cohort_database_schema = cohortDatabaseSchema,
+                                resultsSchema=cohortDatabaseSchema,
                                 cohort_table = cohortTable)
-  DatabaseConnector::executeSql(connection, sql)
+  counts <- DatabaseConnector::querySql(connection, sql)
+  colnames(counts) <- SqlRender::snakeCaseToCamelCase(colnames(counts))
+  write.csv(counts, file.path(outputFolder, "cohort_counts.csv"), row.names = FALSE)
+  
+  DatabaseConnector::disconnect(connection)
 }
 

@@ -1,6 +1,5 @@
 USE @resultsSchema;
 
-
 DROP TABLE IF EXISTS @studyName_targetcohort;
 DROP TABLE IF EXISTS @studyName_characterization;
 
@@ -21,7 +20,6 @@ SELECT
   c.cohort_end_date -- cohort_end_date is equal to cohort_end_date
 FROM @cohortTable C
 WHERE C.cohort_definition_id = @targetCohortId;
-
 
 -- Do characterization
 CREATE TABLE @studyName_characterization AS

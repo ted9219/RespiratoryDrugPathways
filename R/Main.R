@@ -11,11 +11,8 @@ execute <- function(connection = NULL,
                     runCreateCohorts = TRUE,
                     runCohortCharacterization = FALSE,
                     runCheckCohorts = TRUE,
-                    runSunburstPlot,
-                    runIncidencePrevalance = FALSE,
                     runTreatmentPathways = FALSE,
                     exportResults = TRUE,
-                    addIndex = FALSE,
                     selfManageTempTables = TRUE,
                     vocabularyDatabaseSchema = cdmDatabaseSchema,
                     cdmDrugExposureSchema = cdmDatabaseSchema,
@@ -53,7 +50,6 @@ execute <- function(connection = NULL,
                   cohortDatabaseSchema = cohortDatabaseSchema,
                   vocabularyDatabaseSchema = vocabularyDatabaseSchema,
                   cohortTable = cohortTable,
-                  # addIndex = addIndex,
                   oracleTempSchema = oracleTempSchema,
                   outputFolder = outputFolder)
   }
@@ -84,11 +80,13 @@ execute <- function(connection = NULL,
                                     tableName="characterization")
       descriptive_stats <- DatabaseConnector::querySql(connection, sql)
       
-      outputFile <- paste("output/",studyName,"_characterization.csv",sep='') 
+      if (!file.exists(paste0(outputFolder, "/", studyName)))
+        dir.create(paste0(outputFolder, "/",studyName), recursive = TRUE)
+      
+      outputFile <- paste("output/",studyName,"/", studyName, "_characterization.csv",sep='') 
       write.table(descriptive_stats,file=outputFile, sep = ",", row.names = TRUE, col.names = TRUE)
       
       # todo: add more covariates
-      
       
     }
     
@@ -101,27 +99,30 @@ execute <- function(connection = NULL,
     # Validate cohorts with concept information (description + dose form etc.)
   }
   
-  if (runSunburstPlot) {
-    
+  if (runTreatmentPathways) {
     # for all different study settings
     settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
     
     for (s in settings) {
       studyName <- study_settings[study_settings$param == "studyName",s]
       
+      if (!file.exists(paste0(outputFolder, "/", studyName)))
+        dir.create(paste0(outputFolder, "/",studyName), recursive = TRUE)
+      
       # Select cohorts included
       targetCohortId <- study_settings[study_settings$param == "targetCohortId",s]
       outcomeCohortIds <- study_settings[study_settings$param == "outcomeCohortIds",s]
       
       # Analyis settings
-      minEraDuration <-  study_settings[study_settings$param == "minEraDuration",s]
-      eraCollapseSize <-  study_settings[study_settings$param == "eraCollapseSize",s]
-      combinationWindow <-  study_settings[study_settings$param == "combinationWindow",s]
-      firstTreatment <-  study_settings[study_settings$param == "firstTreatment",s] # Select to only include first encounter of each outcome cohort
+      minEraDuration <-  as.integer(study_settings[study_settings$param == "minEraDuration",s])
+      eraCollapseSize <-  as.integer(study_settings[study_settings$param == "eraCollapseSize",s])
+      combinationWindow <-  as.integer(study_settings[study_settings$param == "combinationWindow",s])
+      sequentialRepetition <-  study_settings[study_settings$param == "sequentialRepetition",s] # Select to only remove double sequential occurences of each outcome cohort
+      firstTreatment <-  study_settings[study_settings$param == "firstTreatment",s] # Select to only include first occurrence of each outcome cohort
       
       # Result settings
-      maxPathLength <-  study_settings[study_settings$param == "maxPathLength",s] # Maximum number of treatment layers
-      minCellCount <-  study_settings[study_settings$param == "minCellCount",s] # Minimum number of people in treatment path
+      maxPathLength <-  as.integer(study_settings[study_settings$param == "maxPathLength",s]) # Maximum number of treatment layers
+      minCellCount <-  as.integer(study_settings[study_settings$param == "minCellCount",s]) # Minimum number of people in treatment path
       
       # Load cohorts and pre-processing in SQL
       sql <- loadRenderTranslateSql(sql = "CreateTreatmentSequence.sql",
@@ -142,143 +143,13 @@ execute <- function(connection = NULL,
       
       # Apply analysis settings
       data <- as.data.table(all_data)
-      print(paste0("Original: ", nrow(data)))
+      writeLines(paste0("Original: ", nrow(data)))
       
-      # -- minEraDuration
-      # filter out rows with duration_era < minEraDuration
-      data <- data[DURATION_ERA >= minEraDuration,]
-      print(paste0("After minEraDuration: ", nrow(data)))
-      
-      # -- eraCollapseSize
-      # order data by person_id, drug_concept_id, drug_start_date, drug_end_date
-      data <- data[order(PERSON_ID, DRUG_CONCEPT_ID,DRUG_START_DATE, DRUG_END_DATE),]
-      
-      # find all rows with gap_same < eraCollapseSize
-      rows <- which(data$GAP_SAME < eraCollapseSize)
-      
-      # for all rows, modify the row preceding, loop backwards in case more than one collapse
-      for (r in rev(rows)) {
-        data[r - 1,"DRUG_END_DATE"] <- data[r,DRUG_END_DATE]
-      }
-      
-      # remove all rows with  gap_same < eraCollapseSize
-      data <- data[!rows,]
-      data[,GAP_SAME:=NULL]
-      print(paste0("After eraCollapseSize: ", nrow(data)))
-      
-      # re-calculate duration_era
-      data[,DURATION_ERA:=difftime(DRUG_END_DATE , DRUG_START_DATE, units = "days")]
-      
-      # -- combinationWindow
-      data$DRUG_CONCEPT_ID <- as.character(data$DRUG_CONCEPT_ID)
-      
-      # order data by person_id, drug_start_date, drug_end_date
-      data <- data[order(PERSON_ID, DRUG_START_DATE, DRUG_END_DATE),]
-      
-      # calculate gap with previous treatment
-      data[,GAP_PREVIOUS:=difftime(DRUG_START_DATE, shift(DRUG_END_DATE, type = "lag"), units = "days"), by = PERSON_ID]
-      data$GAP_PREVIOUS <- as.integer(data$GAP_PREVIOUS)
-      
-      # find all rows with gap_previous < 0
-      data[data$GAP_PREVIOUS < 0, SELECT_INDEX:=which(data$GAP_PREVIOUS < 0)]
-      
-      # select one row per iteration for each person
-      rows <- data[!is.na(SELECT_INDEX),head(.SD,1), by=PERSON_ID]$SELECT_INDEX
-      data[,SELECT_INDEX:=NULL]
-      
-      # while rows exist:
-      while(!(length(rows)==0)) {
-        print(length(rows))
-        
-        for (r in rows) {
-          # switch
-          if (-data$GAP_PREVIOUS[r] < combinationWindow) {
-            data[r - 1,"DRUG_END_DATE"] <- data[r,DRUG_START_DATE]
-          }
-          
-          # combination
-          else if (-data$GAP_PREVIOUS[r] >= combinationWindow) {
-            if (data[r - 1, DRUG_END_DATE] <= data[r, DRUG_END_DATE]) {
-              # add combination as new row
-              new_row <- data[r,]
-              new_row[, "DRUG_END_DATE"]  <- data[r - 1, DRUG_END_DATE]
-              new_row[, "DRUG_CONCEPT_ID"] <- paste0(data[r - 1, "DRUG_CONCEPT_ID"], "+", data[r, "DRUG_CONCEPT_ID"])
-              
-              data <- rbindlist(list(data, new_row))
-              
-              # adjust current rows
-              temp <- data[r-1,DRUG_END_DATE]
-              data[r - 1,"DRUG_END_DATE"] <- data[r,DRUG_START_DATE]
-              data[r,"DRUG_START_DATE"] <- temp
-            }
-            
-            else if (data[r - 1, DRUG_END_DATE] > data[r, DRUG_END_DATE]) {
-              # adjust row for combination
-              data[r,"DRUG_CONCEPT_ID"] <- paste0(data[r - 1, "DRUG_CONCEPT_ID"], "+", data[r, "DRUG_CONCEPT_ID"])
-              
-              
-              # split row in two by adding new row 
-              data[r - 1,"DRUG_END_DATE"] <- data[r,DRUG_START_DATE]
-              
-              new_row <- data[r - 1,]
-              new_row[, "DRUG_START_DATE"]  <- data[r, DRUG_END_DATE]
-              
-              data <- rbindlist(list(data, new_row))
-            }
-          }
-        }
-        
-        # re-calculate duration_era
-        data[,DURATION_ERA:=difftime(DRUG_END_DATE, DRUG_START_DATE, units = "days")]
-        
-        # -- minEraDuration
-        # filter out rows with duration_era < minEraDuration
-        data <- data[DURATION_ERA >= minEraDuration,]
-        
-        # order data by person_id, drug_start_date, drug_end_date
-        data <- data[order(PERSON_ID, DRUG_START_DATE, DRUG_END_DATE),]
-        
-        # calculate gap with previous treatment
-        data[,GAP_PREVIOUS:=difftime(DRUG_START_DATE, shift(DRUG_END_DATE, type = "lag"), units = "days"), by = PERSON_ID]
-        data$GAP_PREVIOUS <- as.integer(data$GAP_PREVIOUS)
-        
-        # find all rows with gap_previous < 0
-        data[data$GAP_PREVIOUS < 0, SELECT_INDEX:=which(data$GAP_PREVIOUS < 0)]
-        
-        # select one row per iteration for each person
-        rows <- data[!is.na(SELECT_INDEX),head(.SD,1), by=PERSON_ID]$SELECT_INDEX
-        data[,SELECT_INDEX:=NULL]
-        
-        print(paste0("After iteration combinationWindow: ", nrow(data)))
-      }
-      
-      data[,GAP_PREVIOUS:=NULL]
-      
-      # collapse same sequential treatments
-      # order data by person_id, drug_concept_id, drug_start_date, drug_end_date
-      data <- data[order(PERSON_ID, DRUG_CONCEPT_ID, DRUG_START_DATE, DRUG_END_DATE),]
-      data[,ID_PREVIOUS:=shift(DRUG_CONCEPT_ID, type = "lag"), by = PERSON_ID]
-      
-      # find all rows with gap_same < eraCollapseSize
-      rows <- which(data$DRUG_CONCEPT_ID == data$ID_PREVIOUS)
-      
-      # for all rows, modify the row preceding, loop backwards in case more than one collapse
-      for (r in rev(rows)) {
-        data[r - 1,"DRUG_END_DATE"] <- data[r,DRUG_END_DATE]
-      }
-      
-      # remove all rows with same sequential treatments
-      data <- data[!rows,]
-      print(paste0("After collapseSameSequential: ", nrow(data)))
-      
-      # TODO: differentiate between time on and off drug when collapsing?
-      # re-calculate duration_era
-      data[,DURATION_ERA:=difftime(DRUG_END_DATE, DRUG_START_DATE, units = "days")]
-      
-      # -- firstTreatment
-      if (firstTreatment == TRUE) {
-        data <- data[, head(.SD,1), by=.(PERSON_ID, DRUG_CONCEPT_ID)]
-      }
+      data <- doEraDuration(data, minEraDuration)
+      data <- doEraCollapse(data, eraCollapseSize)
+      data <- doCombinationWindow(data, combinationWindow, minEraDuration)
+      if (sequentialRepetition) {data <- doSequentialRepetition(data)}
+      if (firstTreatment) {data <- doFirstTreatment(data)}
       
       # add drug_seq
       data[, DRUG_SEQ:=seq_len(.N), by= .(PERSON_ID)]
@@ -288,19 +159,7 @@ execute <- function(connection = NULL,
       data$DRUG_CONCEPT_ID <- sapply(concept_ids, function(x) paste(sort(x), collapse = "+"))
       
       # add concept_name
-      cohortIds <- readr::read_csv("output/cohort.csv", col_types = readr::cols())
-      labels <- data.frame(DRUG_CONCEPT_ID = as.character(cohortIds$cohortId), CONCEPT_NAME = trim(str_replace(cohortIds$cohortName, c("mono ", "combi ", "all "), "")), stringsAsFactors = FALSE)
-      data <- merge(data, labels, all.x = TRUE)
-      
-      data$CONCEPT_NAME[is.na(data$CONCEPT_NAME)] <- sapply(data$DRUG_CONCEPT_ID[is.na(data$CONCEPT_NAME)], function(x) {
-        # revert search to look for longest concept_ids first
-        for (l in nrow(labels):1)
-        {
-          x <- gsub(labels$DRUG_CONCEPT_ID[l], labels$CONCEPT_NAME[l], x)
-        }
-        
-        return(x)
-      })
+      data <- addLabels(data)
       
       # Move table back to SQL
       DatabaseConnector::insertTable(connection = connection,
@@ -311,7 +170,6 @@ execute <- function(connection = NULL,
                                      tempTable = FALSE)
       
       # Load cohorts and pre-processing in SQL
-      # TODO: debug (switch integer to character)
       sql <- loadRenderTranslateSql(sql = "SummarizeTreatmentSequence.sql",
                                     oracleTempSchema = oracleTempSchema,
                                     resultsSchema=cohortDatabaseSchema,
@@ -332,58 +190,6 @@ execute <- function(connection = NULL,
       transformFile(tableName = "drug_seq_summary", studyName = studyName, maxPathLength = maxPathLength, minCellCount = minCellCount)
       
     }
-  }
-  
-  if (runIncidencePrevalance) {
-    
-    # # TODO: change this code
-    # ParallelLogger::logInfo("Creating All Tables")
-    # createAllTables(connection = connection,
-    #                 connectionDetails = connectionDetails,
-    #                 cdmDatabaseSchema = cdmDatabaseSchema,
-    #                 cohortDatabaseSchema = cohortDatabaseSchema,
-    #                 oracleTempSchema = oracleTempSchema,
-    #                 debug = debug,
-    #                 outputFolder = outputFolder,
-    #                 debugSqlFile = debugSqlFile, 
-    #                 minCellCount = minCellCount,
-    #                 databaseId,
-    #                 databaseName)
-    # 
-    # ParallelLogger::logInfo("Gathering prevalence proportion")
-    # getProportion <- function(row, proportionType) {
-    #   data <- getProportionByType(connection = connection,
-    #                               connectionDetails = connectionDetails,
-    #                               cdmDatabaseSchema = cdmDatabaseSchema,
-    #                               cohortDatabaseSchema = cohortDatabaseSchema,
-    #                               proportionType = proportionType,
-    #                               ingredient = row$cohortId)
-    #   if (nrow(data) > 0) {
-    #     data$cohortId <- row$cohortId
-    #   }
-    #   return(data)
-    # }
-    # prevalenceData <- lapply(split(cohortsOfInterest, cohortsOfInterest$cohortId), getProportion, proportionType = "prevalence")
-    # prevalenceData <- do.call(rbind, prevalenceData)
-    # if (nrow(prevalenceData) > 0) {
-    #   prevalenceData$databaseId <- databaseId
-    #   prevalenceData <- enforceMinCellValue(prevalenceData, "cohortCount", minCellCount)
-    #   prevalenceData <- enforceMinCellValue(prevalenceData, "proportion", minCellCount/prevalenceData$numPersons)
-    # }
-    # write.csv(prevalenceData, file.path(outputFolder, "prevalence_proportion.csv"))
-    # 
-    # # Incidence
-    # ParallelLogger::logInfo("Gathering incidence proportion")
-    # incidenceData <- lapply(split(cohortsOfInterest, cohortsOfInterest$cohortId), getProportion, proportionType = "incidence")
-    # incidenceData <- do.call(rbind, incidenceData)
-    # if (nrow(incidenceData) > 0) {
-    #   incidenceData$databaseId <- databaseId
-    #   incidenceData <- enforceMinCellValue(incidenceData, "cohortCount", minCellCount)
-    #   incidenceData <- enforceMinCellValue(incidenceData, "proportion", minCellCount/incidenceData$numPersons)
-    # }
-    # write.csv(incidenceData, file.path(outputFolder, "incidence_proportion.csv"))
-    # 
-    
   }
   
   if (exportResults) {

@@ -121,7 +121,7 @@ JOIN
     JOIN 
     (
       --cteEndDates
-      select PERSON_ID, DATEADD(day,-1 * 30,EVENT_DATE) as END_DATE -- unpad the end date by 30
+      select PERSON_ID, DATEADD(day,-1 * 30,EVENT_DATE) as END_DATE -- unpad the end date by 30 -- param ATLAS: persistence window
       FROM
       (
 				select PERSON_ID, EVENT_DATE, EVENT_TYPE, 
@@ -136,7 +136,7 @@ JOIN
 					UNION ALL
 
 					-- add the end dates with NULL as the row number, padding the end dates by 30 to allow a grace period for overlapping ranges.
-					select PERSON_ID, DATEADD(day,30,DRUG_EXPOSURE_END_DATE), 1 as EVENT_TYPE, NULL
+					select PERSON_ID, DATEADD(day,30,DRUG_EXPOSURE_END_DATE), 1 as EVENT_TYPE, NULL  -- param ATLAS: persistence window
 					FROM #drugTarget D
 				) RAWDATA
       ) E
@@ -181,7 +181,7 @@ with cteEndDates (person_id, end_date) AS -- the magic
 (	
 	SELECT
 		person_id
-		, DATEADD(day,-1 * 30, event_date)  as end_date
+		, DATEADD(day,-1 * 30, event_date)  as end_date -- param ATLAS: era collapse gap size
 	FROM
 	(
 		SELECT
@@ -204,7 +204,7 @@ with cteEndDates (person_id, end_date) AS -- the magic
 
 			SELECT
 				person_id
-				, DATEADD(day,30,end_date) as end_date
+				, DATEADD(day,30,end_date) as end_date -- param ATLAS: era collapse gap size
 				, 1 AS event_type
 				, NULL
 			FROM #cohort_rows

@@ -258,7 +258,6 @@ SELECT
   count(DISTINCT person_id)            AS num_persons
 FROM @studyName_targetcohort;
 
-
 -- Count total persons with a treatment, by year
 IF OBJECT_ID('@studyName_person_cnt', 'U') IS NOT NULL
 DROP TABLE @studyName_person_cnt;
@@ -294,6 +293,9 @@ FROM
   ) t1;
 
 -- Count duration
+IF OBJECT_ID('@studyName_duration_cnt', 'U') IS NOT NULL
+DROP TABLE @studyName_duration_cnt;
+
 CREATE TABLE @resultsSchema.@studyName_duration_cnt AS
 select drug_seq, concept_name, avg(CAST(duration_era as int)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from results.txpath_matchcohort) as percent_target
 FROM @resultsSchema.@studyName_drug_seq_processed

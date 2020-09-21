@@ -11,13 +11,9 @@ library(stringr)
 library(glue)
 library(DatabaseConnector)
 
-source('~/RespiratoryDrugStudies/R/TreatmentPathway.R', echo=TRUE)
 source('~/RespiratoryDrugStudies/R/CreateCohort.R', echo=TRUE)
 source('~/RespiratoryDrugStudies/R/Helper.R', echo=TRUE)
 source('~/RespiratoryDrugStudies/R/Main.R', echo=TRUE)
-source('~/RespiratoryDrugStudies/R/PullCohort.R', echo=TRUE)
-source('~/RespiratoryDrugStudies/R/UsagePatternGraph.R', echo=TRUE)
-source('~/RespiratoryDrugStudies/R/CycleIncidencePlot.R', echo=TRUE)
 
 # ------------------------------------------------------------------------
 # Settings and database credentials
@@ -60,10 +56,7 @@ cohortTable <- "resp_drug_study_cohorts"
 runCreateCohorts <- FALSE
 runCohortCharacterization <- FALSE
 runCheckCohorts <- FALSE
-addIndex <- TRUE  # TODO: add and use this for PostgreSQL and other dialects that support creating indices
-runSunburstPlot <- TRUE
-runIncidencePrevalance <- FALSE
-runTreatmentPathways <- FALSE
+runTreatmentPathways <- TRUE
 debug <- FALSE # Use this when you'd like to emit the SQL for debugging 
 exportResults <- FALSE
 
@@ -95,9 +88,6 @@ for (sourceId in 1:length(cdmDatabaseSchemaList)) {
     runCreateCohorts = runCreateCohorts,
     runCohortCharacterization = runCohortCharacterization,
     runCheckCohorts = runCheckCohorts,
-    runSunburstPlot = runSunburstPlot,
-    addIndex = addIndex,
-    runIncidencePrevalance = runIncidencePrevalance,
     runTreatmentPathways = runTreatmentPathways,
     debug = debug,
     exportResults = exportResults,
