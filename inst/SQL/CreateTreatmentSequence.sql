@@ -54,4 +54,5 @@ FROM
    FROM @cohortTable C
          WHERE C.cohort_definition_id IN (@outcomeCohortIds)) de
   INNER JOIN @studyName_targetcohort c1
-ON de.subject_id = c1.person_id;
+ON de.subject_id = c1.person_id
+WHERE c1.index_date <= de.cohort_start_date AND de.cohort_start_date < c1.cohort_end_date; -- exclude events outside target cohort period
