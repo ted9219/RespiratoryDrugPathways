@@ -1,7 +1,10 @@
 USE @resultsSchema;
 
-DROP TABLE IF EXISTS @studyName_targetcohort;
-DROP TABLE IF EXISTS @studyName_characterization;
+IF OBJECT_ID('@studyName_targetcohort', 'U') IS NOT NULL
+DROP TABLE @studyName_targetcohort;
+
+IF OBJECT_ID('@studyName_characterization', 'U') IS NOT NULL
+DROP TABLE @studyName_characterization;
 
 -- Load target population into targetcohort table
 CREATE TABLE @studyName_targetcohort

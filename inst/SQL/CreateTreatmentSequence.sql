@@ -1,7 +1,10 @@
 USE @resultsSchema;
 
-DROP TABLE IF EXISTS @studyName_targetcohort;
-DROP TABLE IF EXISTS @studyName_drug_seq;
+IF OBJECT_ID('@studyName_targetcohort', 'U') IS NOT NULL
+DROP TABLE @studyName_targetcohort;
+
+IF OBJECT_ID('@studyName_drug_seq', 'U') IS NOT NULL
+DROP TABLE @studyName_drug_seq;
 
 -- Load target population into targetcohort table
 CREATE TABLE @studyName_targetcohort
@@ -40,10 +43,6 @@ SELECT
   de.cohort_definition_id,
   de.cohort_start_date,
   de.cohort_end_date,
- -- row_number()
- -- OVER (
- --   PARTITION BY de.subject_id
-  --  ORDER BY de.cohort_start_date, de.cohort_end_date )                                 AS drug_seq,
   date_part('day', de.cohort_end_date :: TIMESTAMP - de.cohort_start_date :: TIMESTAMP) AS duration_era,
   date_part('day', de.cohort_start_date :: TIMESTAMP - (lag(de.cohort_end_date)
   OVER (

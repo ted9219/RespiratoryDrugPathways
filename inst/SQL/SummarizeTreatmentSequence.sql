@@ -1,6 +1,7 @@
 USE @resultsSchema;
 
-DROP TABLE IF EXISTS @studyName_drug_seq_summary;
+IF OBJECT_ID('@studyName_drug_seq_summary', 'U') IS NOT NULL
+	DROP TABLE @studyName_drug_seq_summary;
 
 -- Summarize the unique treatment sequences observed
 CREATE TABLE @studyName_drug_seq_summary
