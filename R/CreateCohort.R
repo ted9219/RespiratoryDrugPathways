@@ -87,6 +87,6 @@ createCohorts <- function(createCohortTable = TRUE,
   colnames(counts) <- SqlRender::snakeCaseToCamelCase(colnames(counts))
   write.csv(counts, file.path(outputFolder, "cohort_counts.csv"), row.names = FALSE)
 
-  DatabaseConnector::disconnect(connection)
+  # DatabaseConnector::disconnect(connection)
 }
 
