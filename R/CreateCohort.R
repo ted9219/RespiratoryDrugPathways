@@ -26,23 +26,9 @@ createCohorts <- function(createCohortTable = TRUE,
     DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
   }
   
-  # In case of custom definitions: create concept sets
-  if (createCustomCohorts) {
-    ParallelLogger::logInfo("Creating concept sets for the custom cohorts")
-    sql <- loadRenderTranslateSql(sql = "CreateDrugClassesSkratch.sql",
-                                  oracleTempSchema = oracleTempSchema,
-                                  cohort_database_schema = cohortDatabaseSchema)
-    DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
-    
-  }
-  
-  # Load custom definitions
-  sql <- loadRenderTranslateSql(sql = "SELECT * FROM @cohort_database_schema.drug_classes",
-                                oracleTempSchema = oracleTempSchema,
-                                cohort_database_schema = cohortDatabaseSchema)
-  custom_definitions <- DatabaseConnector::querySql(connection, sql, snakeCaseToCamelCase = TRUE)
-  
-  # TODO: add check if concept set "closed" with } -> complete
+  # In case of custom definitions: load custom definitions
+  pathToCsv <- "inst/settings/drug_classes.csv"
+  custom_definitions <- readr::read_csv(pathToCsv, col_types = readr::cols())
   
   # Instantiate cohorts
   ParallelLogger::logInfo("Insert cohort of interest into the cohort table")
