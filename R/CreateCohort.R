@@ -6,20 +6,19 @@ createCohorts <- function(createCohortTable = TRUE,
                          cohortDatabaseSchema,
                          vocabularyDatabaseSchema = cdmDatabaseSchema,
                          cohortTable,
-                         outputFolder,
-                         createCustomCohorts = FALSE
-){
+                         outputFolder){
   
   # Load cohorts to create
   pathToCsv <- "inst/settings/cohorts_to_create.csv"
   cohortsToCreate <- readr::read_csv(pathToCsv, col_types = readr::cols())
-  # cohortsToCreate <- cohortsToCreate[cohortsToCreate$cohortId %in% c(34, 35, 36, 37),]
+  cohortsToCreate <- cohortsToCreate[cohortsToCreate$cohortId %in% c(1, 11, 12),]
   write.csv(cohortsToCreate, file.path(outputFolder, "cohort.csv"), row.names = FALSE)
   
   # Create study cohort table structure
   if(createCohortTable){
     ParallelLogger::logInfo("Creating table for the cohorts")
     sql <- loadRenderTranslateSql(sql = "CreateCohortTable.sql",
+                                  dbms = connectionDetails$dbms,
                                   oracleTempSchema = oracleTempSchema,
                                   cohort_database_schema = cohortDatabaseSchema,
                                   cohort_table = cohortTable)
@@ -38,6 +37,7 @@ createCohorts <- function(createCohortTable = TRUE,
     
     if (cohortsToCreate$cohortDefinition[i] == "ATLAS") {
       sql <- loadRenderTranslateSql(sql = paste0(cohortsToCreate$cohortName[i], ".sql"),
+                                    dbms = connectionDetails$dbms,
                                     oracleTempSchema = oracleTempSchema,
                                     cdm_database_schema = cdmDatabaseSchema,
                                     vocabulary_database_schema = vocabularyDatabaseSchema,
@@ -59,6 +59,7 @@ createCohorts <- function(createCohortTable = TRUE,
 
       # Insert concept set in SQL template to create cohort
       sql <- loadRenderTranslateSql(sql = "CohortTemplate.sql",
+                                    dbms = connectionDetails$dbms,
                                     oracleTempSchema = oracleTempSchema,
                                     cdm_database_schema = cdmDatabaseSchema,
                                     vocabulary_database_schema = vocabularyDatabaseSchema,
@@ -78,6 +79,7 @@ createCohorts <- function(createCohortTable = TRUE,
   # Check number of subjects per cohort
   ParallelLogger::logInfo("Counting cohorts")
   sql <- loadRenderTranslateSql(sql = "CohortCounts.sql",
+                                dbms = connectionDetails$dbms,
                                 oracleTempSchema = oracleTempSchema,
                                 resultsSchema=cohortDatabaseSchema,
                                 cohort_table = cohortTable)

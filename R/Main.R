@@ -65,6 +65,7 @@ execute <- function(connection = NULL,
       
       # initial simple characterization
       sql <- loadRenderTranslateSql(sql = "Characterization.sql",
+                                    dbms = connectionDetails$dbms,
                                     oracleTempSchema = oracleTempSchema,
                                     resultsSchema=cohortDatabaseSchema,
                                     cdmDatabaseSchema = cdmDatabaseSchema,
@@ -74,6 +75,7 @@ execute <- function(connection = NULL,
       DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
       
       sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.@studyName_@tableName",
+                                    dbms = connectionDetails$dbms,
                                     oracleTempSchema = oracleTempSchema,
                                     resultsSchema=cohortDatabaseSchema,
                                     studyName=studyName, 
@@ -127,6 +129,7 @@ execute <- function(connection = NULL,
       
       # Load cohorts and pre-processing in SQL
       sql <- loadRenderTranslateSql(sql = "CreateTreatmentSequence.sql",
+                                    dbms = connectionDetails$dbms,
                                     oracleTempSchema = oracleTempSchema,
                                     resultsSchema=cohortDatabaseSchema,
                                     studyName=studyName, 
@@ -136,6 +139,7 @@ execute <- function(connection = NULL,
       DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
       
       sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.dbo.@studyName_@tableName",
+                                    dbms = connectionDetails$dbms,
                                     oracleTempSchema = oracleTempSchema,
                                     resultsSchema=cohortDatabaseSchema,
                                     studyName=studyName, 
@@ -172,6 +176,7 @@ execute <- function(connection = NULL,
       
       # Load cohorts and pre-processing in SQL
       sql <- loadRenderTranslateSql(sql = "SummarizeTreatmentSequence.sql",
+                                    dbms = connectionDetails$dbms,
                                     oracleTempSchema = oracleTempSchema,
                                     resultsSchema=cohortDatabaseSchema,
                                     cdmDatabaseSchema = cdmDatabaseSchema,
@@ -182,10 +187,10 @@ execute <- function(connection = NULL,
       DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
       
       # Get results
-      extractAndWriteToFile(connection, tableName = "summary", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = "postgresql")
-      extractAndWriteToFile(connection, tableName = "person_cnt", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = "postgresql")
-      extractAndWriteToFile(connection, tableName = "drug_seq_summary", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = "postgresql")
-      extractAndWriteToFile(connection, tableName = "duration_cnt", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = "postgresql")
+      extractAndWriteToFile(connection, tableName = "summary", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = connectionDetails$dbms)
+      extractAndWriteToFile(connection, tableName = "person_cnt", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = connectionDetails$dbms)
+      extractAndWriteToFile(connection, tableName = "drug_seq_summary", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = connectionDetails$dbms)
+      extractAndWriteToFile(connection, tableName = "duration_cnt", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = connectionDetails$dbms)
       
       # Process results to input in sunburst plot
       transformFile(tableName = "drug_seq_summary", studyName = studyName, maxPathLength = maxPathLength, minCellCount = minCellCount, addNoPaths = addNoPaths)

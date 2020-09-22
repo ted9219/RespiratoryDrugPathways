@@ -61,6 +61,7 @@ debug <- FALSE # Use this when you'd like to emit the SQL for debugging
 exportResults <- FALSE
 
 study_settings <- data.frame(readr::read_csv("inst/Settings/study_settings.csv", col_types = readr::cols()))
+study_settings <- study_settings[,1:2]
 
 # ------------------------------------------------------------------------ 
 # Run the study
