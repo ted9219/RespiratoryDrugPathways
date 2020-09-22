@@ -1,38 +1,37 @@
 cohortId,cohortName,cohortDefinition,cohortType
 1,Asthma,ATLAS,target
-2,ICS,ATLAS,outcome
-3,LTRA combi,Custom,outcome
-4,Anti IgE all,Custom,outcome
-5,Anti IgE mono,Custom,outcome
-6,Anti IL5 mono,Custom,outcome
-7,Anti IL5 all,Custom,outcome
-8,Systemic B2 agonist combi,Custom,outcome
-9,SAMA combi,Custom,outcome
-10,LAMA combi,Custom,outcome
-11,SABA combi,Custom,outcome
-12,LAMA mono,Custom,outcome
-13,SAMA mono,Custom,outcome
-14,LAMA all,Custom,outcome
-15,SAMA all,Custom,outcome
-16,Systemic B2 agonist mono,Custom,outcome
-17,LABA mono,Custom,outcome
-18,Systemic B2 agonist all,Custom,outcome
-19,ICS combi,Custom,outcome
-20,LABA combi,Custom,outcome
-21,LTRA mono,Custom,outcome
-22,LTRA all,Custom,outcome
-23,Systemic glucocorticosteroids combi,Custom,outcome
-24,xanthines mono,Custom,outcome
-25,SABA mono,Custom,outcome
-26,xanthines combi,Custom,outcome
-27,LABA all,Custom,outcome
-28,SABA all,Custom,outcome
-29,xanthines all,Custom,outcome
-30,ICS mono,Custom,outcome
-31,ICS all,Custom,outcome
-32,Systemic glucocorticosteroids mono,Custom,outcome
-33,Systemic glucocorticosteroids all,Custom,outcome
-34,LABA&ICS,ATLAS,outcome
-35,LABA&LAMA,ATLAS,outcome
-36,LABA&LAMA&ICS,ATLAS,outcome
-37,SABA&SAMA,ATLAS,outcome
+11,LTRA combi,Custom,outcome
+12,Anti IgE all,Custom,outcome
+13,Anti IgE mono,Custom,outcome
+14,Anti IL5 mono,Custom,outcome
+15,Anti IL5 all,Custom,outcome
+16,Systemic B2 agonist combi,Custom,outcome
+17,SAMA combi,Custom,outcome
+18,LAMA combi,Custom,outcome
+19,SABA combi,Custom,outcome
+20,LAMA mono,Custom,outcome
+21,SAMA mono,Custom,outcome
+22,LAMA all,Custom,outcome
+23,SAMA all,Custom,outcome
+24,Systemic B2 agonist mono,Custom,outcome
+25,LABA mono,Custom,outcome
+26,Systemic B2 agonist all,Custom,outcome
+27,ICS combi,Custom,outcome
+28,LABA combi,Custom,outcome
+29,LTRA mono,Custom,outcome
+30,LTRA all,Custom,outcome
+31,Systemic glucocorticosteroids combi,Custom,outcome
+32,xanthines mono,Custom,outcome
+33,SABA mono,Custom,outcome
+34,xanthines combi,Custom,outcome
+35,LABA all,Custom,outcome
+36,SABA all,Custom,outcome
+37,xanthines all,Custom,outcome
+38,ICS mono,Custom,outcome
+39,ICS all,Custom,outcome
+40,Systemic glucocorticosteroids mono,Custom,outcome
+41,Systemic glucocorticosteroids all,Custom,outcome
+42,LABA&ICS,ATLAS,outcome
+43,LABA&LAMA,ATLAS,outcome
+44,LABA&LAMA&ICS,ATLAS,outcome
+45,SABA&SAMA,ATLAS,outcome
