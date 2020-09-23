@@ -1,5 +1,5 @@
 
-# Load packages
+# Load packages (if necessary: install)
 library(SqlRender)
 library(dplyr)
 library(highcharter)
@@ -11,9 +11,12 @@ library(stringr)
 library(glue)
 library(DatabaseConnector)
 
-source('~/RespiratoryDrugStudies/R/CreateCohort.R', echo=TRUE)
-source('~/RespiratoryDrugStudies/R/Helper.R', echo=TRUE)
-source('~/RespiratoryDrugStudies/R/Main.R', echo=TRUE)
+# Change to project folder
+setwd("~/Documents/Git/TreatmentPathways")
+
+source(paste(getwd(), '/R/CreateCohort.R', sep = ""), echo=TRUE)
+source(paste(getwd(), '/R/Helper.R', sep = ""), echo=TRUE)
+source(paste(getwd(), '/R/Main.R', sep = ""), echo=TRUE)
 
 # ------------------------------------------------------------------------
 # Settings and database credentials
@@ -53,8 +56,8 @@ connection <- DatabaseConnector::connect(dbms = dbms,connectionDetails = connect
 debugSqlFile <- "resp_drug_study.dsql"
 cohortTable <- "resp_drug_study_cohorts"
 
-runCreateCohorts <- FALSE
-runCohortCharacterization <- FALSE
+runCreateCohorts <- TRUE
+runCohortCharacterization <- TRUE
 runCheckCohorts <- FALSE
 runTreatmentPathways <- TRUE
 debug <- FALSE # Use this when you'd like to emit the SQL for debugging 
