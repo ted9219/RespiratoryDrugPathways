@@ -11,7 +11,7 @@ createCohorts <- function(createCohortTable = TRUE,
   # Load cohorts to create
   pathToCsv <- "inst/settings/cohorts_to_create.csv"
   cohortsToCreate <- readr::read_csv(pathToCsv, col_types = readr::cols())
-  cohortsToCreate <- cohortsToCreate[cohortsToCreate$cohortId %in% c(1, 11, 12),]
+  # cohortsToCreate <- cohortsToCreate[cohortsToCreate$cohortId %in% c(1, 11, 12),]
   write.csv(cohortsToCreate, file.path(outputFolder, "cohort.csv"), row.names = FALSE)
 
   # Create study cohort table structure
