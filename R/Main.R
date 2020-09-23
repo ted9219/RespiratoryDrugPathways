@@ -170,29 +170,26 @@ execute <- function(connection = NULL,
 
       # Move table back to SQL
       DatabaseConnector::insertTable(connection = connection,
-                                     tableName = paste0(cohortDatabasesChema,".", studyName, "_drug_seq_processed"),
+                                     tableName = paste0(cohortDatabaseSchema,".", studyName, "_drug_seq_processed"),
                                      data = data,
                                      dropTableIfExists = TRUE,
                                      createTable = TRUE,
                                      tempTable = FALSE)
 
-      # Load cohorts and pre-processing in SQL
+      # Post-processing in SQL
       sql <- loadRenderTranslateSql(sql = "SummarizeTreatmentSequence.sql",
                                     dbms = connectionDetails$dbms,
                                     oracleTempSchema = oracleTempSchema,
                                     resultsSchema=cohortDatabaseSchema,
                                     cdmDatabaseSchema = cdmDatabaseSchema,
-                                    studyName=studyName,
-                                    targetCohortId=targetCohortId,
-                                    outcomeCohortIds=outcomeCohortIds,
-                                    cohortTable=cohortTable)
+                                    studyName=studyName)
       DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
 
       # Get results
-      extractAndWriteToFile(connection, tableName = "summary", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = connectionDetails$dbms)
-      extractAndWriteToFile(connection, tableName = "person_cnt", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = connectionDetails$dbms)
-      extractAndWriteToFile(connection, tableName = "drug_seq_summary", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = connectionDetails$dbms)
-      extractAndWriteToFile(connection, tableName = "duration_cnt", cdmSchema = cdmDatabaseSchema , resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = connectionDetails$dbms)
+      extractAndWriteToFile(connection, tableName = "summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = connectionDetails$dbms)
+      extractAndWriteToFile(connection, tableName = "person_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = connectionDetails$dbms)
+      extractAndWriteToFile(connection, tableName = "drug_seq_summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = connectionDetails$dbms)
+      extractAndWriteToFile(connection, tableName = "duration_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = connectionDetails$dbms)
 
       # Process results to input in sunburst plot
       transformFile(tableName = "drug_seq_summary", studyName = studyName, maxPathLength = maxPathLength, minCellCount = minCellCount, addNoPaths = addNoPaths)

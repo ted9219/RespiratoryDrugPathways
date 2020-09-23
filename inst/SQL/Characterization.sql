@@ -34,8 +34,14 @@ AVG_DAYS_IN_COHORT FLOAT(53)
 
 INSERT INTO @resultsSchema.@studyName_characterization
 SELECT gender, count(*) as num_people, avg(age) as avg_age, avg(days_in_cohort) as avg_days_in_cohort
-from (select p.gender_source_value as gender, YEAR(t.cohort_end_date)-p.year_of_birth as age, DATEDIFF(DAY, t.cohort_end_date, t.index_date) AS days_in_cohort
+from (select p.gender_source_value as gender, YEAR(t.cohort_end_date)-p.year_of_birth as age, DATEDIFF(DAY, t.index_date, t.cohort_end_date) AS days_in_cohort
 FROM @resultsSchema.@studyName_targetcohort t
 LEFT JOIN @cdmDatabaseSchema.person p
 ON t.person_id = p.person_id) o
-GROUP BY ROLLUP (gender);
+GROUP BY gender;
+
+INSERT INTO @resultsSchema.@studyName_characterization
+SELECT 'all' as gender, count(*) as num_people, avg(YEAR(t.cohort_end_date)-p.year_of_birth) as avg_age, avg(DATEDIFF(DAY,  t.index_date, t.cohort_end_date)) as avg_days_in_cohort
+FROM @resultsSchema.@studyName_targetcohort t
+LEFT JOIN @cdmDatabaseSchema.person p
+ON t.person_id = p.person_id;

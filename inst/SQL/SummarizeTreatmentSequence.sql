@@ -283,7 +283,7 @@ FROM
     SELECT
       index_year,
       sum(num_persons) AS num_persons
-    FROM @studyName_drug_seq_summary
+    FROM @resultsSchema.@studyName_drug_seq_summary
     GROUP BY index_year
   ) t1;
 
@@ -305,14 +305,28 @@ DROP TABLE @resultsSchema.@studyName_duration_cnt;
 CREATE TABLE @resultsSchema.@studyName_duration_cnt
 (
 drug_seq INT,
-concept_name INT,
+concept_name VARCHAR (255),
 avg_duration FLOAT(53),
 count INT,
 percent_target FLOAT(53)
 );
 
 INSERT INTO @resultsSchema.@studyName_duration_cnt
-select drug_seq, concept_name, avg(CAST(duration_era as int)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from results.txpath_matchcohort) as percent_target
+select drug_seq, concept_name, avg(CAST(duration_era as int)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from @resultsSchema.@studyName_targetcohort) as percent_target
 FROM @resultsSchema.@studyName_drug_seq_processed
-GROUP BY CUBE (drug_seq, concept_name);
+GROUP BY drug_seq, concept_name;
 
+INSERT INTO @resultsSchema.@studyName_duration_cnt
+select drug_seq, concept_name, avg(CAST(duration_era as int)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from @resultsSchema.@studyName_targetcohort) as percent_target
+FROM @resultsSchema.@studyName_drug_seq_processed
+GROUP BY concept_name, drug_seq;
+
+INSERT INTO @resultsSchema.@studyName_duration_cnt
+select NULL as drug_seq, concept_name, avg(CAST(duration_era as int)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from @resultsSchema.@studyName_targetcohort) as percent_target
+FROM @resultsSchema.@studyName_drug_seq_processed
+GROUP BY concept_name;
+
+INSERT INTO @resultsSchema.@studyName_duration_cnt
+select drug_seq, 'all' as concept_name, avg(CAST(duration_era as int)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from @resultsSchema.@studyName_targetcohort) as percent_target
+FROM @resultsSchema.@studyName_drug_seq_processed
+GROUP BY drug_seq;
