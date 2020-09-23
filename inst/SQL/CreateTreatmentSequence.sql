@@ -8,7 +8,7 @@ DROP TABLE @resultsSchema.@studyName_drug_seq;
 -- Load target population into targetcohort table
 CREATE TABLE @resultsSchema.@studyName_targetcohort
 (
-PERSON_ID BIGINT NOT NULL PRIMARY KEY,
+PERSON_ID BIGINT NOT NULL,
 INDEX_DATE date NOT NULL,
 COHORT_END_DATE date NOT NULL
 );
