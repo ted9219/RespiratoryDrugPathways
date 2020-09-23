@@ -56,6 +56,8 @@ execute <- function(connection = NULL,
   
   if (runCohortCharacterization) {
     
+    ParallelLogger::logInfo("Characterization")
+    
     # for all different study settings
     settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
     
@@ -138,7 +140,7 @@ execute <- function(connection = NULL,
                                     cohortTable=cohortTable)
       DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
       
-      sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.dbo.@studyName_@tableName",
+      sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.@studyName_@tableName",
                                     dbms = connectionDetails$dbms,
                                     oracleTempSchema = oracleTempSchema,
                                     resultsSchema=cohortDatabaseSchema,

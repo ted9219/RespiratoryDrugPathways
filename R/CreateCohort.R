@@ -75,7 +75,6 @@ createCohorts <- function(createCohortTable = TRUE,
 
   }
 
-  # TODO: test this
   # Check number of subjects per cohort
   ParallelLogger::logInfo("Counting cohorts")
   sql <- loadRenderTranslateSql(sql = "CohortCounts.sql",

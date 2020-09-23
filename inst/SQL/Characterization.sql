@@ -24,10 +24,18 @@ FROM @resultsSchema.@cohortTable C
 WHERE C.cohort_definition_id = @targetCohortId;
 
 -- Do characterization
-CREATE TABLE @resultsSchema.@studyName_characterization AS
-select gender, count(*) as num_people, avg(age) as avg_age, avg(time_in_cohort) as avg_time_in_cohort
-from (select gender_source_value as gender, date_part('year', age (p.birth_datetime::date)) as age, date_part('day', t.cohort_end_date :: TIMESTAMP - t.index_date :: TIMESTAMP) AS time_in_cohort
-FROM @resultsSchema.@studyName_targetcohort as t
-LEFT JOIN @cdmDatabaseSchema.person as p
-ON t.person_id = p.person_id) as o
+CREATE TABLE @resultsSchema.@studyName_characterization
+(
+GENDER VARCHAR(50),
+NUM_PEOPLE INT,
+AVG_AGE FLOAT(53),
+AVG_DAYS_IN_COHORT FLOAT(53)
+);
+
+INSERT INTO @resultsSchema.@studyName_characterization
+SELECT gender, count(*) as num_people, avg(age) as avg_age, avg(days_in_cohort) as avg_days_in_cohort
+from (select p.gender_source_value as gender, YEAR(t.cohort_end_date)-p.year_of_birth as age, DATEDIFF(DAY, t.cohort_end_date, t.index_date) AS days_in_cohort
+FROM @resultsSchema.@studyName_targetcohort t
+LEFT JOIN @cdmDatabaseSchema.person p
+ON t.person_id = p.person_id) o
 GROUP BY ROLLUP (gender);
