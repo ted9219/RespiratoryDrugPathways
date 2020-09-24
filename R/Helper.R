@@ -29,15 +29,15 @@ extractAndWriteToFile <- function(connection, tableName, resultsSchema, studyNam
   renderedSql <- render(parameterizedSql, resultsSchema=resultsSchema, studyName=studyName, tableName=tableName)
   translatedSql <- translate(renderedSql, targetDialect = dbms)
   data <- DatabaseConnector::querySql(connection, translatedSql)
-  outputFile <- paste("output/",studyName, "/", studyName,"_",tableName,".csv",sep='')
+  outputFile <- paste(outputFolder, "/",studyName, "/", studyName,"_",tableName,".csv",sep='')
   write.csv(data,file=outputFile)
   writeLines(paste("Created file '",outputFile,"'",sep=""))
 }
 
 transformFile <- function(tableName,studyName, maxPathLength, minCellCount, addNoPaths) {
 
-  inputFile <- paste("output/",studyName, "/", studyName,"_",tableName,".csv",sep='')
-  outputFile <- paste("output/",studyName, "/", studyName,"_transformed_",tableName,".csv",sep='')
+  inputFile <- paste(outputFolder, "/",studyName, "/", studyName,"_",tableName,".csv",sep='')
+  outputFile <- paste(outputFolder, "/",studyName, "/", studyName,"_transformed_",tableName,".csv",sep='')
 
   file <- as.data.table(read.csv(inputFile))
   group <- as.vector(colnames(file)[!grepl("X|INDEX_YEAR|NUM_PERSONS|CONCEPT_ID", colnames(file))])
@@ -53,9 +53,9 @@ transformFile <- function(tableName,studyName, maxPathLength, minCellCount, addN
   transformed_file <- paste0(transformed_file, "-End")
   transformed_file <- data.frame(path=transformed_file, freq=file_noyear$freq, stringsAsFactors = FALSE)
 
-  summary_counts <- read.csv(paste("output/",studyName, "/", studyName,"_summary.csv",sep=''), stringsAsFactors = FALSE)
+  summary_counts <- read.csv(paste(outputFolder, "/",studyName, "/", studyName,"_summary.csv",sep=''), stringsAsFactors = FALSE)
   summary_counts <- rbind(summary_counts, c(4,   'Number of pathways final (after minCellCount)', sum(transformed_file$freq)  ))
-  write.table(summary_counts,file=paste("output/",studyName, "/", studyName,"_summary.csv",sep=''), sep = ",", row.names = FALSE, col.names = TRUE)
+  write.table(summary_counts,file=paste(outputFolder, "/",studyName, "/", studyName,"_summary.csv",sep=''), sep = ",", row.names = FALSE, col.names = TRUE)
 
   if (addNoPaths) {
     noPath <- as.integer(summary_counts[summary_counts$COUNT_TYPE == "Number of persons in target cohort", "NUM_PERSONS"]) - sum(transformed_file$freq)

@@ -43,15 +43,17 @@ execute <- function(connection = NULL,
   if (runCreateCohorts) {
     ParallelLogger::addDefaultFileLogger(file.path(outputFolder, "log.txt"))
 
-    ParallelLogger::logInfo("Creating cohorts")
-    createCohorts(connection = connection,
-                  connectionDetails = connectionDetails,
-                  cdmDatabaseSchema = cdmDatabaseSchema,
-                  cohortDatabaseSchema = cohortDatabaseSchema,
-                  vocabularyDatabaseSchema = vocabularyDatabaseSchema,
-                  cohortTable = cohortTable,
-                  oracleTempSchema = oracleTempSchema,
-                  outputFolder = outputFolder)
+    if (databaseName %in% c("jmdc", "panther")) {
+      ParallelLogger::logInfo("Creating cohorts")
+      createCohorts(connection = connection,
+                    connectionDetails = connectionDetails,
+                    cdmDatabaseSchema = cdmDatabaseSchema,
+                    cohortDatabaseSchema = cohortDatabaseSchema,
+                    vocabularyDatabaseSchema = vocabularyDatabaseSchema,
+                    cohortTable = cohortTable,
+                    oracleTempSchema = oracleTempSchema,
+                    outputFolder = outputFolder)
+    }
   }
 
   if (runCohortCharacterization) {
@@ -87,7 +89,7 @@ execute <- function(connection = NULL,
       if (!file.exists(paste0(outputFolder, "/", studyName)))
         dir.create(paste0(outputFolder, "/",studyName), recursive = TRUE)
 
-      outputFile <- paste("output/",studyName,"/", studyName, "_characterization.csv",sep='')
+      outputFile <- paste(outputFolder, "/",studyName,"/", studyName, "_characterization.csv",sep='')
       write.table(descriptive_stats,file=outputFile, sep = ",", row.names = TRUE, col.names = TRUE)
 
       # todo: add more covariates
