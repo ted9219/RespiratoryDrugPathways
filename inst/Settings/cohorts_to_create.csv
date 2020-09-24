@@ -35,3 +35,15 @@ cohortId,cohortName,cohortDefinition,cohortType
 43,LABA&LAMA,ATLAS,outcome
 44,LABA&LAMA&ICS,ATLAS,outcome
 45,SABA&SAMA,ATLAS,outcome
+46,SABA,ATLAS,outcome
+47,SAMA,ATLAS,outcome
+48,LABA,ATLAS,outcome
+49,LAMA,ATLAS,outcome
+50,ICS,ATLAS,outcome
+51,Systemic glucocorticosteroids,ATLAS,outcome
+52,Systemic B2 agonist,ATLAS,outcome
+53,LTRA,ATLAS,outcome
+54,Xanthines,ATLAS,outcome
+55,Anti IL5,ATLAS,outcome
+56,Anti IgE,ATLAS,outcome
+
