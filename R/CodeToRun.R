@@ -12,7 +12,7 @@ library(glue)
 library(DatabaseConnector)
 
 # Change to project folder
-setwd("~/Documents/Git/TreatmentPathways")
+setwd('todo')
 
 source(paste(getwd(), '/R/CreateCohort.R', sep = ""), echo=TRUE)
 source(paste(getwd(), '/R/Helper.R', sep = ""), echo=TRUE)
@@ -21,23 +21,19 @@ source(paste(getwd(), '/R/Main.R', sep = ""), echo=TRUE)
 # ------------------------------------------------------------------------
 # Settings and database credentials
 # ------------------------------------------------------------------------
-user <- "amarkus"
-password <- "amarkus"
-cdmDatabaseSchemaList <- 'cdm'
-cohortSchemaList <- 'results'
+user <- 'todo'
+password <- 'todo'
+cdmDatabaseSchemaList <- 'todo'
+cohortSchema <- 'todo'
 oracleTempSchema <- NULL
-databaseList <- 'IPCI'
+databaseList <- 'todo'
 fftempdir <- paste0(getwd(),"/temp")
 
-dbms <- "postgresql"
-server <- "Res-Srv-Lin-01/IPCI-HI-LARIOUS"
-port <- 5432
+dbms <- 'todo'
+server <- 'todo'
+port <- 'todo'
 outputFolder <- paste0(getwd(),"/output")
 options(fftempdir = fftempdir)
-
-if (length(cdmDatabaseSchemaList) != length(cohortSchemaList) || length(cohortSchemaList) != length(databaseList)) {
-  stop("The CDM, results and database lists match in length")
-}
 
 # Connect to the server
 connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = dbms,
@@ -56,11 +52,10 @@ connection <- DatabaseConnector::connect(dbms = dbms,connectionDetails = connect
 debugSqlFile <- "resp_drug_study.dsql"
 cohortTable <- "resp_drug_study_cohorts"
 
-runCreateCohorts <- TRUE
-runCohortCharacterization <- TRUE
+runCreateCohorts <- FALSE
+runCohortCharacterization <- FALSE
 runCheckCohorts <- FALSE
-runTreatmentPathways <- TRUE
-debug <- FALSE # Use this when you'd like to emit the SQL for debugging 
+runTreatmentPathways <- FALSE
 exportResults <- FALSE
 
 study_settings <- data.frame(readr::read_csv("inst/Settings/study_settings.csv", col_types = readr::cols()))
@@ -72,12 +67,14 @@ study_settings <- study_settings[,1:2]
 
 for (sourceId in 1:length(cdmDatabaseSchemaList)) {
   cdmDatabaseSchema <- cdmDatabaseSchemaList[sourceId]
-  cohortDatabaseSchema <- cohortSchemaList[sourceId]
+  cohortDatabaseSchema <- cohortSchema
   databaseName <- databaseList[sourceId]
   databaseId <- databaseName
   databaseDescription <- databaseName
   
   print(paste("Executing against", databaseName))
+  
+  outputFolderDB <- paste0(outputFolder, "/", databaseName)
   
   execute(
     connection = connection,
@@ -86,14 +83,13 @@ for (sourceId in 1:length(cdmDatabaseSchemaList)) {
     cohortDatabaseSchema = cohortDatabaseSchema,
     cohortTable = cohortTable,
     oracleTempSchema = oracleTempSchema,
-    outputFolder = outputFolder,
+    outputFolder = outputFolderDB,
     databaseId = databaseId,
     databaseName = databaseName,
     runCreateCohorts = runCreateCohorts,
     runCohortCharacterization = runCohortCharacterization,
     runCheckCohorts = runCheckCohorts,
     runTreatmentPathways = runTreatmentPathways,
-    debug = debug,
     exportResults = exportResults,
     debugSqlFile = debugSqlFile,
     study_settings = study_settings
