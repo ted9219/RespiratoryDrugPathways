@@ -168,7 +168,7 @@ execute <- function(connection = NULL,
       data$DRUG_CONCEPT_ID <- sapply(concept_ids, function(x) paste(sort(x), collapse = "+"))
 
       # add concept_name
-      data <- addLabels(data)
+      data <- addLabels(data, outputFolder)
 
       # Move table back to SQL
       DatabaseConnector::insertTable(connection = connection,
@@ -188,13 +188,13 @@ execute <- function(connection = NULL,
       DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
 
       # Get results
-      extractAndWriteToFile(connection, tableName = "summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = connectionDetails$dbms)
-      extractAndWriteToFile(connection, tableName = "person_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = connectionDetails$dbms)
-      extractAndWriteToFile(connection, tableName = "drug_seq_summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = connectionDetails$dbms)
-      extractAndWriteToFile(connection, tableName = "duration_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName, dbms = connectionDetails$dbms)
+      extractAndWriteToFile(connection, tableName = "summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, outputFolder = outputFolder, dbms = connectionDetails$dbms)
+      extractAndWriteToFile(connection, tableName = "person_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName,  outputFolder = outputFolder, dbms = connectionDetails$dbms)
+      extractAndWriteToFile(connection, tableName = "drug_seq_summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, outputFolder = outputFolder, dbms = connectionDetails$dbms)
+      extractAndWriteToFile(connection, tableName = "duration_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName, outputFolder = outputFolder, dbms = connectionDetails$dbms)
 
       # Process results to input in sunburst plot
-      transformFile(tableName = "drug_seq_summary", studyName = studyName, maxPathLength = maxPathLength, minCellCount = minCellCount, addNoPaths = addNoPaths)
+      transformFile(tableName = "drug_seq_summary", studyName = studyName,  outputFolder = outputFolder, maxPathLength = maxPathLength, minCellCount = minCellCount, addNoPaths = addNoPaths)
 
     }
   }

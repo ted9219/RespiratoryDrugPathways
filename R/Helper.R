@@ -24,7 +24,7 @@ loadRenderTranslateSql <- function(sql,
   return(renderedSql)
 }
 
-extractAndWriteToFile <- function(connection, tableName, resultsSchema, studyName, dbms){
+extractAndWriteToFile <- function(connection, tableName, resultsSchema, studyName, outputFolder, dbms){
   parameterizedSql <- "SELECT * FROM @resultsSchema.@studyName_@tableName"
   renderedSql <- render(parameterizedSql, resultsSchema=resultsSchema, studyName=studyName, tableName=tableName)
   translatedSql <- translate(renderedSql, targetDialect = dbms)
@@ -34,7 +34,7 @@ extractAndWriteToFile <- function(connection, tableName, resultsSchema, studyNam
   writeLines(paste("Created file '",outputFile,"'",sep=""))
 }
 
-transformFile <- function(tableName,studyName, maxPathLength, minCellCount, addNoPaths) {
+transformFile <- function(tableName,studyName,outputFolder, maxPathLength, minCellCount, addNoPaths) {
 
   inputFile <- paste(outputFolder, "/",studyName, "/", studyName,"_",tableName,".csv",sep='')
   outputFile <- paste(outputFolder, "/",studyName, "/", studyName,"_transformed_",tableName,".csv",sep='')
@@ -212,8 +212,8 @@ doFirstTreatment <- function(data) {
   data <- data[, head(.SD,1), by=.(PERSON_ID, DRUG_CONCEPT_ID)]
 }
 
-addLabels <- function(data) {
-  cohortIds <- readr::read_csv("output/cohort.csv", col_types = readr::cols())
+addLabels <- function(data, outputFolder) {
+  cohortIds <- readr::read_csv(paste(outputFolder, "/cohort.csv",sep=''), col_types = readr::cols())
   labels <- data.frame(DRUG_CONCEPT_ID = as.character(cohortIds$cohortId), CONCEPT_NAME = str_replace_all(cohortIds$cohortName, c(" mono| combi| all"), ""), stringsAsFactors = FALSE)
   data <- merge(data, labels, all.x = TRUE)
 
