@@ -139,10 +139,10 @@ doCombinationWindow <- function(data, combinationWindow, minEraDuration) {
           data[r,"DRUG_CONCEPT_ID"] <- paste0(data[r - 1, "DRUG_CONCEPT_ID"], "+", data[r, "DRUG_CONCEPT_ID"])
 
           # split row in two by adding new row
-          data[r - 1,"DRUG_END_DATE"] <- data[r,DRUG_START_DATE]
-
           new_row <- data[r - 1,]
           new_row[, "DRUG_START_DATE"]  <- data[r, DRUG_END_DATE]
+          
+          data[r - 1,"DRUG_END_DATE"] <- data[r,DRUG_START_DATE]
 
           data <- rbindlist(list(data, new_row))
         }
