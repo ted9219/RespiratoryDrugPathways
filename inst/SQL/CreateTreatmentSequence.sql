@@ -42,11 +42,11 @@ SELECT
   de.cohort_definition_id,
   de.cohort_start_date,
   de.cohort_end_date,
-  DATEDIFF(DAY, de.cohort_end_date, de.cohort_start_date) AS duration_era,
-  DATEDIFF(DAY, de.cohort_start_date, lag(de.cohort_end_date)
+  DATEDIFF(DAY, de.cohort_start_date, e.cohort_end_date) AS duration_era,
+  DATEDIFF(DAY, lag(de.cohort_end_date)
   OVER (
     PARTITION BY de.subject_id, de.cohort_definition_id
-    ORDER BY de.cohort_start_date, de.cohort_end_date ))                  AS gap_same
+    ORDER BY de.cohort_start_date, de.cohort_end_date ), de.cohort_start_date)                  AS gap_same
 FROM
   (SELECT *
    FROM @resultsSchema.@cohortTable C
