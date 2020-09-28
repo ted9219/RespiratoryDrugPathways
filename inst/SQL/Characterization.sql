@@ -26,7 +26,7 @@ WHERE C.cohort_definition_id = @targetCohortId;
 -- Do characterization
 CREATE TABLE @resultsSchema.@studyName_characterization
 (
-GENDER INT,
+GENDER VARCHAR(55),
 NUM_PEOPLE INT,
 AVG_AGE FLOAT(53),
 AVG_DAYS_IN_COHORT FLOAT(53)
