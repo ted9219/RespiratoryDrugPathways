@@ -1,0 +1,2308 @@
+{
+  "ExpressionLimit": {"Type": "All"},
+  "CollapseSettings": {
+    "CollapseType": "ERA",
+    "EraPad": 30
+  },
+  "CensorWindow": {
+    "StartDate": null,
+    "EndDate": null
+  },
+  "ConceptSets": [
+    {
+      "expression": {"items": [
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 792993,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1989100",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "benralizumab",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Ingredient",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": true
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35606631,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1720597",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Ingredient",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": true
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35603983,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1746889",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "reslizumab",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Ingredient",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": true
+        }
+      ]},
+      "name": "Anti IL5 only ingredient",
+      "id": 0
+    },
+    {
+      "expression": {"items": [
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40715154,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4741836",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "10 ML reslizumab 10 MG/ML Injectable Solution",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Clinical Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40715153,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4741837",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "10 ML reslizumab 10 MG/ML Injectable Solution Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Clinical Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 784541,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4832360",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "10 ML reslizumab 10 MG/ML Injectable Solution Box of 2",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Clinical Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40715152,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4741838",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "10 ML reslizumab 10 MG/ML Injectable Solution [Cinqair]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Branded Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40715150,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4741840",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "10 ML reslizumab 10 MG/ML Injectable Solution [Cinqair] Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Branded Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40715149,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4741841",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "10 ML reslizumab 10 MG/ML Injectable Solution [Cinqair] Box of 1 by TEVA",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 784542,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4832361",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "10 ML reslizumab 10 MG/ML Injectable Solution [Cinqair] Box of 2",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Branded Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 784543,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4832362",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "10 ML reslizumab 10 MG/ML Injectable Solution [Cinqair] Box of 2 by TEVA",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40715151,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4741839",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "10 ML reslizumab 10 MG/ML Injectable Solution [Cinqair] by TEVA",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35603986,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1746893",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "10 ML reslizumab 10 MG/ML Injection",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Clinical Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40715148,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4741842",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "10 ML reslizumab 10 MG/ML Injection Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Clinical Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35603990,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1746898",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "10 ML reslizumab 10 MG/ML Injection [Cinqair]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Branded Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40715146,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4741844",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "10 ML reslizumab 10 MG/ML Injection [Cinqair] Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Branded Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40715145,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4741845",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "10 ML reslizumab 10 MG/ML Injection [Cinqair] Box of 1 by TEVA",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40715147,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4741843",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "10 ML reslizumab 10 MG/ML Injection [Cinqair] by TEVA",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40718606,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4738585",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "1 ML benralizumab 30 MG/ML Injectable Solution",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Clinical Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40718605,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4738586",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "1 ML benralizumab 30 MG/ML Injectable Solution Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Clinical Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40718604,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4738587",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "1 ML benralizumab 30 MG/ML Injectable Solution [Fasenra]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Branded Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40718602,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4738589",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "1 ML benralizumab 30 MG/ML Injectable Solution [Fasenra] Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Branded Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40718601,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4738590",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "1 ML benralizumab 30 MG/ML Injectable Solution [Fasenra] Box of 1 by Astrazeneca",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40718603,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4738588",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "1 ML benralizumab 30 MG/ML Injectable Solution [Fasenra] by Astrazeneca",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 792997,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1989104",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "1 ML benralizumab 30 MG/ML Prefilled Syringe",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Clinical Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40718600,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4738591",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "1 ML benralizumab 30 MG/ML Prefilled Syringe Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Clinical Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 793002,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1989109",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "1 ML benralizumab 30 MG/ML Prefilled Syringe [Fasenra]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Branded Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40718598,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4738593",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "1 ML benralizumab 30 MG/ML Prefilled Syringe [Fasenra] Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Branded Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40718597,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4738594",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "1 ML benralizumab 30 MG/ML Prefilled Syringe [Fasenra] Box of 1 by Astrazeneca",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40718599,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4738592",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "1 ML benralizumab 30 MG/ML Prefilled Syringe [Fasenra] by Astrazeneca",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 1396812,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "2170990",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "1 ML mepolizumab 100 MG/ML Auto-Injector",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Clinical Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 1396813,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "2170993",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "1 ML mepolizumab 100 MG/ML Auto-Injector [Nucala]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Branded Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 1396815,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "2173820",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "1 ML mepolizumab 100 MG/ML Prefilled Syringe",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Clinical Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 1396816,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "2173822",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "1 ML mepolizumab 100 MG/ML Prefilled Syringe [Nucala]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Branded Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40716953,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4740159",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "2.5 ML reslizumab 10 MG/ML Injectable Solution",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Clinical Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40716952,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4740160",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "2.5 ML reslizumab 10 MG/ML Injectable Solution Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Clinical Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 784252,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4832076",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "2.5 ML reslizumab 10 MG/ML Injectable Solution Box of 2",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Clinical Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40716951,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4740161",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "2.5 ML reslizumab 10 MG/ML Injectable Solution [Cinqair]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Branded Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40716949,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4740163",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "2.5 ML reslizumab 10 MG/ML Injectable Solution [Cinqair] Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Branded Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40716948,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4740164",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "2.5 ML reslizumab 10 MG/ML Injectable Solution [Cinqair] Box of 1 by TEVA",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 784253,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4832077",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "2.5 ML reslizumab 10 MG/ML Injectable Solution [Cinqair] Box of 2",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Branded Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 784254,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4832078",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "2.5 ML reslizumab 10 MG/ML Injectable Solution [Cinqair] Box of 2 by TEVA",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40716950,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4740162",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "2.5 ML reslizumab 10 MG/ML Injectable Solution [Cinqair] by TEVA",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40716947,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4740165",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "2.5 ML reslizumab 10 MG/ML Injection",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Clinical Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40716946,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4740166",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "2.5 ML reslizumab 10 MG/ML Injection Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Clinical Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40716945,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4740167",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "2.5 ML reslizumab 10 MG/ML Injection [Cinqair]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Branded Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40716943,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4740169",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "2.5 ML reslizumab 10 MG/ML Injection [Cinqair] Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Quant Branded Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40716942,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4740170",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "2.5 ML reslizumab 10 MG/ML Injection [Cinqair] Box of 1 by TEVA",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40716944,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4740168",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "2.5 ML reslizumab 10 MG/ML Injection [Cinqair] by TEVA",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 792993,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1989100",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "benralizumab",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Ingredient",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 792994,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1989101",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "benralizumab 30 MG/ML",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Comp",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 792999,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1989106",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "benralizumab 30 MG/ML [Fasenra]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Comp",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40745308,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712388",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "benralizumab 30 MG/ML Injectable Solution",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40745307,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712389",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "benralizumab 30 MG/ML Injectable Solution Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40745306,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712390",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "benralizumab 30 MG/ML Injectable Solution [Fasenra]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40745305,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712391",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "benralizumab 30 MG/ML Injectable Solution [Fasenra] Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 793003,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1989110",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "benralizumab 30 MG/ML Prefilled Syringe",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40745304,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712392",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "benralizumab 30 MG/ML Prefilled Syringe Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 793004,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1989111",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "benralizumab 30 MG/ML Prefilled Syringe [Fasenra]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40745303,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712393",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "benralizumab 30 MG/ML Prefilled Syringe [Fasenra] Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 792995,
+            "STANDARD_CONCEPT": "C",
+            "CONCEPT_CODE": "1989102",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "benralizumab Injectable Product",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Classification",
+            "CONCEPT_CLASS_ID": "Clinical Dose Group",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40745310,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712386",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "benralizumab Injectable Solution",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Form",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40745309,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712387",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "benralizumab Injectable Solution [Fasenra]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Form",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 792996,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1989103",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "benralizumab Prefilled Syringe",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Form",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 793000,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1989107",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "benralizumab Prefilled Syringe [Fasenra]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Form",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 36249396,
+            "STANDARD_CONCEPT": "C",
+            "CONCEPT_CODE": "1746897",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "Cinqair Injectable Product",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Classification",
+            "CONCEPT_CLASS_ID": "Branded Dose Group",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 793001,
+            "STANDARD_CONCEPT": "C",
+            "CONCEPT_CODE": "1989108",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "Fasenra Injectable Product",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Classification",
+            "CONCEPT_CLASS_ID": "Branded Dose Group",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35606631,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1720597",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Ingredient",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35606632,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1720598",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab 100 MG",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Comp",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40991152,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP2189114",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injectable Solution",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 41147691,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP2345653",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injectable Solution Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 41178715,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP2376677",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injectable Solution Box of 3",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40744905,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712206",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injectable Solution [Nucala]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40744903,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712208",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injectable Solution [Nucala] Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40744902,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712209",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injectable Solution [Nucala] Box of 1 by Glaxosmithkline",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 36787799,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4776063",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injectable Solution [Nucala] Box of 1 by GSK",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 37592620,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4782065",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injectable Solution [Nucala] by Abacus Medicine",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40744904,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712207",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injectable Solution [Nucala] by Glaxosmithkline",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 994750,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4821264",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injectable Solution [Nucala] by Kohlpharma",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 994751,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4821265",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injectable Solution [Nucala] by Paranova Pack",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35606634,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1720601",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injection",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 21031739,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP344676",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injection Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 587021,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP3137977",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injection Box of 3",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35606638,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1720606",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injection [Nucala]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 21031740,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP344679",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injection [Nucala] Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 44178608,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP3055331",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injection [Nucala] Box of 1 by Cc",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 21090594,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP344680",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injection [Nucala] Box of 1 by Glaxosmithkline",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40968197,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP2166159",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injection [Nucala] Box of 3",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 21169321,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP344678",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injection [Nucala] by Glaxosmithkline",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 36276212,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP3127087",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Injection [Nucala] by GSK",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 1396501,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "2170988",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab 100 MG/ML",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Comp",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 1396505,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "2170994",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab 100 MG/ML Auto-Injector",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 1396506,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "2170995",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab 100 MG/ML Auto-Injector [Nucala]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 1396503,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "2170991",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab 100 MG/ML [Nucala]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Comp",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 1396658,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "2173823",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab 100 MG/ML Prefilled Syringe",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 1396659,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "2173824",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab 100 MG/ML Prefilled Syringe [Nucala]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35606636,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1720603",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab 100 MG [Nucala]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Comp",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 36880195,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP995049",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Prefilled Syringe",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 36884004,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP990256",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Prefilled Syringe Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 36891984,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP1006042",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Prefilled Syringe [Nucala]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 36890996,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP990787",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Prefilled Syringe [Nucala] Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 43156542,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP443745",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Prefilled Syringe [Nucala] Box of 1 by Glaxosmithkline",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35765702,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP2767163",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab 100 MG Prefilled Syringe [Nucala] by Glaxosmithkline",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 1396502,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "2170989",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab Auto-Injector",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Form",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 1396504,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "2170992",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab Auto-Injector [Nucala]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Form",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 36248433,
+            "STANDARD_CONCEPT": "C",
+            "CONCEPT_CODE": "1720599",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab Injectable Product",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Classification",
+            "CONCEPT_CLASS_ID": "Clinical Dose Group",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40892831,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP2090793",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab Injectable Solution",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Form",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40744906,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712205",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "mepolizumab Injectable Solution [Nucala]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Form",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35606633,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1720600",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab Injection",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Form",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35606637,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1720604",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab Injection [Nucala]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Form",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 1396656,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "2173819",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab Prefilled Syringe",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Form",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 1396657,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "2173821",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "mepolizumab Prefilled Syringe [Nucala]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Form",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 36248434,
+            "STANDARD_CONCEPT": "C",
+            "CONCEPT_CODE": "1720605",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "Nucala Injectable Product",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Classification",
+            "CONCEPT_CLASS_ID": "Branded Dose Group",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35603983,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1746889",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "reslizumab",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Ingredient",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35603984,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1746890",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "reslizumab 10 MG/ML",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Comp",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35603988,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1746895",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "reslizumab 10 MG/ML [Cinqair]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Comp",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40745049,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712123",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "reslizumab 10 MG/ML Injectable Solution",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40745048,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712124",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "reslizumab 10 MG/ML Injectable Solution Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 783009,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4830839",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "reslizumab 10 MG/ML Injectable Solution Box of 2",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40745047,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712125",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "reslizumab 10 MG/ML Injectable Solution [Cinqair]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40745046,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712126",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "reslizumab 10 MG/ML Injectable Solution [Cinqair] Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 783010,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4830840",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "reslizumab 10 MG/ML Injectable Solution [Cinqair] Box of 2",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35603991,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1746899",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "reslizumab 10 MG/ML Injection",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40745045,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712127",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "reslizumab 10 MG/ML Injection Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35603992,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1746900",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "reslizumab 10 MG/ML Injection [Cinqair]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40745044,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712128",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "reslizumab 10 MG/ML Injection [Cinqair] Box of 1",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Box",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 44088065,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP1082696",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "reslizumab 10 MG/ML Injection [Cinqair] by TEVA",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Marketed Product",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 36249395,
+            "STANDARD_CONCEPT": "C",
+            "CONCEPT_CODE": "1746891",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "reslizumab Injectable Product",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Classification",
+            "CONCEPT_CLASS_ID": "Clinical Dose Group",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40745051,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712121",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "reslizumab Injectable Solution",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Form",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 40745050,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "OMOP4712122",
+            "VOCABULARY_ID": "RxNorm Extension",
+            "CONCEPT_NAME": "reslizumab Injectable Solution [Cinqair]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Form",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35603985,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1746892",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "reslizumab Injection",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Clinical Drug Form",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        },
+        {
+          "isExcluded": false,
+          "concept": {
+            "INVALID_REASON_CAPTION": "Valid",
+            "CONCEPT_ID": 35603989,
+            "STANDARD_CONCEPT": "S",
+            "CONCEPT_CODE": "1746896",
+            "VOCABULARY_ID": "RxNorm",
+            "CONCEPT_NAME": "reslizumab Injection [Cinqair]",
+            "DOMAIN_ID": "Drug",
+            "STANDARD_CONCEPT_CAPTION": "Standard",
+            "CONCEPT_CLASS_ID": "Branded Drug Form",
+            "INVALID_REASON": "V"
+          },
+          "includeMapped": false,
+          "includeDescendants": false
+        }
+      ]},
+      "name": "Anti IL5 corrected for dose form",
+      "id": 1
+    }
+  ],
+  "EndStrategy": {"CustomEra": {
+    "DrugCodesetId": 1,
+    "DaysSupplyOverride": null,
+    "GapDays": 30,
+    "Offset": 0
+  }},
+  "cdmVersionRange": ">=5.0.0",
+  "CensoringCriteria": [],
+  "QualifiedLimit": {"Type": "First"},
+  "InclusionRules": [],
+  "PrimaryCriteria": {
+    "CriteriaList": [{"DrugExposure": {
+      "OccurrenceEndDate": null,
+      "CorrelatedCriteria": null,
+      "DrugSourceConcept": null,
+      "CodesetId": 1,
+      "DrugTypeExclude": false,
+      "Quantity": null,
+      "DrugType": null,
+      "ProviderSpecialty": null,
+      "EffectiveDrugDose": null,
+      "Gender": null,
+      "DaysSupply": null,
+      "DoseUnit": null,
+      "VisitType": null,
+      "Refills": null,
+      "First": null,
+      "OccurrenceStartDate": null,
+      "RouteConcept": null,
+      "StopReason": null,
+      "LotNumber": null,
+      "Age": null
+    }}],
+    "PrimaryCriteriaLimit": {"Type": "All"},
+    "ObservationWindow": {
+      "PostDays": 0,
+      "PriorDays": 0
+    }
+  }
+}
