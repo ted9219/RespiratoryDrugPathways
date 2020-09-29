@@ -7,6 +7,6 @@ eraCollapseSize,30,30
 combinationWindow,30,30
 sequentialRepetition,FALSE,TRUE
 firstTreatment,TRUE,FALSE
-maxPathLength,3,5
-minCellCount,0,0
+maxPathLength,3,3
+minCellCount,5,5
 addNoPaths,TRUE,TRUE
