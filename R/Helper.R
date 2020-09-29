@@ -114,12 +114,12 @@ doCombinationWindow <- function(data, combinationWindow, minEraDuration) {
 
     for (r in rows) {
       # define switch
-      if (-data$GAP_PREVIOUS[r] < combinationWindow) {
+      if (-data$GAP_PREVIOUS[r] < combinationWindow & data[r,"DRUG_START_DATE"] != data[r - 1,"DRUG_START_DATE"]) {
         data[r - 1,"DRUG_END_DATE"] <- data[r,DRUG_START_DATE]
       }
 
       # define combination
-      else if (-data$GAP_PREVIOUS[r] >= combinationWindow) {
+      else {
         if (data[r - 1, DRUG_END_DATE] <= data[r, DRUG_END_DATE]) {
           # add combination as new row
           new_row <- data[r,]
@@ -152,7 +152,7 @@ doCombinationWindow <- function(data, combinationWindow, minEraDuration) {
     # re-calculate duration_era
     data[,DURATION_ERA:=difftime(DRUG_END_DATE, DRUG_START_DATE, units = "days")]
 
-    data <- doEraDuration(data, minEraDuration)
+    data <- doEraDuration(data, minEraDuration = 1) # todo: allow minEraDuration = 0 by changing switch/combination to day - 1?
 
     output <- selectRowsCombinationWindow(data)
     data <- output[[1]]
