@@ -10,6 +10,7 @@ library(data.table)
 library(stringr)
 library(glue)
 library(DatabaseConnector)
+library(readr)
 
 # Change to project folder
 setwd('todo')
@@ -59,7 +60,6 @@ runTreatmentPathways <- FALSE
 exportResults <- FALSE
 
 study_settings <- data.frame(readr::read_csv("inst/Settings/study_settings.csv", col_types = readr::cols()))
-study_settings <- study_settings[,1:2]
 
 # ------------------------------------------------------------------------ 
 # Run the study
