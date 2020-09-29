@@ -21,12 +21,12 @@ cohortId,cohortName,cohortDefinition,cohortType
 29,LTRA mono,Custom,outcome
 30,LTRA all,Custom,outcome
 31,Systemic glucocorticosteroids combi,Custom,outcome
-32,xanthines mono,Custom,outcome
+32,Xanthines mono,Custom,outcome
 33,SABA mono,Custom,outcome
-34,xanthines combi,Custom,outcome
+34,Xanthines combi,Custom,outcome
 35,LABA all,Custom,outcome
 36,SABA all,Custom,outcome
-37,xanthines all,Custom,outcome
+37,Xanthines all,Custom,outcome
 38,ICS mono,Custom,outcome
 39,ICS all,Custom,outcome
 40,Systemic glucocorticosteroids mono,Custom,outcome
@@ -46,4 +46,3 @@ cohortId,cohortName,cohortDefinition,cohortType
 54,Xanthines,ATLAS,outcome
 55,Anti IL5,ATLAS,outcome
 56,Anti IgE,ATLAS,outcome
-

@@ -5,27 +5,27 @@ var radius = Math.min(width, height) / 2;
 
 // Breadcrumb dimensions: width, height, spacing, width of tip/tail.
 var b = {
-  w: 75, h: 30, s: 3, t: 10
+  w: 200, h: 30, s: 3, t: 5
 };
 
 // Mapping of step names to colors.
 var colors = {
-  "Systemic glucocorticosteroids": "#5687d1",
-  "ICS": "#7b615c",
-  "SABA": "#de783b",
-  "LABA": "#6ab975",
-  "SAMA": "#a173d1",
-  "LAMA": "#D32F2F",
-    "LTRA": "#E91E63",
-    "xanthines": "#455A64",
-    "Systemic B2 agonist": "#00796B",
-    "Anti IL5": "#CDDC39",
     "Anti IgE": "#F8BBD0",
-    "End": "#D3D3D3",
-    "LABA&ICS": "#FFC107",
+      "Anti IL5": "#CDDC39",
+       "ICS": "#7b615c",
+       "LABA": "#6ab975",
+           "LABA&ICS": "#FFC107",
     "LABA&LAMA": "#FFC107",
     "LABA&LAMA&ICS": "#FFC107",
+       "LAMA": "#D32F2F",
+         "LTRA": "#E91E63",
+  "SABA": "#de783b",
+  "SAMA": "#a173d1",
+    "Systemic B2 agonist": "#00796B",
+ "Systemic glucocorticosteroids": "#5687d1",
     "SABA&SAMA": "#FFC107",
+      "Xanthines": "#455A64",
+     "End": "#D3D3D3"
 };
 
 // Total size of all segments; we set this later, after loading the data.
@@ -49,7 +49,7 @@ var arc = d3.arc()
 
 // Use d3.text and d3.csvParseRows so that we do not need to have a header
 // row, and can receive the csv as an array of arrays.
-d3.text("txpath2_transformed_drug_seq_summary.csv", function(text) {
+d3.text("ipci.csv", function(text) {
   var csv = d3.csvParseRows(text);
   var json = buildHierarchy(csv);
   createVisualization(json);
@@ -225,7 +225,7 @@ function drawLegend() {
 
   // Dimensions of legend item: width, height, spacing, radius of rounded rect.
   var li = {
-    w: 75, h: 30, s: 3, r: 3
+    w: 200, h: 30, s: 3, r: 3
   };
 
   var legend = d3.select("#legend").append("svg:svg")
