@@ -158,6 +158,7 @@ execute <- function(connection = NULL,
       if (firstTreatment) {data <- doFirstTreatment(data)}
       
       # add drug_seq
+      data <- data[order(PERSON_ID, DRUG_START_DATE, DRUG_END_DATE),]
       data[, DRUG_SEQ:=seq_len(.N), by= .(PERSON_ID)]
       
       # order the combinations
