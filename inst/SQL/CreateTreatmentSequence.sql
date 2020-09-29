@@ -42,7 +42,7 @@ SELECT
   de.cohort_definition_id,
   de.cohort_start_date,
   de.cohort_end_date,
-  DATEDIFF(DAY, de.cohort_start_date, e.cohort_end_date) AS duration_era,
+  DATEDIFF(DAY, de.cohort_start_date, de.cohort_end_date) AS duration_era,
   DATEDIFF(DAY, lag(de.cohort_end_date)
   OVER (
     PARTITION BY de.subject_id, de.cohort_definition_id
