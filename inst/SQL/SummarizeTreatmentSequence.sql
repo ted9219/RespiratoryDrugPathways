@@ -306,27 +306,27 @@ CREATE TABLE @resultsSchema.@studyName_duration_cnt
 (
 drug_seq INT,
 concept_name VARCHAR (255),
-avg_duration FLOAT(53),
+avg_duration NUMERIC,
 count INT,
-percent_target FLOAT(53)
+percent_target NUMERIC
 );
 
 INSERT INTO @resultsSchema.@studyName_duration_cnt
-select drug_seq, concept_name, avg(CAST(duration_era as int)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from @resultsSchema.@studyName_targetcohort) as percent_target
+select drug_seq, concept_name, avg(CAST(duration_era as numeric)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from @resultsSchema.@studyName_targetcohort) as percent_target
 FROM @resultsSchema.@studyName_drug_seq_processed
 GROUP BY drug_seq, concept_name;
 
 INSERT INTO @resultsSchema.@studyName_duration_cnt
-select drug_seq, concept_name, avg(CAST(duration_era as int)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from @resultsSchema.@studyName_targetcohort) as percent_target
+select drug_seq, concept_name, avg(CAST(duration_era as numeric)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from @resultsSchema.@studyName_targetcohort) as percent_target
 FROM @resultsSchema.@studyName_drug_seq_processed
 GROUP BY concept_name, drug_seq;
 
 INSERT INTO @resultsSchema.@studyName_duration_cnt
-select NULL as drug_seq, concept_name, avg(CAST(duration_era as int)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from @resultsSchema.@studyName_targetcohort) as percent_target
+select NULL as drug_seq, concept_name, avg(CAST(duration_era as numeric)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from @resultsSchema.@studyName_targetcohort) as percent_target
 FROM @resultsSchema.@studyName_drug_seq_processed
 GROUP BY concept_name;
 
 INSERT INTO @resultsSchema.@studyName_duration_cnt
-select drug_seq, 'all' as concept_name, avg(CAST(duration_era as int)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from @resultsSchema.@studyName_targetcohort) as percent_target
+select drug_seq, 'all' as concept_name, avg(CAST(duration_era as numeric)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from @resultsSchema.@studyName_targetcohort) as percent_target
 FROM @resultsSchema.@studyName_drug_seq_processed
 GROUP BY drug_seq;
