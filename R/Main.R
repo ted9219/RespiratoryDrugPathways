@@ -127,6 +127,7 @@ execute <- function(connection = NULL,
       maxPathLength <-  as.integer(study_settings[study_settings$param == "maxPathLength",s]) # Maximum number of steps in a given pathway to be included in the sunburst plot
       minCellCount <-  as.integer(study_settings[study_settings$param == "minCellCount",s]) # Minimum number of subjects in the target cohort for a given eent in order to be counted in the pathway
       addNoPaths  <-  study_settings[study_settings$param == "addNoPaths",s] # Select to add subjects without path to sunburst plot
+      otherCombinations  <-  study_settings[study_settings$param == "otherCombinations",s] # Select to group all non-fixed combinations in one category 'other combinations'
       
       # Load cohorts and pre-processing in SQL
       sql <- loadRenderTranslateSql(sql = "CreateTreatmentSequence.sql",
@@ -192,7 +193,7 @@ execute <- function(connection = NULL,
       extractAndWriteToFile(connection, tableName = "duration_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName, outputFolder = outputFolder, dbms = connectionDetails$dbms)
       
       # Process results to input in sunburst plot
-      transformFile(tableName = "drug_seq_summary", studyName = studyName,  outputFolder = outputFolder, maxPathLength = maxPathLength, minCellCount = minCellCount, addNoPaths = addNoPaths)
+      transformFile(tableName = "drug_seq_summary", studyName = studyName,  outputFolder = outputFolder, maxPathLength = maxPathLength, minCellCount = minCellCount, addNoPaths = addNoPaths, otherCombinations = otherCombinations)
       
     }
   }

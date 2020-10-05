@@ -34,16 +34,37 @@ extractAndWriteToFile <- function(connection, tableName, resultsSchema, studyNam
   writeLines(paste("Created file '",outputFile,"'",sep=""))
 }
 
-transformFile <- function(tableName,studyName,outputFolder, maxPathLength, minCellCount, addNoPaths) {
+transformFile <- function(tableName,studyName,outputFolder, maxPathLength, minCellCount, addNoPaths, otherCombinations) {
 
   inputFile <- paste(outputFolder, "/",studyName, "/", studyName,"_",tableName,".csv",sep='')
   outputFile <- paste(outputFolder, "/",studyName, "/", studyName,"_transformed_",tableName,".csv",sep='')
 
-  file <- as.data.table(read.csv(inputFile))
+  file <- as.data.table(read.csv(inputFile, stringsAsFactors = FALSE))
+  
+  if (otherCombinations) {
+    findCombinations <- apply(file, 2, function(x) grepl("+", x, fixed = TRUE))
+    file[findCombinations] <- "Other combinations"
+  }
+  
+  file[D1_CONCEPT_NAME == "SABA", IS_SABA:=1]
+  percentStartSABA <- file[, sum(NUM_PERSONS), by = list(IS_SABA, INDEX_YEAR)]
+  write.csv(percentStartSABA, file=paste(outputFolder, "/",studyName, "/", studyName,"_percent_start_saba.csv",sep=''))
+
   group <- as.vector(colnames(file)[!grepl("X|INDEX_YEAR|NUM_PERSONS|CONCEPT_ID", colnames(file))])
   group <- group[1:maxPathLength]
   file_noyear <- file[,.(freq=sum(NUM_PERSONS)), by=group]
 
+  percentCombinationTreated <- sapply(group, function(g) {
+    indexCombinations <- grepl("Other combinations|\\+|\\&", transpose(file_noyear[,..g]))
+    
+    sumCombinations <- sum(file_noyear$freq[indexCombinations])
+    sumNotNA <- sum(file_noyear$freq[!is.na(file_noyear[,..g])])
+    
+    result <- sumCombinations * 100.0 / sumNotNA
+    
+  })
+  write.csv(percentCombinationTreated, file=paste(outputFolder, "/",studyName, "/", studyName,"_percent_combination_treated.csv",sep=''))
+  
   # todo: not remove minCellCount but aggregate pathway to other path
   writeLines(paste("Remove ", sum(file_noyear$freq < minCellCount), " paths with too low frequency"))
   file_noyear <- file_noyear[freq >= minCellCount,]

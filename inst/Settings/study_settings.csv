@@ -10,3 +10,4 @@ firstTreatment,TRUE,FALSE
 maxPathLength,3,3
 minCellCount,0,0
 addNoPaths,TRUE,TRUE
+otherCombinations,TRUE,TRUE
