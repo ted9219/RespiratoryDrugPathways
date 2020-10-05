@@ -2,7 +2,6 @@
 # Load packages (if necessary: install)
 library(SqlRender)
 library(dplyr)
-library(highcharter)
 library(ggplot2)
 library(scales)
 library(gridExtra)
