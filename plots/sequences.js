@@ -8,24 +8,25 @@ var b = {
   w: 200, h: 30, s: 3, t: 5
 };
 
-// Mapping of step names to colors.
+// Mapping of step names to colors. (https://htmlcolorcodes.com)
 var colors = {
-    "Anti IgE": "#F8BBD0",
-      "Anti IL5": "#CDDC39",
-       "ICS": "#7b615c",
-       "LABA": "#6ab975",
-           "LABA&ICS": "#FFC107",
-    "LABA&LAMA": "#FFC107",
-    "LABA&LAMA&ICS": "#FFC107",
-       "LAMA": "#D32F2F",
-         "LTRA": "#E91E63",
-  "SABA": "#de783b",
-  "SAMA": "#a173d1",
-    "Systemic B2 agonist": "#00796B",
- "Systemic glucocorticosteroids": "#5687d1",
-    "SABA&SAMA": "#FFC107",
-      "Xanthines": "#455A64",
-     "End": "#D3D3D3"
+    "Anti IgE": "#FB7476",
+      "Anti IL5": "#819AB1", 
+       "ICS": "#1E8449",
+       "LABA": "#1F618D",
+           "LABA&ICS": "#43AA8B", 
+    "LABA&LAMA": "#85C1E9",
+    "LABA&LAMA&ICS": "#90BE6D", 
+       "LAMA": "#577590", 
+         "LTRA": "#A569BD", 
+  "SABA": "#F94144", 
+      "SABA&SAMA": "#F8961E",
+  "SAMA": "#76448A  ", 
+    "Systemic B2 agonist": "#F3722C", 
+ "Systemic glucocorticosteroids": "#F9C74F", 
+      "Xanthines": "#1D493C",
+    "Other combinations": "#465D72",
+     "End": "#E5E8E8"
 };
 
 // Total size of all segments; we set this later, after loading the data.
@@ -49,7 +50,7 @@ var arc = d3.arc()
 
 // Use d3.text and d3.csvParseRows so that we do not need to have a header
 // row, and can receive the csv as an array of arrays.
-d3.text("ipci.csv", function(text) {
+d3.text("mdcr1.csv", function(text) {
   var csv = d3.csvParseRows(text);
   var json = buildHierarchy(csv);
   createVisualization(json);
@@ -75,21 +76,19 @@ function createVisualization(json) {
       .sort(function(a, b) { return b.value - a.value; });
   
   // For efficiency, filter nodes to keep only those large enough to see.
-  var nodes = partition(root).descendants()
-      .filter(function(d) {
-          return (d.x1 - d.x0 > 0.005); // 0.005 radians = 0.29 degrees
-      });
-
-  var path = vis.data([json]).selectAll("path")
+ let nodes = partition(root).descendants()
+     .filter(d => (d.x1 - d.x0 > 0.005));
+					
+		var path = vis.data([json]).selectAll("path")
       .data(nodes)
-      .enter().append("svg:path")
-      .attr("display", function(d) { return d.depth ? null : "none"; })
-      .attr("d", arc)
-      .attr("fill-rule", "evenodd")
-      .style("fill", function(d) { return colors[d.data.name]; })
-      .style("opacity", 1)
-      .on("mouseover", mouseover);
-
+     .enter().append("svg:path")
+     .attr("display", function(d) { return d.depth ? null : "none"; })
+   .attr("d", arc)
+     .attr("fill-rule", "evenodd")
+			.style("fill", function(d) { return colors[d.data.name]; })
+   .style("opacity", 1)
+     .on("mouseover", mouseover);			
+					
   // Add the mouseleave handler to the bounding circle.
   d3.select("#container").on("mouseleave", mouseleave);
 
