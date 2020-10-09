@@ -192,8 +192,8 @@ execute <- function(connection = NULL,
       extractAndWriteToFile(connection, tableName = "drug_seq_summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, outputFolder = outputFolder, dbms = connectionDetails$dbms)
       extractAndWriteToFile(connection, tableName = "duration_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName, outputFolder = outputFolder, dbms = connectionDetails$dbms)
       
-      # Process results to input in sunburst plot
-      transformFile(tableName = "drug_seq_summary", studyName = studyName,  outputFolder = outputFolder, maxPathLength = maxPathLength, minCellCount = minCellCount, addNoPaths = addNoPaths, otherCombinations = otherCombinations)
+      # Process results to outputs
+      generateOutput(studyName = studyName,  outputFolder = outputFolder, maxPathLength = maxPathLength, minCellCount = minCellCount, addNoPaths = addNoPaths, otherCombinations = otherCombinations)
       
     }
   }

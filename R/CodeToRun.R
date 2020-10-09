@@ -10,6 +10,8 @@ library(stringr)
 library(glue)
 library(DatabaseConnector)
 library(readr)
+library(networkD3)
+library(tidyr)
 
 # Change to project folder
 setwd('todo')
