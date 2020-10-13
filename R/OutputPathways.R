@@ -49,7 +49,7 @@ sankeyDiagram <- function(data) {
   links <- as.data.frame(rbind(results1,results2))
   
   # Create nodes dataframe
-  labels <- unique(as.character(c(results$source,results$target)))
+  labels <- unique(as.character(c(links$source,links$target)))
   nodes <- data.frame(node = c(0:(length(labels)-1)), 
                       name = c(labels))
   
