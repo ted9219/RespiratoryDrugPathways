@@ -89,7 +89,7 @@ outputCombinationTreated <- function(data, group, outputFile) {
   
 }
 
-inputSunburstPlot <- function(data, group, studyName, outputFolder, outputFile) {
+inputSunburstPlot <- function(data, group, studyName, outputFolder, outputFile, addNoPaths) {
   transformed_file <- apply(data[,..group],1, paste, collapse = "-")
   transformed_file <- str_replace_all(transformed_file, "-NA", "")
   transformed_file <- paste0(transformed_file, "-End")
