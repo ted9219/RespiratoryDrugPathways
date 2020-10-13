@@ -24,7 +24,7 @@ generateOutput <- function(studyName,outputFolder, maxPathLength, minCellCount, 
   
   sankeyDiagram(data = file_noyear)
   
-  inputSunburstPlot(data = file_noyear, group = group, studyName = studyName, outputFolder = outputFolder)
+  inputSunburstPlot(data = file_noyear, group = group, studyName = studyName, outputFolder = outputFolder, addNoPaths = addNoPaths)
   
   writeLines("Created output files")
 }
