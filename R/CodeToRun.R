@@ -19,6 +19,8 @@ setwd('todo')
 source(paste(getwd(), '/R/CreateCohort.R', sep = ""), echo=TRUE)
 source(paste(getwd(), '/R/Helper.R', sep = ""), echo=TRUE)
 source(paste(getwd(), '/R/Main.R', sep = ""), echo=TRUE)
+source(paste(getwd(), '/R/OutputPathways.R', sep = ""), echo=TRUE)
+source(paste(getwd(), '/R/ConstructPathways.R', sep = ""), echo=TRUE)
 
 # ------------------------------------------------------------------------
 # Settings and database credentials
