@@ -1,5 +1,7 @@
 cohortId,cohortName,cohortDefinition,cohortType
 1,Asthma,ATLAS,target
+2,COPD,ATLAS,target
+3,Asthma&COPD,ATLAS,target
 11,LTRA combi,Custom,outcome
 12,Anti IgE all,Custom,outcome
 13,Anti IgE mono,Custom,outcome
