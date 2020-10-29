@@ -42,6 +42,7 @@ doCombinationWindow <- function(data, combinationWindow, minEraDuration) {
     
     for (r in rows) {
       # define switch
+      # todo: look at minimum of combinationWindow & length minimum drug era -> this could replace the below requirement for drug era's starting on the same date
       if (-data$GAP_PREVIOUS[r] < combinationWindow & data[r,"DRUG_START_DATE"] != data[r - 1,"DRUG_START_DATE"]) {
         data[r - 1,"DRUG_END_DATE"] <- data[r,DRUG_START_DATE]
       }
@@ -87,6 +88,7 @@ doCombinationWindow <- function(data, combinationWindow, minEraDuration) {
     rows <- output[[2]]
     
     writeLines(paste0("After iteration combinationWindow: ", nrow(data)))
+    gc()
   }
   
   data[,GAP_PREVIOUS:=NULL]
