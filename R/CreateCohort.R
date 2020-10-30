@@ -50,6 +50,7 @@ createCohorts <- function(connectionDetails,
   connection <- DatabaseConnector::connect(connectionDetails)
   
   # Load cohorts to create
+  # (One can add ATLAS cohorts to package using populatePackageCohorts())
   pathToCsv <- "inst/settings/cohorts_to_create.csv"
   cohortsToCreate <- readr::read_csv(pathToCsv, col_types = readr::cols())
   cohortsToCreate <- cohortsToCreate[cohortsToCreate$cohortId %in% c(1,13,14,20,21,24,25,29,32,33,38,40,42,43,44,45),]
