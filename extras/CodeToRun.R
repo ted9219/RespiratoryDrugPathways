@@ -1,26 +1,6 @@
 
-# Load packages (if necessary: install)
-library(SqlRender)
-library(dplyr)
-library(ggplot2)
-library(scales)
-library(gridExtra)
-library(data.table)
-library(stringr)
-library(glue)
-library(DatabaseConnector)
-library(readr)
-library(networkD3)
-library(tidyr)
-
 # Change to project folder
 setwd('todo')
-
-source(paste(getwd(), '/R/CreateCohort.R', sep = ""), echo=TRUE)
-source(paste(getwd(), '/R/Helper.R', sep = ""), echo=TRUE)
-source(paste(getwd(), '/R/Main.R', sep = ""), echo=TRUE)
-source(paste(getwd(), '/R/OutputPathways.R', sep = ""), echo=TRUE)
-source(paste(getwd(), '/R/ConstructPathways.R', sep = ""), echo=TRUE)
 
 # ------------------------------------------------------------------------
 # Settings and database credentials
@@ -48,7 +28,7 @@ connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = dbms,
 
 connection <- DatabaseConnector::connect(dbms = dbms,connectionDetails = connectionDetails)
 
-# ------------------------------------------------------------------------ 
+# ------------------------------------------------------------------------
 # Hard-coded settings
 # ------------------------------------------------------------------------
 
@@ -58,13 +38,12 @@ cohortTable <- "resp_drug_study_cohorts"
 
 runCreateCohorts <- FALSE
 runCohortCharacterization <- FALSE
-runCheckCohorts <- FALSE
 runTreatmentPathways <- FALSE
-exportResults <- FALSE
+outputResults <- FALSE
 
 study_settings <- data.frame(readr::read_csv("inst/Settings/study_settings.csv", col_types = readr::cols()))
 
-# ------------------------------------------------------------------------ 
+# ------------------------------------------------------------------------
 # Run the study
 # ------------------------------------------------------------------------
 
@@ -74,11 +53,11 @@ for (sourceId in 1:length(cdmDatabaseSchemaList)) {
   databaseName <- databaseList[sourceId]
   databaseId <- databaseName
   databaseDescription <- databaseName
-  
+
   print(paste("Executing against", databaseName))
-  
+
   outputFolderDB <- paste0(outputFolder, "/", databaseName)
-  
+
   execute(
     connection = connection,
     connectionDetails = connectionDetails,
@@ -91,10 +70,8 @@ for (sourceId in 1:length(cdmDatabaseSchemaList)) {
     databaseName = databaseName,
     runCreateCohorts = runCreateCohorts,
     runCohortCharacterization = runCohortCharacterization,
-    runCheckCohorts = runCheckCohorts,
     runTreatmentPathways = runTreatmentPathways,
-    exportResults = exportResults,
-    debugSqlFile = debugSqlFile,
+    outputResults = outputResults,
     study_settings = study_settings
   )
   }

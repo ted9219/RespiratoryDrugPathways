@@ -1,0 +1,30 @@
+Package: RespiratoryDrugPathways
+Type: Package
+Title: A package to generate real-world treatment patterns for patients with asthma, COPD and asthma/COPD overlap
+Version: 0.1.0
+Author: Aniek F Markus 
+Maintainer: Aniek F Markus <a.markus@erasmusmc.nl>
+Description: This package gives insight in treatment patterns, the following tasks are performed sequentially:
+    1. Target/outcome cohorts of interest are extracted from the database (defined using ATLAS or custom concept sets created in SQL inserted into cohort template) 
+    2. Characterization of study/target population
+    3. Treatment pathways are constructed
+    4. Output is generated (sunburst plots and more)
+    Go to extras -> CodeToRun.R to execute package
+Depends:
+    R (>= 3.6.1),
+    DatabaseConnector
+Imports: 
+    SqlRender,
+    dplyr,
+    ggplot2,
+    scales,
+    gridExtra,
+    data.table,
+    stringr,
+    glue,
+    readr,
+    networkD3,
+    tidyr
+License: Apache License 2.0
+Encoding: UTF-8
+LazyData: true

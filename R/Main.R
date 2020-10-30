@@ -1,4 +1,51 @@
 
+# Copyright 2020 Observational Health Data Sciences and Informatics
+#
+# This file is part of RespiratoryDrugPathways
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#' Execute the study
+#'
+#' @details
+#' This function will create the exposure and outcome cohorts following the definitions included in
+#' this package.
+#'
+#' @param connectionDetails    An object of type \code{connectionDetails} as created using the
+#'                             \code{\link[DatabaseConnector]{createConnectionDetails}} function in the
+#'                             DatabaseConnector package.
+#' @param cdmDatabaseSchema    Schema name where your patient-level data in OMOP CDM format resides.
+#'                             Note that for SQL Server, this should include both the database and
+#'                             schema name, for example 'cdm_data.dbo'.
+#' @param cohortDatabaseSchema Schema name where intermediate data can be stored. You will need to have
+#'                             write priviliges in this schema. Note that for SQL Server, this should
+#'                             include both the database and schema name, for example 'cdm_data.dbo'.
+#' @param cohortTable          The name of the table that will be created in the work database schema.
+#'                             This table will hold the exposure and outcome cohorts used in this
+#'                             study.
+#' @param oracleTempSchema     Should be used in Oracle to specify a schema where the user has write
+#'                             priviliges for storing temporary tables.
+#' @param outputFolder         Name of local folder to place results; make sure to use forward slashes
+#'                             (/)
+#' @param databaseId         
+#' @param databaseName         
+#' @param runCreateCohorts         
+#' @param runCohortCharacterization         
+#' @param runTreatmentPathways         
+#' @param outputResults         
+#' @param study_settings         
+#' @export
+
 execute <- function(connection = NULL,
                     connectionDetails,
                     cdmDatabaseSchema,
@@ -10,21 +57,9 @@ execute <- function(connection = NULL,
                     databaseName = "Unknown",
                     runCreateCohorts = TRUE,
                     runCohortCharacterization = FALSE,
-                    runCheckCohorts = TRUE,
                     runTreatmentPathways = FALSE,
-                    exportResults = TRUE,
-                    selfManageTempTables = TRUE,
-                    vocabularyDatabaseSchema = cdmDatabaseSchema,
-                    cdmDrugExposureSchema = cdmDatabaseSchema,
-                    drugExposureTable = "drug_exposure",
-                    cdmObservationPeriodSchema = cdmDatabaseSchema,
-                    observationPeriodTable = "observation_period",
-                    cdmPersonSchema = cdmDatabaseSchema,
-                    personTable = "person",
-                    debug = FALSE,
-                    debugSqlFile = "",
+                    outputResults = TRUE,
                     study_settings = study_settings) {
-  
   # Input checks
   if (!file.exists(outputFolder))
     dir.create(outputFolder, recursive = TRUE)
@@ -39,32 +74,31 @@ execute <- function(connection = NULL,
     on.exit(DatabaseConnector::disconnect(connection))
   }
   
-  # Create cohorts: either predefined in ATLAS or using custom concept sets created in SQL inserted into template
+  # Target/outcome cohorts of interest are extracted from the database (defined using ATLAS or custom concept sets created in SQL inserted into cohort template) 
   if (runCreateCohorts) {
     ParallelLogger::addDefaultFileLogger(file.path(outputFolder, "log.txt"))
     
     ParallelLogger::logInfo("Creating cohorts")
-    createCohorts(connection = connection,
-                  connectionDetails = connectionDetails,
+    createCohorts(connectionDetails = connectionDetails,
                   cdmDatabaseSchema = cdmDatabaseSchema,
                   cohortDatabaseSchema = cohortDatabaseSchema,
-                  vocabularyDatabaseSchema = vocabularyDatabaseSchema,
                   cohortTable = cohortTable,
                   oracleTempSchema = oracleTempSchema,
                   outputFolder = outputFolder)
   }
   
+  # Characterization of study/target population
   if (runCohortCharacterization) {
     ParallelLogger::logInfo("Characterization")
     
-    # for all different study settings
+    # For all different study settings # todo: only different target populations!
     settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
     
     for (s in settings) {
       studyName <- study_settings[study_settings$param == "studyName",s]
       targetCohortId <- study_settings[study_settings$param == "targetCohortId",s]
       
-      # initial simple characterization
+      # Initial simple characterization
       sql <- loadRenderTranslateSql(sql = "Characterization.sql",
                                     dbms = connectionDetails$dbms,
                                     oracleTempSchema = oracleTempSchema,
@@ -89,21 +123,16 @@ execute <- function(connection = NULL,
       outputFile <- paste(outputFolder, "/",studyName,"/", studyName, "_characterization.csv",sep='')
       write.table(descriptive_stats,file=outputFile, sep = ",", row.names = TRUE, col.names = TRUE)
       
-      # todo: add more covariates
+      # todo: Add more covariates
       
     }
     
   }
   
-  if (runCheckCohorts) {
-    # Number of concepts in each cohort
-    # Number of overlapping concepts between cohorts
-    # Total exposure counts in database (in a specified period)
-    # Validate cohorts with concept information (description + dose form etc.)
-  }
-  
+  # Treatment pathways are constructed
   if (runTreatmentPathways) {
-    # for all different study settings
+    
+    # For all different study settings
     settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
     
     for (s in settings) {
@@ -122,12 +151,6 @@ execute <- function(connection = NULL,
       combinationWindow <-  as.integer(study_settings[study_settings$param == "combinationWindow",s]) # Window of time when two event cohorts need to overlap to be considered a combination
       sequentialRepetition <-  study_settings[study_settings$param == "sequentialRepetition",s] # Select to only remove sequential occurences of each outcome cohort
       firstTreatment <-  study_settings[study_settings$param == "firstTreatment",s] # Select to only include first occurrence of each outcome cohort
-      
-      # Result settings
-      maxPathLength <-  as.integer(study_settings[study_settings$param == "maxPathLength",s]) # Maximum number of steps in a given pathway to be included in the sunburst plot
-      minCellCount <-  as.integer(study_settings[study_settings$param == "minCellCount",s]) # Minimum number of subjects in the target cohort for a given eent in order to be counted in the pathway
-      addNoPaths  <-  study_settings[study_settings$param == "addNoPaths",s] # Select to add subjects without path to sunburst plot
-      otherCombinations  <-  study_settings[study_settings$param == "otherCombinations",s] # Select to group all non-fixed combinations in one category 'other combinations'
       
       # Load cohorts and pre-processing in SQL
       sql <- loadRenderTranslateSql(sql = "CreateTreatmentSequence.sql",
@@ -158,15 +181,15 @@ execute <- function(connection = NULL,
       if (sequentialRepetition) {data <- doSequentialRepetition(data)}
       if (firstTreatment) {data <- doFirstTreatment(data)}
       
-      # add drug_seq
+      # Add drug_seq
       data <- data[order(PERSON_ID, DRUG_START_DATE, DRUG_END_DATE),]
       data[, DRUG_SEQ:=seq_len(.N), by= .(PERSON_ID)]
       
-      # order the combinations
+      # Order the combinations
       concept_ids <- strsplit(data$DRUG_CONCEPT_ID, split="+", fixed=TRUE)
       data$DRUG_CONCEPT_ID <- sapply(concept_ids, function(x) paste(sort(x), collapse = "+"))
       
-      # add concept_name
+      # Add concept_name
       data <- addLabels(data, outputFolder)
       
       # Move table back to SQL
@@ -185,6 +208,22 @@ execute <- function(connection = NULL,
                                     cdmDatabaseSchema = cdmDatabaseSchema,
                                     studyName=studyName)
       DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
+    }
+  }
+  
+  if (outputResults) {
+    # For all different study settings
+    settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
+    
+    for (s in settings) {
+      studyName <- study_settings[study_settings$param == "studyName",s]
+      
+      # Result settings
+      maxPathLength <-  as.integer(study_settings[study_settings$param == "maxPathLength",s]) # Maximum number of steps in a given pathway to be included in the sunburst plot
+      minCellCount <-  as.integer(study_settings[study_settings$param == "minCellCount",s]) # Minimum number of subjects in the target cohort for a given eent in order to be counted in the pathway
+      addNoPaths  <-  study_settings[study_settings$param == "addNoPaths",s] # Select to add subjects without path to sunburst plot
+      otherCombinations  <-  study_settings[study_settings$param == "otherCombinations",s] # Select to group all non-fixed combinations in one category 'other combinations'
+      
       
       # Get results
       extractAndWriteToFile(connection, tableName = "summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, outputFolder = outputFolder, dbms = connectionDetails$dbms)
@@ -198,9 +237,6 @@ execute <- function(connection = NULL,
     }
   }
   
-  if (exportResults) {
-    exportResults(outputFolder,databaseId)
-  }
-  
+  DatabaseConnector::disconnect(connection)
   invisible(NULL)
 }
