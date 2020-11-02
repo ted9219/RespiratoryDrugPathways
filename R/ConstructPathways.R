@@ -32,7 +32,7 @@ doEraCollapse <- function(data, eraCollapseSize) {
 doCombinationWindow <- function(data, combinationWindow, minEraDuration) {
   data$DRUG_CONCEPT_ID <- as.character(data$DRUG_CONCEPT_ID)
   
-  output <- selectRowsCombinationWindow(data)
+  output <- selectRowsCombinationWindow(data) # todo: add row indicator as extra column and return one matrix
   data <- output[[1]]
   rows <- output[[2]]
   
@@ -40,43 +40,66 @@ doCombinationWindow <- function(data, combinationWindow, minEraDuration) {
   while(!(length(rows)==0)) {
     writeLines(as.character(length(rows)))
     
-    for (r in rows) {
-      # define switch
-      # todo: look at minimum of combinationWindow & length minimum drug era -> this could replace the below requirement for drug era's starting on the same date
-      if (-data$GAP_PREVIOUS[r] < combinationWindow & data[r,"DRUG_START_DATE"] != data[r - 1,"DRUG_START_DATE"]) {
-        data[r - 1,"DRUG_END_DATE"] <- data[r,DRUG_START_DATE]
-      }
-      
-      # define combination
-      else {
-        if (data[r - 1, DRUG_END_DATE] <= data[r, DRUG_END_DATE]) {
-          # add combination as new row
-          new_row <- data[r,]
-          new_row[, "DRUG_END_DATE"]  <- data[r - 1, DRUG_END_DATE]
-          new_row[, "DRUG_CONCEPT_ID"] <- paste0(data[r - 1, "DRUG_CONCEPT_ID"], "+", data[r, "DRUG_CONCEPT_ID"])
-          
-          data <- rbindlist(list(data, new_row))
-          
-          # adjust current rows
-          temp <- data[r-1,DRUG_END_DATE]
-          data[r - 1,"DRUG_END_DATE"] <- data[r,DRUG_START_DATE]
-          data[r,"DRUG_START_DATE"] <- temp
-        }
-        
-        else if (data[r - 1, DRUG_END_DATE] > data[r, DRUG_END_DATE]) {
-          # adjust row for combination
-          data[r,"DRUG_CONCEPT_ID"] <- paste0(data[r - 1, "DRUG_CONCEPT_ID"], "+", data[r, "DRUG_CONCEPT_ID"])
-          
-          # split row in two by adding new row
-          new_row <- data[r - 1,]
-          new_row[, "DRUG_START_DATE"]  <- data[r, DRUG_END_DATE]
-          
-          data[r - 1,"DRUG_END_DATE"] <- data[r,DRUG_START_DATE]
-          
-          data <- rbindlist(list(data, new_row))
-        }
-      }
+    ### REPLACED loop start
+    
+    # which have gap previous shorter than combination window OR min(current duration era, previous duration era) -> add column switch
+    data[selected_rows == 1 && (GAP_PREVIOUS < combinationWindow || GAP_PREVIOUS < min(DURATION_ERA,shift(DURATION_ERA, type = "lag"))), switch:=1]
+    # todo: check this!
+    
+    # for rows selected not in column switch -> if data[r - 1, DRUG_END_DATE] <= data[r, DRUG_END_DATE] -> add column combination first received, first stopped
+    data[selected_rows == 1 && switch != 1 && shift(DRUG_END_DATE, type = "lag") <= DRUG_END_DATE, combination_FRFS:=1]
+    # todo: check this!
+    
+    # for rows selected not in column switch -> if data[r - 1, DRUG_END_DATE] > data[r, DRUG_END_DATE] -> add column combination last received, first stopped
+    data[selected_rows == 1 && switch != 1 && shift(DRUG_END_DATE, type = "lag") > DRUG_END_DATE, combination_LRFS:=1]
+    # todo: check this!
+    
+    # CHECK IF switch + both combinations = NUMBER OF SELECTED ROWS (one person only falls under one of the cases each round)
+    if (sum(data$switch) + sum(data$combination_FRFS) + sum(data$combination_LRFS)  != sum(selected_rows)) {
+      print('Throw error?')
     }
+    
+    # do transformations for each of the three newly added columns
+    # construct helpers
+    data[,DRUG_START_DATE_next:=shift(DRUG_START_DATE, type = "lead"),by=PERSON_ID]
+    data[,DRUG_END_DATE_previous:=shift(DRUG_END_DATE, type = "lag"),by=PERSON_ID]
+    data[,DRUG_END_DATE_next:=shift(DRUG_END_DATE, type = "lead"),by=PERSON_ID]
+    data[,DRUG_CONCEPT_ID_previous:=shift(DRUG_CONCEPT_ID, type = "lag"),by=PERSON_ID]
+    
+    # case: switch
+    # change end data of previous row
+    data[shift(switch, type = "lead")==1,DRUG_END_DATE:=DRUG_START_DATE_next]
+    
+    # case: combination_FRFS
+    # add a new row with start date (r) and end date (r-1) as combination (copy current row + change end date + update concept id)
+    add_rows_FRFS <- data[combination_FRFS==1,]
+    add_rows_FRFS[,DRUG_END_DATE:=DRUG_END_DATE_previous]
+    add_rows_FRFS[,DRUG_CONCEPT_ID:=paste0(DRUG_CONCEPT_ID, "+", DRUG_CONCEPT_ID_previous)]
+    
+    # change end date of previous row
+    data[shift(combination_FRFS, type = "lead")==1,DRUG_END_DATE:=DRUG_START_DATE_next]
+    
+    # change start date of current row
+    data[combination_FRFS==1,DRUG_START_DATE:=DRUG_END_DATE_previous]
+    
+    # case: combination_LRFS
+    # change current row to combination
+    data[combination_LRFS==1,DRUG_CONCEPT_ID:=paste0(DRUG_CONCEPT_ID, "+", DRUG_CONCEPT_ID_previous)]
+    
+    # add a new row with end date (r) and end date (r-1) to split drug era (copy previous row + change end date)
+    add_rows_LRFS <- data[shift(combination_LRFS, type = "lead")==1,]
+    add_rows_LRFS[,DRUG_START_DATE:=DRUG_END_DATE_next]
+    
+    # change end date of previous row
+    data[shift(combination_LRFS, type = "lead")==1,DRUG_END_DATE:=DRUG_START_DATE_next]
+    
+    # combine all rows and remove helper columns
+    data <- rbind(data, add_rows_FRFS)
+    data <- rbind(data, add_rows_LRFS)
+    
+    data <- data[,c("PERSON_ID", "INDEX_YEAR", "DRUG_CONCEPT_ID", "DRUG_START_DATE", "DRUG_END_DATE", "DURATION_ERA")]
+    
+    ### REPLACED loop end
     
     # re-calculate duration_era
     data[,DURATION_ERA:=difftime(DRUG_END_DATE, DRUG_START_DATE, units = "days")]
@@ -111,7 +134,7 @@ selectRowsCombinationWindow <- function(data) {
   rows <- data[!is.na(SELECT_INDEX),head(.SD,1), by=PERSON_ID]$SELECT_INDEX
   data[,SELECT_INDEX:=NULL]
   
-  return(list(data,rows))
+  return(list(data,rows)) # todo: add row indicator as extra column and return one matrix
 }
 
 doSequentialRepetition <- function(data) {
