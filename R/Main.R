@@ -109,8 +109,8 @@ execute <- function(connection = NULL,
                                     tableName=paste0(databaseName, "_characterization_", targetCohortId))
       descriptive_stats <- DatabaseConnector::querySql(connection, sql)
       
-      if (!file.exists(paste0(outputFolder, "/characterization/")))
-        dir.create(paste0(outputFolder,"/characterization/"), recursive = TRUE)
+      if (!file.exists(paste0(outputFolder, "/characterization")))
+        dir.create(paste0(outputFolder,"/characterization"), recursive = TRUE)
       
       outputFile <- paste(outputFolder, "/characterization/characterization_targetcohort", targetCohortId,".csv",sep='')
       write.table(descriptive_stats,file=outputFile, sep = ",", row.names = TRUE, col.names = TRUE)
@@ -123,6 +123,7 @@ execute <- function(connection = NULL,
   
   # Treatment pathways are constructed
   if (runTreatmentPathways) {
+    ParallelLogger::logInfo("Constructing treatment pathways")
     
     # For all different study settings
     settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
@@ -206,7 +207,9 @@ execute <- function(connection = NULL,
     }
   }
   
+  # Output is generated
   if (outputResults) {
+    ParallelLogger::logInfo("Generating output")
     
     # For all different study settings
     settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
@@ -232,7 +235,7 @@ execute <- function(connection = NULL,
       generateOutput(studyName = studyName, databaseName = databaseName, outputFolder = outputFolder, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, addNoPaths = addNoPaths, otherCombinations = otherCombinations)
       
       # Create sunburst plots
-      createSunburstPlots(studyName = studyName,  outputFolder = outputFolder, path=path)
+      createSunburstPlot(studyName = studyName,  outputFolder = outputFolder, path=path)
       
     }
   }
