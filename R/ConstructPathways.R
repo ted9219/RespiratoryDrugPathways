@@ -32,31 +32,24 @@ doEraCollapse <- function(data, eraCollapseSize) {
 doCombinationWindow <- function(data, combinationWindow, minEraDuration) {
   data$DRUG_CONCEPT_ID <- as.character(data$DRUG_CONCEPT_ID)
   
-  output <- selectRowsCombinationWindow(data) # todo: add row indicator as extra column and return one matrix
-  data <- output[[1]]
-  rows <- output[[2]]
+  data <- selectRowsCombinationWindow(data)
   
   # while rows exist:
-  while(!(length(rows)==0)) {
-    writeLines(as.character(length(rows)))
-    
-    ### REPLACED loop start
+  while(sum(data$SELECTED_ROWS)!=0) {
     
     # which have gap previous shorter than combination window OR min(current duration era, previous duration era) -> add column switch
-    data[selected_rows == 1 && (GAP_PREVIOUS < combinationWindow || GAP_PREVIOUS < min(DURATION_ERA,shift(DURATION_ERA, type = "lag"))), switch:=1]
-    # todo: check this!
+    data[SELECTED_ROWS == 1 & (-GAP_PREVIOUS < combinationWindow & shift(DRUG_START_DATE, type = "lag") != DRUG_START_DATE), switch:=1]
+    # todo: add this after comparing to previous version -> | (-GAP_PREVIOUS >= DURATION_ERA | -GAP_PREVIOUS >= shift(DURATION_ERA, type = "lag")) 
     
     # for rows selected not in column switch -> if data[r - 1, DRUG_END_DATE] <= data[r, DRUG_END_DATE] -> add column combination first received, first stopped
-    data[selected_rows == 1 && switch != 1 && shift(DRUG_END_DATE, type = "lag") <= DRUG_END_DATE, combination_FRFS:=1]
-    # todo: check this!
+    data[SELECTED_ROWS == 1 & is.na(switch) & shift(DRUG_END_DATE, type = "lag") <= DRUG_END_DATE, combination_FRFS:=1]
     
     # for rows selected not in column switch -> if data[r - 1, DRUG_END_DATE] > data[r, DRUG_END_DATE] -> add column combination last received, first stopped
-    data[selected_rows == 1 && switch != 1 && shift(DRUG_END_DATE, type = "lag") > DRUG_END_DATE, combination_LRFS:=1]
-    # todo: check this!
+    data[SELECTED_ROWS == 1 & is.na(switch) & shift(DRUG_END_DATE, type = "lag") > DRUG_END_DATE, combination_LRFS:=1]
     
-    # CHECK IF switch + both combinations = NUMBER OF SELECTED ROWS (one person only falls under one of the cases each round)
-    if (sum(data$switch) + sum(data$combination_FRFS) + sum(data$combination_LRFS)  != sum(selected_rows)) {
-      print('Throw error?')
+    writeLines(paste0("Total of ", sum(data$SELECTED_ROWS), " selected rows: ", sum(!is.na(data$switch)) , " switches, ", sum(!is.na(data$combination_FRFS)), " combinations FRFS and ", sum(!is.na(data$combination_LRFS)), " combinations LRFS"))
+    if (sum(!is.na(data$switch)) + sum(!is.na(data$combination_FRFS)) +  sum(!is.na(data$combination_LRFS)) != sum(data$SELECTED_ROWS)) {
+      warning(paste0(sum(data$SELECTED_ROWS), ' does not equal total sum ', sum(!is.na(data$switch)) +  sum(!is.na(data$combination_FRFS)) +  sum(!is.na(data$combination_LRFS))))
     }
     
     # do transformations for each of the three newly added columns
@@ -99,16 +92,12 @@ doCombinationWindow <- function(data, combinationWindow, minEraDuration) {
     
     data <- data[,c("PERSON_ID", "INDEX_YEAR", "DRUG_CONCEPT_ID", "DRUG_START_DATE", "DRUG_END_DATE", "DURATION_ERA")]
     
-    ### REPLACED loop end
-    
     # re-calculate duration_era
     data[,DURATION_ERA:=difftime(DRUG_END_DATE, DRUG_START_DATE, units = "days")]
     
     data <- doEraDuration(data, minEraDuration = 1) # todo: allow minEraDuration = 0 by changing switch/combination to day - 1?
     
-    output <- selectRowsCombinationWindow(data)
-    data <- output[[1]]
-    rows <- output[[2]]
+    data <- selectRowsCombinationWindow(data)
     
     writeLines(paste0("After iteration combinationWindow: ", nrow(data)))
     gc()
@@ -128,13 +117,16 @@ selectRowsCombinationWindow <- function(data) {
   data$GAP_PREVIOUS <- as.integer(data$GAP_PREVIOUS)
   
   # find all rows with gap_previous < 0
-  data[data$GAP_PREVIOUS < 0, SELECT_INDEX:=which(data$GAP_PREVIOUS < 0)]
+  data[data$GAP_PREVIOUS < 0, ALL_ROWS:=which(data$GAP_PREVIOUS < 0)]
   
   # select one row per iteration for each person
-  rows <- data[!is.na(SELECT_INDEX),head(.SD,1), by=PERSON_ID]$SELECT_INDEX
-  data[,SELECT_INDEX:=NULL]
+  rows <- data[!is.na(ALL_ROWS),head(.SD,1), by=PERSON_ID]$ALL_ROWS
   
-  return(list(data,rows)) # todo: add row indicator as extra column and return one matrix
+  data[rows,SELECTED_ROWS:=1]
+  data[!rows,SELECTED_ROWS:=0]
+  data[,ALL_ROWS:=NULL]
+  
+  return(data)
 }
 
 doSequentialRepetition <- function(data) {
@@ -167,7 +159,7 @@ doFirstTreatment <- function(data) {
 
 addLabels <- function(data, outputFolder) {
   cohortIds <- readr::read_csv(paste(outputFolder, "/cohort.csv",sep=''), col_types = readr::cols())
-  labels <- data.frame(DRUG_CONCEPT_ID = as.character(cohortIds$cohortId), CONCEPT_NAME = str_replace_all(cohortIds$cohortName, c(" mono| combi| all"), ""), stringsAsFactors = FALSE)
+  labels <- data.frame(DRUG_CONCEPT_ID = as.character(cohortIds$cohortId), CONCEPT_NAME = stringr::str_replace_all(cohortIds$cohortName, c(" mono| combi| all"), ""), stringsAsFactors = FALSE)
   data <- merge(data, labels, all.x = TRUE)
   
   data$CONCEPT_NAME[is.na(data$CONCEPT_NAME)] <- sapply(data$DRUG_CONCEPT_ID[is.na(data$CONCEPT_NAME)], function(x) {
