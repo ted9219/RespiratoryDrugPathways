@@ -96,6 +96,8 @@ execute <- function(connection = NULL,
     
     for (s in settings) {
       studyName <- study_settings[study_settings$param == "studyName",s]
+      studyName <- paste0(databaseName, "_", studyName)
+      
       targetCohortId <- study_settings[study_settings$param == "targetCohortId",s]
       
       # Initial simple characterization
@@ -137,6 +139,7 @@ execute <- function(connection = NULL,
     
     for (s in settings) {
       studyName <- study_settings[study_settings$param == "studyName",s]
+      studyName <- paste0(databaseName, "_", studyName)
       
       if (!file.exists(paste0(outputFolder, "/", studyName)))
         dir.create(paste0(outputFolder, "/",studyName), recursive = TRUE)
@@ -217,6 +220,7 @@ execute <- function(connection = NULL,
     
     for (s in settings) {
       studyName <- study_settings[study_settings$param == "studyName",s]
+      studyName <- paste0(databaseName, "_", studyName)
       
       # Result settings
       maxPathLength <-  as.integer(study_settings[study_settings$param == "maxPathLength",s]) # Maximum number of steps in a given pathway to be included in the sunburst plot
