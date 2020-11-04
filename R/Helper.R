@@ -13,8 +13,8 @@ loadRenderTranslateSql <- function(sql,
     parameterizedSql <- sql
   }
 
-  renderedSql <- render(sql = parameterizedSql, warnOnMissingParameters = warnOnMissingParameters, ...)
-  renderedSql <- translate(sql = renderedSql, targetDialect = dbms, oracleTempSchema = oracleTempSchema)
+  renderedSql <- SqlRender::render(sql = parameterizedSql, warnOnMissingParameters = warnOnMissingParameters, ...)
+  renderedSql <- SqlRender::translate(sql = renderedSql, targetDialect = dbms, oracleTempSchema = oracleTempSchema)
 
   if (output == TRUE) {
     SqlRender::writeSql(renderedSql,outputFile)
@@ -26,8 +26,8 @@ loadRenderTranslateSql <- function(sql,
 
 extractAndWriteToFile <- function(connection, tableName, resultsSchema, studyName, databaseName, outputFolder, path, dbms){
   parameterizedSql <- "SELECT * FROM @resultsSchema.@databaseName_@studyName_@tableName"
-  renderedSql <- render(parameterizedSql, resultsSchema=resultsSchema, studyName=studyName, databaseName=databaseName, tableName=tableName)
-  translatedSql <- translate(renderedSql, targetDialect = dbms)
+  renderedSql <- SqlRender::render(parameterizedSql, resultsSchema=resultsSchema, studyName=studyName, databaseName=databaseName, tableName=tableName)
+  translatedSql <- SqlRender::translate(renderedSql, targetDialect = dbms)
   data <- DatabaseConnector::querySql(connection, translatedSql)
   outputFile <- paste(path,"_",tableName,".csv",sep='')
   write.csv(data,file=outputFile)
