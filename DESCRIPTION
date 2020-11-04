@@ -16,15 +16,10 @@ Depends:
 Imports: 
     SqlRender,
     dplyr,
-    ggplot2,
-    scales,
-    gridExtra,
     data.table,
     stringr,
-    glue,
     readr,
-    networkD3,
-    tidyr
+    networkD3
 License: Apache License 2.0
 Encoding: UTF-8
 LazyData: true
