@@ -234,6 +234,9 @@ execute <- function(connection = NULL,
       # Process results to outputs
       generateOutput(studyName = studyName,  outputFolder = outputFolder, maxPathLength = maxPathLength, minCellCount = minCellCount, addNoPaths = addNoPaths, otherCombinations = otherCombinations)
       
+      # Create sunburst plots
+      createSunburstPlots(studyName = studyName,  outputFolder = outputFolder)
+      
     }
   }
   

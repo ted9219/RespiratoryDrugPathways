@@ -111,3 +111,35 @@ inputSunburstPlot <- function(data, group, studyName, outputFolder, outputFile, 
   write.table(transformed_file[order(-transformed_file$freq, transformed_file$path),],file=paste(outputFolder, "/",studyName, "/", studyName,"_transformed_drug_seq_summary.csv",sep=''), sep = ",", row.names = FALSE, col.names = FALSE)
 }
 
+createSunburstPlot <- function(studyName, outputFolder){
+  inputFile=paste(outputFolder, "/",studyName, "/", studyName,"_transformed_drug_seq_summary.csv",sep='')
+
+  # Load template HTML file
+  template_html <- paste(readLines("plots/index_template.html"), collapse="\n")
+  
+  # Replace @studyName
+  html <- sub("@studyName", studyName, template_html)
+  
+  # Save HTML file as index_@studyName
+  write.table(html, 
+              file=paste0("plots/index_",studyName,".html"), 
+              quote = FALSE,
+              col.names = FALSE,
+              row.names = FALSE)
+  
+  # Load template JS file
+  template_js <- paste(readLines("plots/sequences_template.js"), collapse="\n")
+  
+  # Replace @file
+  js <- sub("@file", inputFile, template_js)
+  
+  # Save JS file as sequences_@studyName
+  write.table(js, 
+              file=paste0("plots/sequences_",studyName,".js"), 
+              quote = FALSE,
+              col.names = FALSE,
+              row.names = FALSE)
+}
+
+
+
