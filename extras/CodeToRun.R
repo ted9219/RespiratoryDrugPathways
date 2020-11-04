@@ -17,7 +17,6 @@ dbms <- 'todo'
 server <- 'todo'
 port <- 'todo'
 outputFolder <- paste0(getwd(),"/output")
-options(fftempdir = fftempdir)
 
 # Connect to the server
 connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = dbms,
