@@ -24,12 +24,12 @@ loadRenderTranslateSql <- function(sql,
   return(renderedSql)
 }
 
-extractAndWriteToFile <- function(connection, tableName, resultsSchema, studyName, outputFolder, dbms){
-  parameterizedSql <- "SELECT * FROM @resultsSchema.@studyName_@tableName"
-  renderedSql <- render(parameterizedSql, resultsSchema=resultsSchema, studyName=studyName, tableName=tableName)
+extractAndWriteToFile <- function(connection, tableName, resultsSchema, studyName, databaseName, outputFolder, path, dbms){
+  parameterizedSql <- "SELECT * FROM @resultsSchema.@databaseName_@studyName_@tableName"
+  renderedSql <- render(parameterizedSql, resultsSchema=resultsSchema, studyName=studyName, databaseName=databaseName, tableName=tableName)
   translatedSql <- translate(renderedSql, targetDialect = dbms)
   data <- DatabaseConnector::querySql(connection, translatedSql)
-  outputFile <- paste(outputFolder, "/",studyName, "/", studyName,"_",tableName,".csv",sep='')
+  outputFile <- paste(path,"_",tableName,".csv",sep='')
   write.csv(data,file=outputFile)
   writeLines(paste("Created file '",outputFile,"'",sep=""))
 }

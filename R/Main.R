@@ -128,7 +128,6 @@ execute <- function(connection = NULL,
     
     for (s in settings) {
       studyName <- study_settings[study_settings$param == "studyName",s]
-      studyName <- paste0(databaseName, "_", studyName)
       
       if (!file.exists(paste0(outputFolder, "/", studyName)))
         dir.create(paste0(outputFolder, "/",studyName), recursive = TRUE)
@@ -150,16 +149,18 @@ execute <- function(connection = NULL,
                                     oracleTempSchema = oracleTempSchema,
                                     resultsSchema=cohortDatabaseSchema,
                                     studyName=studyName,
+                                    databaseName=databaseName,
                                     targetCohortId=targetCohortId,
                                     outcomeCohortIds=outcomeCohortIds,
                                     cohortTable=cohortTable)
       DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
       
-      sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.@studyName_@tableName",
+      sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.@databaseName_@studyName_@tableName",
                                     dbms = connectionDetails$dbms,
                                     oracleTempSchema = oracleTempSchema,
                                     resultsSchema=cohortDatabaseSchema,
                                     studyName=studyName,
+                                    databaseName=databaseName,
                                     tableName="drug_seq")
       all_data <- DatabaseConnector::querySql(connection, sql)
       
@@ -186,7 +187,7 @@ execute <- function(connection = NULL,
       
       # Move table back to SQL
       DatabaseConnector::insertTable(connection = connection,
-                                     tableName = paste0(cohortDatabaseSchema,".", studyName, "_drug_seq_processed"),
+                                     tableName = paste0(cohortDatabaseSchema,".", databaseName, "_", studyName, "_drug_seq_processed"),
                                      data = data,
                                      dropTableIfExists = TRUE,
                                      createTable = TRUE,
@@ -198,18 +199,19 @@ execute <- function(connection = NULL,
                                     oracleTempSchema = oracleTempSchema,
                                     resultsSchema=cohortDatabaseSchema,
                                     cdmDatabaseSchema = cdmDatabaseSchema,
-                                    studyName=studyName)
+                                    studyName=studyName,
+                                    databaseName=databaseName)
       DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
     }
   }
   
   if (outputResults) {
+    
     # For all different study settings
     settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
     
     for (s in settings) {
       studyName <- study_settings[study_settings$param == "studyName",s]
-      studyName <- paste0(databaseName, "_", studyName)
       
       # Result settings
       maxPathLength <-  as.integer(study_settings[study_settings$param == "maxPathLength",s]) # Maximum number of steps in a given pathway to be included in the sunburst plot
@@ -217,18 +219,19 @@ execute <- function(connection = NULL,
       addNoPaths  <-  study_settings[study_settings$param == "addNoPaths",s] # Select to add subjects without path to sunburst plot
       otherCombinations  <-  study_settings[study_settings$param == "otherCombinations",s] # Select to group all non-fixed combinations in one category 'other combinations'
       
+      path = paste0(outputFolder, "/",studyName, "/", databaseName, "_", studyName)
       
       # Get results
-      extractAndWriteToFile(connection, tableName = "summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, outputFolder = outputFolder, dbms = connectionDetails$dbms)
-      extractAndWriteToFile(connection, tableName = "person_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName,  outputFolder = outputFolder, dbms = connectionDetails$dbms)
-      extractAndWriteToFile(connection, tableName = "drug_seq_summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, outputFolder = outputFolder, dbms = connectionDetails$dbms)
-      extractAndWriteToFile(connection, tableName = "duration_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName, outputFolder = outputFolder, dbms = connectionDetails$dbms)
+      extractAndWriteToFile(connection, tableName = "summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, outputFolder = outputFolder, path = path, dbms = connectionDetails$dbms)
+      extractAndWriteToFile(connection, tableName = "person_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, outputFolder = outputFolder, path = path, dbms = connectionDetails$dbms)
+      extractAndWriteToFile(connection, tableName = "drug_seq_summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName,outputFolder = outputFolder, path = path, dbms = connectionDetails$dbms)
+      extractAndWriteToFile(connection, tableName = "duration_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName,databaseName = databaseName, outputFolder = outputFolder, path = path, dbms = connectionDetails$dbms)
       
       # Process results to outputs
-      generateOutput(studyName = studyName,  outputFolder = outputFolder, maxPathLength = maxPathLength, minCellCount = minCellCount, addNoPaths = addNoPaths, otherCombinations = otherCombinations)
+      generateOutput(studyName = studyName, databaseName = databaseName, outputFolder = outputFolder, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, addNoPaths = addNoPaths, otherCombinations = otherCombinations)
       
       # Create sunburst plots
-      createSunburstPlots(studyName = studyName,  outputFolder = outputFolder)
+      createSunburstPlots(studyName = studyName,  outputFolder = outputFolder, path=path)
       
     }
   }

@@ -1,6 +1,6 @@
 
-generateOutput <- function(studyName,outputFolder, maxPathLength, minCellCount, addNoPaths, otherCombinations) {
-  inputFile <- paste(outputFolder, "/",studyName, "/", studyName,"_drug_seq_summary.csv",sep='')
+generateOutput <- function(studyName, databaseName, outputFolder, path, maxPathLength, minCellCount, addNoPaths, otherCombinations) {
+  inputFile <- paste(path,"_drug_seq_summary.csv",sep='')
   file <- as.data.table(read.csv(inputFile, stringsAsFactors = FALSE))
   
   # Group all 'other' combinations in one group if TRUE
@@ -9,14 +9,14 @@ generateOutput <- function(studyName,outputFolder, maxPathLength, minCellCount, 
     file[findCombinations] <- "Other combinations"
   }
   
-  outputStartSABA(data = file, outputFile = paste(outputFolder, "/",studyName, "/", studyName,"_percent_start_saba.csv",sep=''))
+  outputStartSABA(data = file, outputFile = paste(path,"_percent_start_saba.csv",sep=''))
   
   # Apply maxPathLength and group
   group <- as.vector(colnames(file)[!grepl("X|INDEX_YEAR|NUM_PERSONS|CONCEPT_ID", colnames(file))])
   group <- group[1:maxPathLength]
   file_noyear <- file[,.(freq=sum(NUM_PERSONS)), by=group]
   
-  outputCombinationTreated(data = file_noyear, group = group, outputFile = paste(outputFolder, "/",studyName, "/", studyName,"_percent_combination_treated.csv",sep=''))
+  outputCombinationTreated(data = file_noyear, group = group, outputFile = paste(path,"_percent_combination_treated.csv",sep=''))
   
   # todo: not remove minCellCount but aggregate pathway to other path
   writeLines(paste("Remove ", sum(file_noyear$freq < minCellCount), " paths with too low frequency"))
@@ -24,7 +24,7 @@ generateOutput <- function(studyName,outputFolder, maxPathLength, minCellCount, 
   
   sankeyDiagram(data = file_noyear)
   
-  inputSunburstPlot(data = file_noyear, group = group, studyName = studyName, outputFolder = outputFolder, addNoPaths = addNoPaths)
+  inputSunburstPlot(data = file_noyear, group = group, studyName = studyName, outputFolder = outputFolder, path = path, addNoPaths = addNoPaths)
   
   writeLines("Created output files")
 }
@@ -89,15 +89,15 @@ outputCombinationTreated <- function(data, group, outputFile) {
   
 }
 
-inputSunburstPlot <- function(data, group, studyName, outputFolder, outputFile, addNoPaths) {
+inputSunburstPlot <- function(data, group, studyName, outputFolder, outputFile, path, addNoPaths) {
   transformed_file <- apply(data[,..group],1, paste, collapse = "-")
   transformed_file <- str_replace_all(transformed_file, "-NA", "")
   transformed_file <- paste0(transformed_file, "-End")
   transformed_file <- data.frame(path=transformed_file, freq=data$freq, stringsAsFactors = FALSE)
   
-  summary_counts <- read.csv(paste(outputFolder, "/",studyName, "/", studyName,"_summary.csv",sep=''), stringsAsFactors = FALSE)
+  summary_counts <- read.csv(paste(path,"_summary.csv",sep=''), stringsAsFactors = FALSE)
   summary_counts <- rbind(summary_counts, c(4,   'Number of pathways final (after minCellCount)', sum(transformed_file$freq)  ))
-  write.table(summary_counts,file=paste(outputFolder, "/",studyName, "/", studyName,"_summary.csv",sep=''), sep = ",", row.names = FALSE, col.names = TRUE)
+  write.table(summary_counts,file=paste(path,"_summary.csv",sep=''), sep = ",", row.names = FALSE, col.names = TRUE)
   
   if (addNoPaths) {
     noPath <- as.integer(summary_counts[summary_counts$COUNT_TYPE == "Number of persons in target cohort", "NUM_PERSONS"]) - sum(transformed_file$freq)
@@ -108,11 +108,11 @@ inputSunburstPlot <- function(data, group, studyName, outputFolder, outputFile, 
   transformed_file$path <- as.factor(transformed_file$path)
   transformed_file$freq <- as.integer(transformed_file$freq)
   
-  write.table(transformed_file[order(-transformed_file$freq, transformed_file$path),],file=paste(outputFolder, "/",studyName, "/", studyName,"_transformed_drug_seq_summary.csv",sep=''), sep = ",", row.names = FALSE, col.names = FALSE)
+  write.table(transformed_file[order(-transformed_file$freq, transformed_file$path),],file=paste(path,"_transformed_drug_seq_summary.csv",sep=''), sep = ",", row.names = FALSE, col.names = FALSE)
 }
 
-createSunburstPlot <- function(studyName, outputFolder){
-  inputFile=paste(outputFolder, "/",studyName, "/", studyName,"_transformed_drug_seq_summary.csv",sep='')
+createSunburstPlot <- function(studyName, outputFolder, path){
+  inputFile=paste(path,"_transformed_drug_seq_summary.csv",sep='')
 
   # Load template HTML file
   template_html <- paste(readLines("plots/index_template.html"), collapse="\n")
