@@ -87,6 +87,7 @@ execute <- function(connection = NULL,
     ParallelLogger::logInfo("Characterization")
     
     # For all different target populations
+    settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
     targetCohortIds <- unique(lapply(study_settings[study_settings$param == "targetCohortId",settings], function(x) {x}))
     
     for (targetCohortId in targetCohortIds) {

@@ -46,6 +46,6 @@ FROM @resultsSchema.@databaseName_targetcohort_@targetCohortId t
 LEFT JOIN @cdmDatabaseSchema.person p
 ON t.person_id = p.person_id;
 
-TRUNCATE TABLE @databaseName_targetcohort_@targetCohortId;
-DROP TABLE @databaseName_targetcohort_@targetCohortId;
+TRUNCATE TABLE @resultsSchema.@databaseName_targetcohort_@targetCohortId;
+DROP TABLE @resultsSchema.@databaseName_targetcohort_@targetCohortId;
 
