@@ -86,41 +86,35 @@ execute <- function(connection = NULL,
   if (runCohortCharacterization) {
     ParallelLogger::logInfo("Characterization")
     
-    # For all different study settings # todo: only different target populations!
-    settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
+    # For all different target populations
+    targetCohortIds <- unique(lapply(study_settings[study_settings$param == "targetCohortId",settings], function(x) {x}))
     
-    for (s in settings) {
-      studyName <- study_settings[study_settings$param == "studyName",s]
-      studyName <- paste0(databaseName, "_", studyName)
-      
-      targetCohortId <- study_settings[study_settings$param == "targetCohortId",s]
-      
+    for (targetCohortId in targetCohortIds) {
       # Initial simple characterization
       sql <- loadRenderTranslateSql(sql = "Characterization.sql",
                                     dbms = connectionDetails$dbms,
                                     oracleTempSchema = oracleTempSchema,
                                     resultsSchema=cohortDatabaseSchema,
                                     cdmDatabaseSchema = cdmDatabaseSchema,
-                                    studyName=studyName,
+                                    databaseName=databaseName,
                                     targetCohortId=targetCohortId,
                                     cohortTable=cohortTable)
       DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
       
-      sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.@studyName_@tableName",
+      sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.@tableName",
                                     dbms = connectionDetails$dbms,
                                     oracleTempSchema = oracleTempSchema,
                                     resultsSchema=cohortDatabaseSchema,
-                                    studyName=studyName,
-                                    tableName="characterization")
+                                    tableName=paste0(databaseName, "_characterization_", targetCohortId))
       descriptive_stats <- DatabaseConnector::querySql(connection, sql)
       
-      if (!file.exists(paste0(outputFolder, "/", studyName)))
-        dir.create(paste0(outputFolder, "/",studyName), recursive = TRUE)
+      if (!file.exists(paste0(outputFolder, "/characterization/")))
+        dir.create(paste0(outputFolder,"/characterization/"), recursive = TRUE)
       
-      outputFile <- paste(outputFolder, "/",studyName,"/", studyName, "_characterization.csv",sep='')
+      outputFile <- paste(outputFolder, "/characterization/characterization_targetcohort", targetCohortId,".csv",sep='')
       write.table(descriptive_stats,file=outputFile, sep = ",", row.names = TRUE, col.names = TRUE)
       
-      # todo: Add more covariates
+      # todo: add more covariates
       
     }
     

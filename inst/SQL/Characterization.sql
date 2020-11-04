@@ -1,19 +1,19 @@
 
-IF OBJECT_ID('@resultsSchema.@studyName_targetcohort', 'U') IS NOT NULL
-DROP TABLE @resultsSchema.@studyName_targetcohort;
+IF OBJECT_ID('@resultsSchema.@databaseName_targetcohort_@targetCohortId', 'U') IS NOT NULL
+DROP TABLE @resultsSchema.@databaseName_targetcohort_@targetCohortId;
 
-IF OBJECT_ID('@resultsSchema.@studyName_characterization', 'U') IS NOT NULL
-DROP TABLE @resultsSchema.@studyName_characterization;
+IF OBJECT_ID('@resultsSchema.@databaseName_characterization_@targetCohortId', 'U') IS NOT NULL
+DROP TABLE @resultsSchema.@databaseName_characterization_@targetCohortId;
 
 -- Load target population into targetcohort table
-CREATE TABLE @resultsSchema.@studyName_targetcohort
+CREATE TABLE @resultsSchema.@databaseName_targetcohort_@targetCohortId
 (
 PERSON_ID BIGINT NOT NULL,
 INDEX_DATE date NOT NULL,
 COHORT_END_DATE date NOT NULL
 );
 
-INSERT INTO @resultsSchema.@studyName_targetcohort (PERSON_ID, INDEX_DATE, COHORT_END_DATE)
+INSERT INTO @resultsSchema.@databaseName_targetcohort_@targetCohortId (PERSON_ID, INDEX_DATE, COHORT_END_DATE)
 SELECT
   c.subject_id,
   -- subject_id is equal to person_id
@@ -24,7 +24,7 @@ FROM @resultsSchema.@cohortTable C
 WHERE C.cohort_definition_id = @targetCohortId;
 
 -- Do characterization
-CREATE TABLE @resultsSchema.@studyName_characterization
+CREATE TABLE @resultsSchema.@databaseName_characterization_@targetCohortId
 (
 GENDER VARCHAR(55),
 NUM_PEOPLE INT,
@@ -32,16 +32,20 @@ AVG_AGE FLOAT(53),
 AVG_DAYS_IN_COHORT FLOAT(53)
 );
 
-INSERT INTO @resultsSchema.@studyName_characterization
+INSERT INTO @resultsSchema.@databaseName_characterization_@targetCohortId
 SELECT gender, count(*) as num_people, avg(age) as avg_age, avg(days_in_cohort) as avg_days_in_cohort
 from (select p.gender_concept_id as gender, YEAR(t.cohort_end_date)-p.year_of_birth as age, DATEDIFF(DAY, t.index_date, t.cohort_end_date) AS days_in_cohort
-FROM @resultsSchema.@studyName_targetcohort t
+FROM @resultsSchema.@databaseName_targetcohort_@targetCohortId t
 LEFT JOIN @cdmDatabaseSchema.person p
 ON t.person_id = p.person_id) o
 GROUP BY gender;
 
-INSERT INTO @resultsSchema.@studyName_characterization
+INSERT INTO @resultsSchema.@databaseName_characterization_@targetCohortId
 SELECT 'all' as gender, count(*) as num_people, avg(YEAR(t.cohort_end_date)-p.year_of_birth) as avg_age, avg(DATEDIFF(DAY,  t.index_date, t.cohort_end_date)) as avg_days_in_cohort
-FROM @resultsSchema.@studyName_targetcohort t
+FROM @resultsSchema.@databaseName_targetcohort_@targetCohortId t
 LEFT JOIN @cdmDatabaseSchema.person p
 ON t.person_id = p.person_id;
+
+TRUNCATE TABLE @databaseName_targetcohort_@targetCohortId;
+DROP TABLE @databaseName_targetcohort_@targetCohortId;
+
