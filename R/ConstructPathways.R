@@ -6,6 +6,14 @@ doEraDuration <- function(data, minEraDuration) {
   return(data)
 }
 
+doStepDuration <- function(data, minStepDuration) {
+  # filter out rows with duration_era < minStepDuration for selected steps
+  data <- data[(is.na(check_duration) | DURATION_ERA >= minStepDuration),] # todo: check this
+  writeLines(paste0("After minStepDuration: ", nrow(data)))
+  
+  return(data)
+}
+
 doEraCollapse <- function(data, eraCollapseSize) {
   # order data by person_id, drug_concept_id, drug_start_date, drug_end_date
   data <- data[order(PERSON_ID, DRUG_CONCEPT_ID,DRUG_START_DATE, DRUG_END_DATE),]
@@ -29,7 +37,7 @@ doEraCollapse <- function(data, eraCollapseSize) {
   return(data)
 }
 
-doCombinationWindow <- function(data, combinationWindow, minEraDuration) {
+doCombinationWindow <- function(data, combinationWindow, minStepDuration) {
   data$DRUG_CONCEPT_ID <- as.character(data$DRUG_CONCEPT_ID)
   
   data <- selectRowsCombinationWindow(data)
@@ -59,42 +67,42 @@ doCombinationWindow <- function(data, combinationWindow, minEraDuration) {
     data[,DRUG_CONCEPT_ID_previous:=shift(DRUG_CONCEPT_ID, type = "lag"),by=PERSON_ID]
     
     # case: switch
-    # change end data of previous row
+    # change end data of previous row -> no minStepDuration
     data[shift(switch, type = "lead")==1,DRUG_END_DATE:=DRUG_START_DATE_next]
     
     # case: combination_FRFS
-    # add a new row with start date (r) and end date (r-1) as combination (copy current row + change end date + update concept id)
+    # add a new row with start date (r) and end date (r-1) as combination (copy current row + change end date + update concept id) -> no minStepDuration
     add_rows_FRFS <- data[combination_FRFS==1,]
     add_rows_FRFS[,DRUG_END_DATE:=DRUG_END_DATE_previous]
     add_rows_FRFS[,DRUG_CONCEPT_ID:=paste0(DRUG_CONCEPT_ID, "+", DRUG_CONCEPT_ID_previous)]
     
-    # change end date of previous row
-    data[shift(combination_FRFS, type = "lead")==1,DRUG_END_DATE:=DRUG_START_DATE_next]
+    # change end date of previous row -> check minStepDuration
+    data[shift(combination_FRFS, type = "lead")==1,c("DRUG_END_DATE","check_duration"):=list(DRUG_START_DATE_next, 1)]
     
-    # change start date of current row
-    data[combination_FRFS==1,DRUG_START_DATE:=DRUG_END_DATE_previous]
+    # change start date of current row -> check minStepDuration 
+    data[combination_FRFS==1,c("DRUG_START_DATE", "check_duration"):=list(DRUG_END_DATE_previous,1)]
     
     # case: combination_LRFS
-    # change current row to combination
+    # change current row to combination -> no minStepDuration
     data[combination_LRFS==1,DRUG_CONCEPT_ID:=paste0(DRUG_CONCEPT_ID, "+", DRUG_CONCEPT_ID_previous)]
     
-    # add a new row with end date (r) and end date (r-1) to split drug era (copy previous row + change end date)
+    # add a new row with end date (r) and end date (r-1) to split drug era (copy previous row + change end date) -> check minStepDuration 
     add_rows_LRFS <- data[shift(combination_LRFS, type = "lead")==1,]
-    add_rows_LRFS[,DRUG_START_DATE:=DRUG_END_DATE_next]
+    add_rows_LRFS[,c("DRUG_START_DATE", "check_duration"):=list(DRUG_END_DATE_next,1)]
     
-    # change end date of previous row
-    data[shift(combination_LRFS, type = "lead")==1,DRUG_END_DATE:=DRUG_START_DATE_next]
+    # change end date of previous row -> check minStepDuration 
+    data[shift(combination_LRFS, type = "lead")==1,c("DRUG_END_DATE", "check_duration"):=list(DRUG_START_DATE_next,1)]
     
     # combine all rows and remove helper columns
-    data <- rbind(data, add_rows_FRFS)
+    data <- rbind(data, add_rows_FRFS)  # todo: check if this works without column "check_duration"
     data <- rbind(data, add_rows_LRFS)
-    
-    data <- data[,c("PERSON_ID", "INDEX_YEAR", "DRUG_CONCEPT_ID", "DRUG_START_DATE", "DRUG_END_DATE", "DURATION_ERA")]
     
     # re-calculate duration_era
     data[,DURATION_ERA:=difftime(DRUG_END_DATE, DRUG_START_DATE, units = "days")]
     
-    data <- doEraDuration(data, minEraDuration = 1) # todo: allow minEraDuration = 0 by changing switch/combination to day - 1?
+    data <- doStepDuration(data, minStepDuration)
+    
+    data <- data[,c("PERSON_ID", "INDEX_YEAR", "DRUG_CONCEPT_ID", "DRUG_START_DATE", "DRUG_END_DATE", "DURATION_ERA")]
     
     data <- selectRowsCombinationWindow(data)
     
