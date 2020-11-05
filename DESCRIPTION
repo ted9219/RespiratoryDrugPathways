@@ -12,7 +12,8 @@ Description: This package gives insight in treatment patterns, the following tas
     Go to extras -> CodeToRun.R to execute package
 Depends:
     R (>= 3.6.1),
-    DatabaseConnector
+    DatabaseConnector,
+    CohortDiagnostics
 Imports: 
     SqlRender,
     dplyr,

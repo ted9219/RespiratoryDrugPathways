@@ -116,9 +116,70 @@ execute <- function(connection = NULL,
       write.table(descriptive_stats,file=outputFile, sep = ",", row.names = TRUE, col.names = TRUE)
       
       # todo: add more covariates
-      
     }
     
+    # too much ( do not need to generate new cohorts )
+    CohortDiagnostics::runCohortDiagnostics(cohortToCreateFile = TODO,
+                                            cdmDatabaseSchema = cdmDatabaseSchema,
+                                            cohortDatabaseSchema = cohortDatabaseSchema,  
+                                            runInclusionStatistics = FALSE,
+                                            runIncludedSourceConcepts = FALSE,
+                                            runOrphanConcepts = FALSE,
+                                            runTimeDistributions = FALSE,
+                                            runVisitContext = FALSE,
+                                            runBreakdownIndexEvents = FALSE,
+                                            runIncidenceRate = FALSE,
+                                            runCohortOverlap = FALSE,
+                                            runCohortCharacterization = TRUE,
+                                            covariateSettings = FeatureExtraction::createDefaultCovariateSettings())
+    
+    # todo: test this
+    minCellCount <- 0 # todo: add as parameter
+    
+    cohortCounts <- CohortDiagnostics::getCohortCounts(connection = connection,
+                                    cohortDatabaseSchema = cohortDatabaseSchema,
+                                    cohortTable = cohortTable, 
+                                    cohortIds = targetCohortIds)
+    cohortCounts <- cohortCounts %>% 
+      dplyr::mutate(databaseId = !!databaseId)
+    if (nrow(cohortCounts) > 0) {
+      cohortCounts <- enforceMinCellValue(data = cohortCounts, fieldName = "cohortEntries", minValues = minCellCount)
+      cohortCounts <- enforceMinCellValue(data = cohortCounts, fieldName = "cohortSubjects", minValues = minCellCount)
+    }
+    writeToCsv(data = cohortCounts, 
+               fileName = file.path(paste0(outputFolder, "/characterization"), "cohort_count.csv"), 
+               incremental = FALSE, 
+               cohortId = subset$cohortId)
+    
+    if (nrow(cohortCounts) > 0) {
+      instantiatedCohorts <- cohortCounts %>% 
+        dplyr::pull(.data$cohortId)
+      ParallelLogger::logInfo(sprintf("Found %s of %s (%1.2f%%) submitted cohorts instantiated. ", 
+                                      length(instantiatedCohorts), 
+                                      nrow(cohorts),
+                                      100*(length(instantiatedCohorts)/nrow(cohorts))),
+                              "Beginning cohort diagnostics for instantiated cohorts. ")
+    } else {
+      stop("All cohorts were either not instantiated or all have 0 records.")
+    }
+    
+    characteristics <- CohortDiagnostics::getCohortCharacteristics(connection = connection,
+                                                                   cdmDatabaseSchema = cdmDatabaseSchema,
+                                                                   oracleTempSchema = oracleTempSchema,
+                                                                   cohortDatabaseSchema = cohortDatabaseSchema,
+                                                                   cohortTable = cohortTable,
+                                                                   cohortIds = targetCohortIds,
+                                                                   covariateSettings = FeatureExtraction::createDefaultCovariateSettings())
+    
+    CohortDiagnostics::exportCharacterization(characteristics = characteristics,
+                           databaseId = databaseId,
+                           incremental = incremental,
+                           covariateValueFileName = file.path(paste0(outputFolder, "/characterization"), "covariate_value.csv"),
+                           covariateRefFileName = file.path(paste0(outputFolder, "/characterization"), "covariate_ref.csv"),
+                           analysisRefFileName = file.path(paste0(outputFolder, "/characterization"), "analysis_ref.csv"),
+                           counts = cohortCounts,
+                           minCellCount = minCellCount)
+
   }
   
   # Treatment pathways are constructed
@@ -140,6 +201,7 @@ execute <- function(connection = NULL,
       
       # Analyis settings
       minEraDuration <-  as.integer(study_settings[study_settings$param == "minEraDuration",s]) # Minimum time an era should last to be included in analysis
+      minStepDuration <-  as.integer(study_settings[study_settings$param == "minStepDuration",s]) # Minimum time a step (split drug era) before or after a combination treatment should last to be included in analysis
       eraCollapseSize <-  as.integer(study_settings[study_settings$param == "eraCollapseSize",s]) # Window of time between two same evnt cohorts that are considered one era
       combinationWindow <-  as.integer(study_settings[study_settings$param == "combinationWindow",s]) # Window of time when two event cohorts need to overlap to be considered a combination
       sequentialRepetition <-  study_settings[study_settings$param == "sequentialRepetition",s] # Select to only remove sequential occurences of each outcome cohort
@@ -172,7 +234,7 @@ execute <- function(connection = NULL,
       
       data <- doEraDuration(data, minEraDuration)
       data <- doEraCollapse(data, eraCollapseSize)
-      data <- doCombinationWindow(data, combinationWindow, minEraDuration)
+      data <- doCombinationWindow(data, combinationWindow, minStepDuration)
       if (sequentialRepetition) {data <- doSequentialRepetition(data)}
       if (firstTreatment) {data <- doFirstTreatment(data)}
       
