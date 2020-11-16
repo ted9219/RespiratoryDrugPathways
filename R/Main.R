@@ -127,6 +127,7 @@ execute <- function(connection = NULL,
     final_characterization <- merge(final_characterization, all_characterization, by = "covariate_id", all.x = TRUE)
     
   }
+  
   # Treatment pathways are constructed
   if (runTreatmentPathways) {
     ParallelLogger::logInfo("Constructing treatment pathways")
@@ -136,9 +137,6 @@ execute <- function(connection = NULL,
     
     for (s in settings) {
       studyName <- study_settings[study_settings$param == "studyName",s]
-      
-      if (!file.exists(paste0(outputFolder, "/", studyName)))
-        dir.create(paste0(outputFolder, "/",studyName), recursive = TRUE)
       
       # Select cohorts included
       targetCohortId <- study_settings[study_settings$param == "targetCohortId",s]
@@ -223,6 +221,9 @@ execute <- function(connection = NULL,
     
     for (s in settings) {
       studyName <- study_settings[study_settings$param == "studyName",s]
+      
+      if (!file.exists(paste0(outputFolder, "/", studyName)))
+        dir.create(paste0(outputFolder, "/",studyName), recursive = TRUE)
       
       # Result settings
       maxPathLength <-  as.integer(study_settings[study_settings$param == "maxPathLength",s]) # Maximum number of steps in a given pathway to be included in the sunburst plot
