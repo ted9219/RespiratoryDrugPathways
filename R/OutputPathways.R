@@ -6,6 +6,11 @@ generateOutput <- function(studyName, databaseName, outputFolder, path, maxPathL
   # Group all 'other' combinations in one group if TRUE
   if (otherCombinations) {
     findCombinations <- apply(file, 2, function(x) grepl("+", x, fixed = TRUE))
+    
+    otherCombinations <- as.matrix(file)[findCombinations == TRUE]
+    otherCombinations <- data.frame(combination = otherCombinations) %>% group_by(combination) %>% summarise(freq = n()) %>% arrange(desc(freq))
+    write.csv(otherCombinations, file=paste(path,"_othercombinations.csv",sep=''))
+    
     file[findCombinations] <- "Other combinations"
   }
   
@@ -113,7 +118,7 @@ inputSunburstPlot <- function(data, group, studyName, outputFolder, outputFile, 
 
 createSunburstPlot <- function(studyName, outputFolder, path){
   inputFile=paste(path,"_transformed_drug_seq_summary.csv",sep='')
-
+  
   # Load template HTML file
   template_html <- paste(readLines("plots/index_template.html"), collapse="\n")
   
