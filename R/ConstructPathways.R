@@ -46,8 +46,9 @@ doCombinationWindow <- function(data, combinationWindow, minStepDuration) {
   while(sum(data$SELECTED_ROWS)!=0) {
     
     # which have gap previous shorter than combination window OR min(current duration era, previous duration era) -> add column switch
-    data[SELECTED_ROWS == 1 & (-GAP_PREVIOUS < combinationWindow  | (-GAP_PREVIOUS >= DURATION_ERA | -GAP_PREVIOUS >= shift(DURATION_ERA, type = "lag"))), switch:=1]
-
+    data[SELECTED_ROWS == 1 & (-GAP_PREVIOUS < combinationWindow & shift(DRUG_START_DATE, type = "lag") != DRUG_START_DATE), switch:=1]
+    # data[SELECTED_ROWS == 1 & (-GAP_PREVIOUS < combinationWindow  | (-GAP_PREVIOUS >= DURATION_ERA | -GAP_PREVIOUS >= shift(DURATION_ERA, type = "lag"))), switch:=1]
+    
     # for rows selected not in column switch -> if data[r - 1, DRUG_END_DATE] <= data[r, DRUG_END_DATE] -> add column combination first received, first stopped
     data[SELECTED_ROWS == 1 & is.na(switch) & shift(DRUG_END_DATE, type = "lag") <= DRUG_END_DATE, combination_FRFS:=1]
     

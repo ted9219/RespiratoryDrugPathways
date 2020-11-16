@@ -86,6 +86,9 @@ execute <- function(connection = NULL,
   if (runCohortCharacterization) {
     ParallelLogger::logInfo("Characterization")
     
+    if (!file.exists(paste0(outputFolder, "/characterization")))
+      dir.create(paste0(outputFolder, "/characterization"), recursive = TRUE)
+    
     # For all different target populations
     settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
     targetCohortIds <- unique(lapply(study_settings[study_settings$param == "targetCohortId",settings], function(x) {x}))
@@ -97,11 +100,6 @@ execute <- function(connection = NULL,
     
     cohortCounts <- cohortCounts %>% 
       dplyr::mutate(databaseId = !!databaseId)
-    
-    writeToCsv(data = cohortCounts, 
-               fileName = file.path(paste0(outputFolder, "/characterization"), "cohort_count.csv"), 
-               incremental = FALSE, 
-               cohortId = subset$cohortId)
     
     # todo: test for multiple cohorts
     characteristics <- CohortDiagnostics::getCohortCharacteristics(connection = connection,
