@@ -94,7 +94,7 @@ doCombinationWindow <- function(data, combinationWindow, minStepDuration) {
     data[shift(combination_LRFS, type = "lead")==1,c("DRUG_END_DATE", "check_duration"):=list(DRUG_START_DATE_next,1)]
     
     # combine all rows and remove helper columns
-    data <- rbind(data, add_rows_FRFS)  # todo: check if this works without column "check_duration"
+    data <- rbind(data, add_rows_FRFS, fill=TRUE)
     data <- rbind(data, add_rows_LRFS)
     
     # re-calculate duration_era
