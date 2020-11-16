@@ -90,98 +90,43 @@ execute <- function(connection = NULL,
     settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
     targetCohortIds <- unique(lapply(study_settings[study_settings$param == "targetCohortId",settings], function(x) {x}))
     
-    for (targetCohortId in targetCohortIds) {
-      # Initial simple characterization
-      sql <- loadRenderTranslateSql(sql = "Characterization.sql",
-                                    dbms = connectionDetails$dbms,
-                                    oracleTempSchema = oracleTempSchema,
-                                    resultsSchema=cohortDatabaseSchema,
-                                    cdmDatabaseSchema = cdmDatabaseSchema,
-                                    databaseName=databaseName,
-                                    targetCohortId=targetCohortId,
-                                    cohortTable=cohortTable)
-      DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
-      
-      sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.@tableName",
-                                    dbms = connectionDetails$dbms,
-                                    oracleTempSchema = oracleTempSchema,
-                                    resultsSchema=cohortDatabaseSchema,
-                                    tableName=paste0(databaseName, "_characterization_", targetCohortId))
-      descriptive_stats <- DatabaseConnector::querySql(connection, sql)
-      
-      if (!file.exists(paste0(outputFolder, "/characterization")))
-        dir.create(paste0(outputFolder,"/characterization"), recursive = TRUE)
-      
-      outputFile <- paste(outputFolder, "/characterization/characterization_targetcohort", targetCohortId,".csv",sep='')
-      write.table(descriptive_stats,file=outputFile, sep = ",", row.names = TRUE, col.names = TRUE)
-      
-      # todo: add more covariates
-    }
-    
-    # too much ( do not need to generate new cohorts )
-    CohortDiagnostics::runCohortDiagnostics(cohortToCreateFile = TODO,
-                                            cdmDatabaseSchema = cdmDatabaseSchema,
-                                            cohortDatabaseSchema = cohortDatabaseSchema,  
-                                            runInclusionStatistics = FALSE,
-                                            runIncludedSourceConcepts = FALSE,
-                                            runOrphanConcepts = FALSE,
-                                            runTimeDistributions = FALSE,
-                                            runVisitContext = FALSE,
-                                            runBreakdownIndexEvents = FALSE,
-                                            runIncidenceRate = FALSE,
-                                            runCohortOverlap = FALSE,
-                                            runCohortCharacterization = TRUE,
-                                            covariateSettings = FeatureExtraction::createDefaultCovariateSettings())
-    
-    # todo: test this
-    minCellCount <- 0 # todo: add as parameter
-    
     cohortCounts <- CohortDiagnostics::getCohortCounts(connection = connection,
-                                    cohortDatabaseSchema = cohortDatabaseSchema,
-                                    cohortTable = cohortTable, 
-                                    cohortIds = targetCohortIds)
+                                                       cohortDatabaseSchema = cohortDatabaseSchema,
+                                                       cohortTable = cohortTable, 
+                                                       cohortIds = targetCohortIds)
+    
     cohortCounts <- cohortCounts %>% 
       dplyr::mutate(databaseId = !!databaseId)
-    if (nrow(cohortCounts) > 0) {
-      cohortCounts <- enforceMinCellValue(data = cohortCounts, fieldName = "cohortEntries", minValues = minCellCount)
-      cohortCounts <- enforceMinCellValue(data = cohortCounts, fieldName = "cohortSubjects", minValues = minCellCount)
-    }
+    
     writeToCsv(data = cohortCounts, 
                fileName = file.path(paste0(outputFolder, "/characterization"), "cohort_count.csv"), 
                incremental = FALSE, 
                cohortId = subset$cohortId)
     
-    if (nrow(cohortCounts) > 0) {
-      instantiatedCohorts <- cohortCounts %>% 
-        dplyr::pull(.data$cohortId)
-      ParallelLogger::logInfo(sprintf("Found %s of %s (%1.2f%%) submitted cohorts instantiated. ", 
-                                      length(instantiatedCohorts), 
-                                      nrow(cohorts),
-                                      100*(length(instantiatedCohorts)/nrow(cohorts))),
-                              "Beginning cohort diagnostics for instantiated cohorts. ")
-    } else {
-      stop("All cohorts were either not instantiated or all have 0 records.")
-    }
-    
+    # todo: test for multiple cohorts
     characteristics <- CohortDiagnostics::getCohortCharacteristics(connection = connection,
                                                                    cdmDatabaseSchema = cdmDatabaseSchema,
                                                                    oracleTempSchema = oracleTempSchema,
                                                                    cohortDatabaseSchema = cohortDatabaseSchema,
                                                                    cohortTable = cohortTable,
                                                                    cohortIds = targetCohortIds,
-                                                                   covariateSettings = FeatureExtraction::createDefaultCovariateSettings())
+                                                                   covariateSettings = FeatureExtraction::createCovariateSettings(useDemographicsAge = TRUE, useDemographicsGender = TRUE, useDemographicsTimeInCohort = TRUE, useDemographicsPostObservationTime = TRUE, useConditionGroupEraAnyTimePrior = TRUE, useCharlsonIndex = TRUE))
     
     CohortDiagnostics::exportCharacterization(characteristics = characteristics,
-                           databaseId = databaseId,
-                           incremental = incremental,
-                           covariateValueFileName = file.path(paste0(outputFolder, "/characterization"), "covariate_value.csv"),
-                           covariateRefFileName = file.path(paste0(outputFolder, "/characterization"), "covariate_ref.csv"),
-                           analysisRefFileName = file.path(paste0(outputFolder, "/characterization"), "analysis_ref.csv"),
-                           counts = cohortCounts,
-                           minCellCount = minCellCount)
-
+                                              databaseId = databaseId,
+                                              incremental = FALSE,
+                                              covariateValueFileName = file.path(paste0(outputFolder, "/characterization"), "covariate_value.csv"),
+                                              covariateRefFileName = file.path(paste0(outputFolder, "/characterization"), "covariate_ref.csv"),
+                                              analysisRefFileName = file.path(paste0(outputFolder, "/characterization"), "analysis_ref.csv"),
+                                              counts = cohortCounts,
+                                              minCellCount = 5)
+    # Selection results
+    # todo: add custom covariates
+    all_characterization <- data.frame(readr::read_csv(paste0(outputFolder, "/characterization/covariate_value.csv"), col_types = readr::cols()))
+    final_characterization <- data.frame(readr::read_csv("inst/Settings/characterization_settings.csv", col_types = readr::cols()))
+    final_characterization <- merge(final_characterization, all_characterization, by = "covariate_id", all.x = TRUE)
+    
   }
-  
   # Treatment pathways are constructed
   if (runTreatmentPathways) {
     ParallelLogger::logInfo("Constructing treatment pathways")

@@ -59,3 +59,26 @@ populatePackageCohorts <- function(targetCohortIds,
   
 }
 
+writeToCsv <- function(data, fileName, incremental = FALSE, ...) {
+  colnames(data) <- SqlRender::camelCaseToSnakeCase(colnames(data))
+  if (incremental) {
+    params <- list(...)
+    names(params) <- SqlRender::camelCaseToSnakeCase(names(params))
+    params$data = data
+    params$fileName = fileName
+    do.call(saveIncremental, params)
+    ParallelLogger::logDebug("appending records to ", fileName)
+  } else {
+    if (file.exists(fileName)) {
+      ParallelLogger::logDebug("Overwriting and replacing previous ",fileName, " with new.")
+    } else {
+      ParallelLogger::logDebug("creating ",fileName)
+    }
+    readr::write_excel_csv(x = data, 
+                           path = fileName, 
+                           na = "", 
+                           append = FALSE,
+                           delim = ",")
+  }
+}
+
