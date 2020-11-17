@@ -10,5 +10,6 @@ sequentialRepetition,FALSE,TRUE
 firstTreatment,TRUE,FALSE
 maxPathLength,3,3
 minCellCount,0,0
+removePaths,FALSE,FALSE
 addNoPaths,TRUE,TRUE
 otherCombinations,TRUE,TRUE

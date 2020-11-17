@@ -226,23 +226,37 @@ execute <- function(connection = NULL,
       # Result settings
       maxPathLength <-  as.integer(study_settings[study_settings$param == "maxPathLength",s]) # Maximum number of steps in a given pathway to be included in the sunburst plot
       minCellCount <-  as.integer(study_settings[study_settings$param == "minCellCount",s]) # Minimum number of subjects in the target cohort for a given eent in order to be counted in the pathway
+      removePaths  <-  study_settings[study_settings$param == "removePaths",s] # Select to completely remove paths below minCellCount otherwise adjusted by removing last treatment till above minCellCount
       addNoPaths  <-  study_settings[study_settings$param == "addNoPaths",s] # Select to add subjects without path to sunburst plot
       otherCombinations  <-  study_settings[study_settings$param == "otherCombinations",s] # Select to group all non-fixed combinations in one category 'other combinations'
       
       path = paste0(outputFolder, "/",studyName, "/", databaseName, "_", studyName)
+      # path <- "output/IPCI/asthma1/IPCI_asthma1"
       
-      # Get results
+      # Transform results for output
+      extractAndWriteToFile(connection, tableName = "drug_seq_summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName,outputFolder = outputFolder, path = path, dbms = connectionDetails$dbms)
+      transformOutput(studyName = studyName, databaseName = databaseName, outputFolder = outputFolder, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, removePaths = removePaths, otherCombinations = otherCombinations)
+    
+      file_noyear <- as.data.table(read.csv(paste(path,"_file_noyear.csv",sep=''), stringsAsFactors = FALSE))
+      file_withyear <- as.data.table(read.csv(paste(path,"_file_withyear.csv",sep=''), stringsAsFactors = FALSE))
+      
+      # - Flowchart of study population (todo)
       extractAndWriteToFile(connection, tableName = "summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, outputFolder = outputFolder, path = path, dbms = connectionDetails$dbms)
       extractAndWriteToFile(connection, tableName = "person_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, outputFolder = outputFolder, path = path, dbms = connectionDetails$dbms)
-      extractAndWriteToFile(connection, tableName = "drug_seq_summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName,outputFolder = outputFolder, path = path, dbms = connectionDetails$dbms)
+      
+      # - Compute percentage of people treated with each outcome cohort separately and in the form of combination treatments
+      outputPercentageGroupTreated(data = file_noyear, outputFile = paste(path,"_percentage_groups_treated_noyear.csv",sep=''))
+      outputPercentageGroupTreated(data = file_withyear, outputFile = paste(path,"_percentage_groups_treated_withyear.csv",sep=''))
+      
+      # - Duration of era's (todo)
       extractAndWriteToFile(connection, tableName = "duration_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName,databaseName = databaseName, outputFolder = outputFolder, path = path, dbms = connectionDetails$dbms)
       
-      # Process results to outputs
-      generateOutput(studyName = studyName, databaseName = databaseName, outputFolder = outputFolder, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, addNoPaths = addNoPaths, otherCombinations = otherCombinations)
+      # - Treatment pathways sankey diagram
+      createSankeyDiagram(data = file_noyear)
       
-      # Create sunburst plots
-      createSunburstPlot(studyName = studyName,  outputFolder = outputFolder, path=path)
-      
+      # - Treatment pathways sunburst plot
+      outputSunburstPlot(data = file_noyear, studyName = studyName, path=path, addNoPaths=addNoPaths)
+      outputSunburstPlot(data = file_withyear, studyName = studyName, path=path, addNoPaths=addNoPaths)
     }
   }
   

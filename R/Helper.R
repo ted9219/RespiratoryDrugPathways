@@ -12,15 +12,15 @@ loadRenderTranslateSql <- function(sql,
   } else {
     parameterizedSql <- sql
   }
-
+  
   renderedSql <- SqlRender::render(sql = parameterizedSql, warnOnMissingParameters = warnOnMissingParameters, ...)
   renderedSql <- SqlRender::translate(sql = renderedSql, targetDialect = dbms, oracleTempSchema = oracleTempSchema)
-
+  
   if (output == TRUE) {
     SqlRender::writeSql(renderedSql,outputFile)
     writeLines(paste("Created file '",outputFile,"'",sep=""))
   }
-
+  
   return(renderedSql)
 }
 
@@ -30,7 +30,7 @@ extractAndWriteToFile <- function(connection, tableName, resultsSchema, studyNam
   translatedSql <- SqlRender::translate(renderedSql, targetDialect = dbms)
   data <- DatabaseConnector::querySql(connection, translatedSql)
   outputFile <- paste(path,"_",tableName,".csv",sep='')
-  write.csv(data,file=outputFile)
+  write.csv(data,file=outputFile, row.names = FALSE)
   writeLines(paste("Created file '",outputFile,"'",sep=""))
 }
 
@@ -47,7 +47,7 @@ populatePackageCohorts <- function(targetCohortIds,
                                 type = c(rep('target', length(targetCohortIds)), rep('outcome',length(outcomeIds)))
   )
   
-  write.csv(cohortsToCreate, file.path("./inst/settings",'CohortsToCreate.csv' ), row.names = F)
+  write.csv(cohortsToCreate, file.path("./inst/settings",'CohortsToCreate.csv' ), row.names = FALSE)
   
   for (i in 1:nrow(cohortsToCreate)) {
     writeLines(paste("Inserting cohort:", cohortsToCreate$name[i]))
