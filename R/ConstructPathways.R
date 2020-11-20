@@ -167,7 +167,7 @@ doFirstTreatment <- function(data) {
 
 addLabels <- function(data, outputFolder) {
   cohortIds <- readr::read_csv(paste(outputFolder, "/cohort.csv",sep=''), col_types = readr::cols())
-  labels <- data.frame(DRUG_CONCEPT_ID = as.character(cohortIds$cohortId), CONCEPT_NAME = stringr::str_replace_all(cohortIds$cohortName, c(" mono| combi| all"), ""), stringsAsFactors = FALSE)
+  labels <- data.frame(DRUG_CONCEPT_ID = as.character(cohortIds$cohortId), CONCEPT_NAME = cohortIds$cohortName, stringsAsFactors = FALSE)
   data <- merge(data, labels, all.x = TRUE)
   
   data$CONCEPT_NAME[is.na(data$CONCEPT_NAME)] <- sapply(data$DRUG_CONCEPT_ID[is.na(data$CONCEPT_NAME)], function(x) {

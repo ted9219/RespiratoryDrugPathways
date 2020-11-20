@@ -2,22 +2,18 @@ cohortId,cohortName,cohortDefinition,cohortType
 1,Asthma,ATLAS,target
 2,COPD,ATLAS,target
 3,Asthma&COPD,ATLAS,target
-10,Anti IgE mono,Custom,outcome
-11,Anti IL5 mono,Custom,outcome
-12,LAMA mono,Custom,outcome
-13,SAMA mono,Custom,outcome
-14,Systemic B2 agonist mono,Custom,outcome
-15,LABA mono,Custom,outcome
-16,LTRA mono,Custom,outcome
-17,Xanthines mono,Custom,outcome
-18,SABA mono,Custom,outcome
-19,ICS mono,Custom,outcome
-20,Systemic glucocorticosteroids mono,Custom,outcome
+10,Anti IgE,Custom,outcome
+11,Anti IL5,Custom,outcome
+12,LAMA,Custom,outcome
+13,SAMA,Custom,outcome
+14,Systemic B2 agonist,Custom,outcome
+15,LABA,Custom,outcome
+16,LTRA,Custom,outcome
+17,Xanthines,Custom,outcome
+18,SABA,Custom,outcome
+19,ICS,Custom,outcome
+20,Systemic glucocorticosteroids,Custom,outcome
 21,LABA&ICS,Custom,outcome
 22,LABA&LAMA,Custom,outcome
 23,LABA&LAMA&ICS,Custom,outcome
 24,SABA&SAMA,Custom,outcome
-25,LABA&ICS,ATLAS,outcome
-26,LABA&LAMA,ATLAS,outcome
-27,LABA&LAMA&ICS,ATLAS,outcome
-28,SABA&SAMA,ATLAS,outcome
