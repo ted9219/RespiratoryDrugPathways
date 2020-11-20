@@ -237,46 +237,36 @@ GROUP BY
 
 
 -- Count total persons for attrition table
-IF OBJECT_ID('@resultsSchema.@databaseName_@studyName_summary', 'U') IS NOT NULL
-DROP TABLE @resultsSchema.@databaseName_@studyName_summary;
+IF OBJECT_ID('@resultsSchema.@databaseName_@studyName_summary_cnt', 'U') IS NOT NULL
+DROP TABLE @resultsSchema.@databaseName_@studyName_summary_cnt;
 
-CREATE TABLE @resultsSchema.@databaseName_@studyName_summary
+CREATE TABLE @resultsSchema.@databaseName_@studyName_summary_cnt
 (
 count_type VARCHAR (500),
 num_persons INT
 );
 
-INSERT INTO @resultsSchema.@databaseName_@studyName_summary (count_type, num_persons)
+INSERT INTO @resultsSchema.@databaseName_@studyName_summary_cnt (count_type, num_persons)
 SELECT
   'Number of persons'         AS count_type,
   count(DISTINCT p.person_id) AS num_persons
 FROM @cdmDatabaseSchema.person p;
 
-INSERT INTO @resultsSchema.@databaseName_@studyName_summary (count_type, num_persons)
+INSERT INTO @resultsSchema.@databaseName_@studyName_summary_cnt (count_type, num_persons)
 SELECT
   'Number of persons in target cohort' AS count_type,
   count(DISTINCT person_id)            AS num_persons
 FROM @resultsSchema.@databaseName_@studyName_targetcohort;
 
-INSERT INTO @resultsSchema.@databaseName_@studyName_summary (count_type, num_persons)
+INSERT INTO @resultsSchema.@databaseName_@studyName_summary_cnt (count_type, num_persons)
 SELECT
-  'Number of pathways preliminary' AS count_type,
+  'Total number of pathways (before minCellCount)' AS count_type,
   sum(num_persons)            AS num_persons
 FROM @resultsSchema.@databaseName_@studyName_drug_seq_summary;
 
--- Count total persons with a treatment, by year
-IF OBJECT_ID('@resultsSchema.@databaseName_@studyName_person_cnt', 'U') IS NOT NULL
-DROP TABLE @resultsSchema.@databaseName_@studyName_person_cnt;
-
-CREATE TABLE @resultsSchema.@databaseName_@studyName_person_cnt
-(
-index_year INT,
-num_persons INT
-);
-
-INSERT INTO @resultsSchema.@databaseName_@studyName_person_cnt (index_year, num_persons)
+INSERT INTO @resultsSchema.@databaseName_@studyName_summary_cnt (count_type, num_persons)
 SELECT
-  index_year,
+  CONCAT('Number of pathways (before minCellCount) in ', index_year),
   num_persons
 FROM
   (
@@ -287,46 +277,3 @@ FROM
     GROUP BY index_year
   ) t1;
 
--- Count total persons with a treatment, overall
-INSERT INTO @resultsSchema.@databaseName_@studyName_person_cnt (index_year, num_persons)
-SELECT
-  9999 AS index_year,
-  num_persons
-FROM
-  (
-    SELECT sum(num_persons) AS num_persons
-    FROM @resultsSchema.@databaseName_@studyName_drug_seq_summary
-  ) t1;
-
--- Count duration
-IF OBJECT_ID('@resultsSchema.@databaseName_@studyName_duration_cnt', 'U') IS NOT NULL
-DROP TABLE @resultsSchema.@databaseName_@studyName_duration_cnt;
-
-CREATE TABLE @resultsSchema.@databaseName_@studyName_duration_cnt
-(
-drug_seq INT,
-concept_name VARCHAR (255),
-avg_duration NUMERIC,
-count INT,
-percent_target NUMERIC
-);
-
-INSERT INTO @resultsSchema.@databaseName_@studyName_duration_cnt
-select drug_seq, concept_name, avg(CAST(duration_era as numeric)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from @resultsSchema.@databaseName_@studyName_targetcohort) as percent_target
-FROM @resultsSchema.@databaseName_@studyName_drug_seq_processed
-GROUP BY drug_seq, concept_name;
-
-INSERT INTO @resultsSchema.@databaseName_@studyName_duration_cnt
-select drug_seq, concept_name, avg(CAST(duration_era as numeric)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from @resultsSchema.@databaseName_@studyName_targetcohort) as percent_target
-FROM @resultsSchema.@databaseName_@studyName_drug_seq_processed
-GROUP BY concept_name, drug_seq;
-
-INSERT INTO @resultsSchema.@databaseName_@studyName_duration_cnt
-select NULL as drug_seq, concept_name, avg(CAST(duration_era as numeric)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from @resultsSchema.@databaseName_@studyName_targetcohort) as percent_target
-FROM @resultsSchema.@databaseName_@studyName_drug_seq_processed
-GROUP BY concept_name;
-
-INSERT INTO @resultsSchema.@databaseName_@studyName_duration_cnt
-select drug_seq, 'all' as concept_name, avg(CAST(duration_era as numeric)) as avg_duration, count(*) as count,  count(*)*100.0 / (select count(*) from @resultsSchema.@databaseName_@studyName_targetcohort) as percent_target
-FROM @resultsSchema.@databaseName_@studyName_drug_seq_processed
-GROUP BY drug_seq;

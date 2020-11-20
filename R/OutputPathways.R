@@ -1,12 +1,11 @@
 
-transformOutput <- function(studyName, databaseName, outputFolder, path, maxPathLength, minCellCount, removePaths, otherCombinations) {
-  inputFile <- paste(path,"_drug_seq_summary.csv",sep='')
-  file <- as.data.table(read.csv(inputFile, stringsAsFactors = FALSE))
+transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLength, minCellCount, removePaths, otherCombinations) {
   
+  file <- data.table(extractFile(connection, tableName = "drug_seq_summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, dbms = connectionDetails$dbms))
+
   # Remove unnessary columns
   columns <- colnames(file)[!grepl("CONCEPT_ID", colnames(file))]
   file <- file[,..columns]
-  # file$X <- NULL
   
   # Group all non-fixed combinations in one group if TRUE
   if (otherCombinations) {
@@ -33,7 +32,7 @@ transformOutput <- function(studyName, databaseName, outputFolder, path, maxPath
   file_withyear <- file[,.(freq=sum(NUM_PERSONS)), by=c(layers, "INDEX_YEAR")]
   
   # Apply minCellCount by removing complete path or adding to other most similar path (removing last treatment in path)
-  if (!removePaths) {
+  if (removePaths != "TRUE") {
     col <- ncol(file_noyear) - 1
     while (sum(file_noyear$freq < minCellCount) > 0 & col !=0) {
       writeLines(paste("Change col ", col, " to NA for ", sum(file_noyear$freq < minCellCount), " paths with too low frequency (without year)"))
@@ -69,10 +68,10 @@ transformOutput <- function(studyName, databaseName, outputFolder, path, maxPath
   write.csv(file_withyear,  paste(path,"_file_withyear.csv",sep=''), row.names = FALSE)
 }
 
-outputPercentageGroupTreated <- function(data, path, outputFile) {
+outputPercentageGroupTreated <- function(data, outcomeCohortIds, path, outputFolder, outputFile) {
   if (is.null(data$INDEX_YEAR)) {
     # For file_noyear compute once
-    result <- computePercentageGroupTreated(data)
+    result <- computePercentageGroupTreated(data, outcomeCohortIds, outputFolder)
     
   } else {
     # For file_withyear compute per year
@@ -81,23 +80,24 @@ outputPercentageGroupTreated <- function(data, path, outputFile) {
     results <- lapply(years, function(y) {
       subset_data <- data[INDEX_YEAR == as.character(y),]
       
-      result <- cbind(y, computePercentageGroupTreated(subset_data))
+      subset_result <- cbind(y, computePercentageGroupTreated(subset_data, outcomeCohortIds, outputFolder))
     }) 
     
     result <- rbindlist(results)
-    colnames(result) <- c("INDEX_YEAR" ,"outcomes", layers)
-    
+    # colnames(result[,1:2]) <- c("INDEX_YEAR" ,"outcomes")
+    result$y <- as.character(result$y)
   }
   
   write.csv(result, file=outputFile, row.names = FALSE)
 }
 
-computePercentageGroupTreated <- function(data) {
+computePercentageGroupTreated <- function(data, outcomeCohortIds, outputFolder) {
   layers <- as.vector(colnames(data)[!grepl("INDEX_YEAR|freq", colnames(data))])
-  outcomes <- unique(data[,1]) # todo: add all combinations possible
+  cohorts <- read.csv(paste(outputFolder, "/cohort.csv",sep=''), stringsAsFactors = FALSE)
+  outcomes <- cohorts$cohortName[cohorts$cohortId %in% unlist(strsplit(outcomeCohortIds, ","))]
   
   percentGroupLayer <- sapply(layers, function(l) {
-    percentGroup <- apply(outcomes, 1, function(g) {
+    percentGroup <- sapply(outcomes, function(g) {
       sumGroup <- sum(data$freq[data[,..l] == g], na.rm = TRUE)
       sumAllNotNA <- sum(data$freq[!is.na(data[,..l])])
       
@@ -106,17 +106,69 @@ computePercentageGroupTreated <- function(data) {
   })
   
   # Add outcome names
-  result <- data.frame(outcomes, percentGroupLayer)
+  result <- data.frame(outcomes, percentGroupLayer, stringsAsFactors = FALSE)
   colnames(result) <- c("outcomes", layers)
+  rownames(result) <- NULL
   
   # Add rows for total, fixed combinations, all combinations
   result <- rbind(result, c("Total",colSums(result[layers])), c("Fixed combinations",colSums(result[grepl("\\&", result$outcomes), layers])), c("All combinations",colSums(result[grepl("Other combinations|\\+|\\&", result$outcomes), layers])))
 }
 
+
+
+transformDuration <- function(studyName, databaseName, path, maxPathLength, minCellCount, removePaths, otherCombinations) {
+  
+  file <- data.table(extractFile(connection, tableName = "drug_seq_processed", resultsSchema = cohortDatabaseSchema, studyName = studyName,databaseName = databaseName, dbms = connectionDetails$dbms))
+  
+  # Remove unnessary columns
+  columns <- c("DURATION_ERA", "DRUG_SEQ", "CONCEPT_NAME" )
+  file <- file[,..columns]
+  file$DURATION_ERA <- as.numeric(file$DURATION_ERA)
+  
+  # Group all non-fixed combinations in one group if TRUE
+  if (otherCombinations) {
+    findCombinations <- apply(file, 2, function(x) grepl("+", x, fixed = TRUE))
+    file[findCombinations] <- "Other combinations"
+  }
+  
+  # Apply maxPathLength
+  file <- file[DRUG_SEQ <= maxPathLength,]
+  
+  # Add column for total, fixed combinations, all combinations
+  file$total <- 1
+  file$fixed_combinations[grepl("\\&", file$CONCEPT_NAME)] <- 1
+  file$all_combinations[grepl("Other combinations|\\+|\\&", file$CONCEPT_NAME)] <- 1
+
+  result <- file[,.(AVG_DURATION=round(mean(DURATION_ERA),3), COUNT = .N), by = c("CONCEPT_NAME", "DRUG_SEQ")][order(CONCEPT_NAME, DRUG_SEQ)]
+
+  result_total_seq <- file[,.(DRUG_SEQ = "Total", AVG_DURATION= round(mean(DURATION_ERA),3), COUNT = .N), by = c("CONCEPT_NAME", "total")]
+  result_total_seq$total <- NULL
+  
+  result_total_concept <- file[,.(CONCEPT_NAME = "Total", AVG_DURATION= round(mean(DURATION_ERA),3), COUNT = .N), by = c("DRUG_SEQ", "total")]
+  result_total_concept$total <- NULL
+
+  result_fixed_combinations <- file[,.(CONCEPT_NAME = "Fixed combinations", AVG_DURATION= round(mean(DURATION_ERA),3), COUNT = .N), by = c("DRUG_SEQ", "fixed_combinations")]
+  result_fixed_combinations <- result_fixed_combinations[!is.na(fixed_combinations),]
+  result_fixed_combinations$fixed_combinations <- NULL
+  
+  result_all_combinations <- file[,.(CONCEPT_NAME = "All combinations", AVG_DURATION=round(mean(DURATION_ERA),3), COUNT = .N), by = c("DRUG_SEQ", "all_combinations")]
+  result_all_combinations <- result_all_combinations[!is.na(all_combinations),]
+  result_all_combinations$all_combinations <- NULL
+  
+  results <- rbind(result, result_total_seq, result_total_concept, result_fixed_combinations, result_all_combinations)
+  
+  # Remove durations computed using less than minCellCount observations
+  results[COUNT < minCellCount,c("AVG_DURATION", "COUNT")] <- NA
+
+  write.csv(results,  paste(path,"_duration.csv",sep=''), row.names = FALSE)
+}
+
+
+
 outputSunburstPlot <- function(data, studyName, path, addNoPaths) {
   if (is.null(data$INDEX_YEAR)) {
     # For file_noyear compute once
-    result <- createSunburstPlot(data, index_year = 'All')
+    result <- createSunburstPlot(data, studyName, path, addNoPaths, index_year = 'all')
     
   } else {
     # For file_withyear compute per year
@@ -124,7 +176,7 @@ outputSunburstPlot <- function(data, studyName, path, addNoPaths) {
     
     for (y in years) {
       subset_data <- data[INDEX_YEAR == as.character(y),]
-      createSunburstPlot(subset_data, index_year = y)
+      createSunburstPlot(subset_data, studyName, path, addNoPaths, index_year = y)
     }
   }
 }
@@ -136,6 +188,8 @@ createSunburstPlot <- function(data, studyName, path, addNoPaths, index_year){
   
   inputFile <- paste(path,"_inputsunburst_", index_year, ".csv",sep='')
 
+  # todo: create files for each year separately
+  
   # Load template HTML file
   template_html <- paste(readLines("plots/index_template.html"), collapse="\n")
   
@@ -175,8 +229,8 @@ inputSunburstPlot <- function(data, path, addNoPaths, index_year) {
   transformed_file <- paste0(transformed_file, "-End")
   transformed_file <- data.frame(path=transformed_file, freq=data$freq, stringsAsFactors = FALSE)
   
-  if (addNoPaths) {
-    summary_counts <- read.csv(paste(path,"_summary.csv",sep=''), stringsAsFactors = FALSE)
+  if (addNoPaths) { # todo: change for separate years (but first merge summary + person_cnt file?)
+    summary_counts <- read.csv(paste(path,"_summary_cnt.csv",sep=''), stringsAsFactors = FALSE)
     noPath <- as.integer(summary_counts[summary_counts$COUNT_TYPE == "Number of persons in target cohort", "NUM_PERSONS"]) - sum(transformed_file$freq)
     transformed_file <- rbind(transformed_file, c("End", noPath))
   }

@@ -24,7 +24,15 @@ loadRenderTranslateSql <- function(sql,
   return(renderedSql)
 }
 
-extractAndWriteToFile <- function(connection, tableName, resultsSchema, studyName, databaseName, outputFolder, path, dbms){
+extractFile <- function(connection, tableName, resultsSchema, studyName, databaseName, dbms){
+  parameterizedSql <- "SELECT * FROM @resultsSchema.@databaseName_@studyName_@tableName"
+  renderedSql <- SqlRender::render(parameterizedSql, resultsSchema=resultsSchema, studyName=studyName, databaseName=databaseName, tableName=tableName)
+  translatedSql <- SqlRender::translate(renderedSql, targetDialect = dbms)
+  data <- DatabaseConnector::querySql(connection, translatedSql)
+}
+
+
+extractAndWriteToFile <- function(connection, tableName, resultsSchema, studyName, databaseName, path, dbms){
   parameterizedSql <- "SELECT * FROM @resultsSchema.@databaseName_@studyName_@tableName"
   renderedSql <- SqlRender::render(parameterizedSql, resultsSchema=resultsSchema, studyName=studyName, databaseName=databaseName, tableName=tableName)
   translatedSql <- SqlRender::translate(renderedSql, targetDialect = dbms)
