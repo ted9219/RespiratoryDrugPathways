@@ -235,28 +235,28 @@ execute <- function(connection = NULL,
       
       path = paste0(outputFolder, "/",studyName, "/", databaseName, "_", studyName)
       
+      # Numbers study population
+      extractAndWriteToFile(connection, tableName = "summary_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, path = path, dbms = connectionDetails$dbms)
+      
       # Transform results for output
       transformTreatmentSequence(studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, removePaths = removePaths, otherCombinations = otherCombinations)
     
       file_noyear <- as.data.table(read.csv(paste(path,"_file_noyear.csv",sep=''), stringsAsFactors = FALSE))
       file_withyear <- as.data.table(read.csv(paste(path,"_file_withyear.csv",sep=''), stringsAsFactors = FALSE))
       
-      # - Numbers study population
-      extractAndWriteToFile(connection, tableName = "summary_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, path = path, dbms = connectionDetails$dbms)
-      
-      # - Compute percentage of people treated with each outcome cohort separately and in the form of combination treatments
+      # Compute percentage of people treated with each outcome cohort separately and in the form of combination treatments
       outputPercentageGroupTreated(data = file_noyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_noyear.csv",sep=''))
       outputPercentageGroupTreated(data = file_withyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_withyear.csv",sep=''))
       
-      # - Duration of era's
+      # Duration of era's
       transformDuration(studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, removePaths = removePaths, otherCombinations = otherCombinations)
       
-      # - Treatment pathways sankey diagram
+      # Treatment pathways sankey diagram
       createSankeyDiagram(data = file_noyear)
       
-      # - Treatment pathways sunburst plot
-      outputSunburstPlot(data = file_noyear, studyName = studyName, path=path, addNoPaths=addNoPaths)
-      outputSunburstPlot(data = file_withyear, studyName = studyName, path=path, addNoPaths=addNoPaths)
+      # Treatment pathways sunburst plot
+      outputSunburstPlot(data = file_noyear, studyName = studyName, path=path, addNoPaths=addNoPaths, createInput=TRUE, createPlot=FALSE)
+      outputSunburstPlot(data = file_withyear, studyName = studyName, path=path, addNoPaths=addNoPathsm, createInput=TRUE, createPlot=FALSE)
     }
   }
   
