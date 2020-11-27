@@ -91,7 +91,8 @@ execute <- function(connection = NULL,
     
     # For all different target populations
     settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
-    targetCohortIds <- unique(lapply(study_settings[study_settings$param == "targetCohortId",settings], function(x) {x}))
+    targetCohortIds <- unique(as.numeric(study_settings[study_settings$param == "targetCohortId",settings]))
+    minCellCount <- max(as.integer(study_settings[study_settings$param == "minCellCount",settings])) # Minimum number of subjects in the target cohort for a given eent in order to be counted in the pathway
     
     cohortCounts <- CohortDiagnostics::getCohortCounts(connection = connection,
                                                        cohortDatabaseSchema = cohortDatabaseSchema,
@@ -101,7 +102,6 @@ execute <- function(connection = NULL,
     cohortCounts <- cohortCounts %>% 
       dplyr::mutate(databaseId = !!databaseId)
     
-    # todo: test for multiple cohorts
     characteristics <- CohortDiagnostics::getCohortCharacteristics(connection = connection,
                                                                    cdmDatabaseSchema = cdmDatabaseSchema,
                                                                    oracleTempSchema = oracleTempSchema,
@@ -117,13 +117,53 @@ execute <- function(connection = NULL,
                                               covariateRefFileName = file.path(paste0(outputFolder, "/characterization"), "covariate_ref.csv"),
                                               analysisRefFileName = file.path(paste0(outputFolder, "/characterization"), "analysis_ref.csv"),
                                               counts = cohortCounts,
-                                              minCellCount = 5)
+                                              minCellCount = minCellCount)
     # Selection results
-    # todo: add custom covariates
+    # TODO: add custom covariates
     all_characterization <- data.frame(readr::read_csv(paste0(outputFolder, "/characterization/covariate_value.csv"), col_types = readr::cols()))
-    final_characterization <- data.frame(readr::read_csv("inst/Settings/characterization_settings.csv", col_types = readr::cols()))
-    final_characterization <- merge(final_characterization, all_characterization, by = "covariate_id", all.x = TRUE)
+    settings_characterization <- data.frame(readr::read_csv("inst/Settings/characterization_settings.csv", col_types = readr::cols()))
+    final_characterization <- merge(settings_characterization, all_characterization, by = "covariate_id", all.x = TRUE)
     
+    custom <- settings_characterization$covariate_name[settings_characterization$covariate_id == "Custom"]
+  
+    # TODO: link this to cohort ids using cohort_to_create.csv
+    custom_ids <- 18
+  
+    # Assume custom characterization cohorts already generated   # TODO: add other custom cohorts and generate
+    
+    for (t in targetCohortIds) {
+        # IN SQL:
+        # join the datasets
+        # such that custom characterization cohort first (in history)
+        # group by custom_ids
+        # return count unique persons
+        
+        # TODO: test script
+        # Initial simple characterization
+        sql <- loadRenderTranslateSql(sql = "CustomCharacterization.sql",
+                                      dbms = connectionDetails$dbms,
+                                      oracleTempSchema = oracleTempSchema,
+                                      resultsSchema=cohortDatabaseSchema,
+                                      cdmDatabaseSchema = cdmDatabaseSchema,
+                                      databaseName=databaseName,
+                                      targetCohortId=targetCohortId,
+                                      characterizationCohortIds=custom_ids,
+                                      cohortTable=cohortTable)
+        DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
+        
+        sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.@tableName",
+                                      dbms = connectionDetails$dbms,
+                                      oracleTempSchema = oracleTempSchema,
+                                      resultsSchema=cohortDatabaseSchema,
+                                      tableName=paste0(databaseName, "_characterization_", targetCohortId))
+        custom_counts <- DatabaseConnector::querySql(connection, sql)
+        
+        # TODO: insert result in final_characterization
+        
+      }
+    }
+
+    write.csv(final_characterization, paste0(outputFolder, "/characterization/characterization.csv"), row.names = FALSE)
   }
   
   # Treatment pathways are constructed
@@ -256,7 +296,7 @@ execute <- function(connection = NULL,
       
       # Treatment pathways sunburst plot
       outputSunburstPlot(data = file_noyear, studyName = studyName, path=path, addNoPaths=addNoPaths, createInput=TRUE, createPlot=FALSE)
-      outputSunburstPlot(data = file_withyear, studyName = studyName, path=path, addNoPaths=addNoPathsm, createInput=TRUE, createPlot=FALSE)
+      outputSunburstPlot(data = file_withyear, studyName = studyName, path=path, addNoPaths=addNoPaths, createInput=TRUE, createPlot=FALSE)
     }
   }
   
