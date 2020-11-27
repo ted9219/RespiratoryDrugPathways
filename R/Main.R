@@ -264,6 +264,7 @@ execute <- function(connection = NULL,
         dir.create(paste0(outputFolder, "/",studyName), recursive = TRUE)
       
       # Select cohorts included
+      targetCohortId <- study_settings[study_settings$param == "targetCohortId",s]
       outcomeCohortIds <- study_settings[study_settings$param == "outcomeCohortIds",s]
       
       # Result settings
@@ -288,8 +289,12 @@ execute <- function(connection = NULL,
       outputPercentageGroupTreated(data = file_noyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_noyear.csv",sep=''))
       outputPercentageGroupTreated(data = file_withyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_withyear.csv",sep=''))
       
+      # Compute step-up/down of asthma/COPD drugs
+      # TODO: test this
+      outputStepUpDown(connection = connection, cohortDatabaseSchema = cohortDatabaseSchema, dbms = dbms, studyName = studyName, databaseName = databaseName, path = path, targetCohortId = targetCohortId, maxPathLength = maxPathLength, minCellCount = minCellCount) 
+      
       # Duration of era's
-      transformDuration(studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, removePaths = removePaths, otherCombinations = otherCombinations)
+      transformDuration(connection = connection, cohortDatabaseSchema = cohortDatabaseSchema, dbms = dbms, studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, otherCombinations = otherCombinations)
       
       # Treatment pathways sankey diagram
       createSankeyDiagram(data = file_noyear)

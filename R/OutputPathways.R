@@ -1,5 +1,5 @@
 
-transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLength, minCellCount, removePaths, otherCombinations) {
+transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLength, minCellCount, otherCombinations) {
   
   file <- data.table(extractFile(connection, tableName = "drug_seq_summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, dbms = connectionDetails$dbms))
   
@@ -91,6 +91,66 @@ outputPercentageGroupTreated <- function(data, outcomeCohortIds, path, outputFol
   write.csv(result, file=outputFile, row.names = FALSE)
 }
 
+outputStepUpDown <- function(connection, cohortDatabaseSchema, dbms, studyName, databaseName, path, targetCohortId, minCellCount) { 
+  
+  # TODO: check if this is correct
+  file <- data.table(extractFile(connection, tableName = "drug_seq", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, dbms = connectionDetails$dbms))
+  
+  # Apply maxPathLength
+  file <- file[DRUG_SEQ <= maxPathLength,]
+  
+  # TODO: replace & signs by +
+  
+  
+  def_updown <- read.csv("inst/Settings/augment_switch.csv", sep=",")
+  settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
+  targetCohortIds <- unique(as.numeric(study_settings[study_settings$param == "targetCohortId",settings]))
+  
+  def_groups <- as.vector(unique(def_updown$targetCohortIds))
+  
+  for (t in targetCohortIds) {
+    
+    # Define set of rules
+    # TODO: ACO?
+    done <- FALSE
+    group <- 1
+    
+    while(!done & group < length(def_groups)) {
+      if(t %in% strsplit(def_groups[group], split=",")[[1]]) {
+        done <- TRUE
+        group <- def_groups[1]
+      } else {
+        group <- group + 1
+      }
+    }
+    
+    if (!done) {
+      warning(paste0("No definition for augment/switching for target cohort ", t))
+      break # TODO: test if this works
+    }
+    
+    def_updown_t <- def_updown[def_updown$targetCohortIds == group,]
+    
+    # For each treament layer determine total: step up / step down / switching / undefined
+    # TODO:
+    result_t <- merge(file, def_updown_t, by.x=c("TODO","TODO"), by.y=c("from","to"), all.x = TRUE)
+    
+    # Fill NA's with 'undefined'
+    result_t$category[is.na(result_t)] <- 'undefined'
+    
+    # Compute augment/switch
+    # TODO: check + add percentage
+    result_t[,.(COUNT = .N), by = c("DRUG_SEQ", "CONCEPT_NAME", "category")]
+    
+    # Remove minCellCount
+    result_t[COUNT >= minCellCount,]
+    
+    # Save one file per target cohort
+    write.csv(result,  paste(path,"_augmentswitch_targetcohort", t, ".csv",sep=''), row.names = FALSE)
+  }
+  
+} 
+
 computePercentageGroupTreated <- function(data, outcomeCohortIds, outputFolder) {
   layers <- as.vector(colnames(data)[!grepl("INDEX_YEAR|freq", colnames(data))])
   cohorts <- read.csv(paste(outputFolder, "/cohort.csv",sep=''), stringsAsFactors = FALSE)
@@ -114,7 +174,7 @@ computePercentageGroupTreated <- function(data, outcomeCohortIds, outputFolder) 
   result <- rbind(result, c("Total",colSums(result[layers])), c("Fixed combinations",colSums(result[grepl("\\&", result$outcomes), layers])), c("All combinations",colSums(result[grepl("Other combinations|\\+|\\&", result$outcomes), layers])))
 }
 
-transformDuration <- function(studyName, databaseName, path, maxPathLength, minCellCount, removePaths, otherCombinations) {
+transformDuration <- function(connection, cohortDatabaseSchema, dbms, studyName, databaseName, path, maxPathLength, minCellCount, removePaths, otherCombinations) {
   
   file <- data.table(extractFile(connection, tableName = "drug_seq_processed", resultsSchema = cohortDatabaseSchema, studyName = studyName,databaseName = databaseName, dbms = connectionDetails$dbms))
   
@@ -182,7 +242,7 @@ createSunburstPlot <- function(data, studyName, path, addNoPaths, index_year, cr
   if (createInput) {
     inputSunburstPlot(data, path, addNoPaths, index_year)
   }
-
+  
   if (createPlot) {
     
     CSV <- FALSE
@@ -222,11 +282,11 @@ createSunburstPlot <- function(data, studyName, path, addNoPaths, index_year, cr
     }
     
     if (JSON) {
-    
+      
       preparationCSVtoJSON(outputFolder, path, index_year)
-    
+      
       # TODO: Insert data in script
-     
+      
       # TODO: Automatically take screenshot of resulting html (or generate all in one html?)
       # library(webshot)
       # URL <- paste0("file://", getwd(), "/output/plots/sunburst.html")
@@ -259,7 +319,7 @@ inputSunburstPlot <- function(data, path, addNoPaths, index_year) {
 
 transformCSVtoJSON <- function(outputFolder, path, index_year) {
   # data <- read.csv(paste(path,"_inputsunburst_", index_year, ".csv",sep=''))
-  data <- read.csv("output/IPCI/asthma1/test.csv")
+  # data <- read.csv("output/IPCI/asthma1/test.csv")
   
   cohorts <- read.csv(paste(outputFolder, "/cohort.csv",sep=''), stringsAsFactors = FALSE)
   outcomes <- c(cohorts$cohortName[cohorts$cohortId %in% unlist(strsplit(outcomeCohortIds, ","))], "Other combinations")
@@ -276,7 +336,7 @@ transformCSVtoJSON <- function(outputFolder, path, index_year) {
   lookup <- paste0("[", paste(series, collapse = ","), "]")
   
   # TODO: remove backslashes
-
+  
   # Order names from longest to shortest to adjust in the right order
   linking <- linking[order(-sapply(linking$outcomes, function(x) str_length(x))),]
   
@@ -301,19 +361,19 @@ transformCSVtoJSON <- function(outputFolder, path, index_year) {
   
   #  TODO: test function transformed_json <- buildHierarchy(transformed_csv) 
   
-  write.table(transformed_json, file="output/IPCI/asthma1/test_transformed.csv", sep = ",", row.names = FALSE)
+  # write.table(transformed_json, file="output/IPCI/asthma1/test_transformed.csv", sep = ",", row.names = FALSE)
   # write.table(transformed_json, file=paste(path,"_inputsunburst_", index_year, ".csv",sep=''), sep = ",", row.names = FALSE)
 }
 
 
-buildHierarchy <- funciton(csv) {
+# buildHierarchy <- funciton(csv) {
 
-  
-  
-  return(json)
-}
 
-createSankeyDiagram <- function(data) {
+
+#  return(json)
+#}
+
+createSankeyDiagram <- function(data) { #TODO: change to more than 3 layers?
   # Sankey diagram for first three treatment layers
   data$D1_CONCEPT_NAME <- paste0("1. ",data$D1_CONCEPT_NAME)
   data$D2_CONCEPT_NAME <- paste0("2. ",data$D2_CONCEPT_NAME)
@@ -328,8 +388,8 @@ createSankeyDiagram <- function(data) {
     dplyr::summarise(freq = sum(freq))
   
   # Format in prep for sankey diagram
-  colnames(results1) <- c("source", "target","value")
-  colnames(results2) <- c("source", "target","value")
+  colnames(results1) <- c("source", "target", "value")
+  colnames(results2) <- c("source", "target", "value")
   links <- as.data.frame(rbind(results1,results2))
   
   # Create nodes dataframe
