@@ -90,3 +90,24 @@ writeToCsv <- function(data, fileName, incremental = FALSE, ...) {
   }
 }
 
+# recursive function to remove name from all levels of list
+stripname <- function(x, name) {
+  thisdepth <- depth(x)
+  if (thisdepth == 0) {
+    return(x)
+  } else if (length(nameIndex <- which(names(x) == name))) {
+    temp <- names(x)[names(x) == name]
+    x[[temp]] <- unname(x[[temp]])
+  }
+  return(lapply(x, stripname, name))
+}
+
+# function to find depth of a list element
+depth <- function(this, thisdepth=0){
+  if (!is.list(this)) {
+    return(thisdepth)
+  } else{
+    return(max(unlist(lapply(this,depth,thisdepth=thisdepth+1))))    
+  }
+}
+

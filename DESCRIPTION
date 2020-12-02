@@ -21,7 +21,8 @@ Imports:
     dplyr,
     stringr,
     readr,
-    networkD3
+    networkD3,
+    rjson
 License: Apache License 2.0
 Encoding: UTF-8
 LazyData: true

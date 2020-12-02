@@ -221,10 +221,10 @@ transformDuration <- function(connection, cohortDatabaseSchema, dbms, studyName,
   write.csv(results,  paste(path,"_duration.csv",sep=''), row.names = FALSE)
 }
 
-outputSunburstPlot <- function(data, studyName, path, addNoPaths, createInput, createPlot) {
+outputSunburstPlot <- function(data, studyName, path, addNoPaths, maxPathLength, createInput, createPlot) {
   if (is.null(data$INDEX_YEAR)) {
     # For file_noyear compute once
-    result <- createSunburstPlot(data, studyName, path, addNoPaths, index_year = 'all', createInput, createPlot)
+    result <- createSunburstPlot(data, studyName, path, addNoPaths, maxPathLength, index_year = 'all', createInput, createPlot)
     
   } else {
     # For file_withyear compute per year
@@ -232,12 +232,12 @@ outputSunburstPlot <- function(data, studyName, path, addNoPaths, createInput, c
     
     for (y in years) {
       subset_data <- data[INDEX_YEAR == as.character(y),]
-      createSunburstPlot(subset_data, studyName, path, addNoPaths, index_year = y, createInput, createPlot)
+      createSunburstPlot(subset_data, studyName, path, addNoPaths, maxPathLength, index_year = y, createInput, createPlot)
     }
   }
 }
 
-createSunburstPlot <- function(data, studyName, path, addNoPaths, index_year, createInput, createPlot){
+createSunburstPlot <- function(data, studyName, path, addNoPaths, maxPathLength, index_year, createInput, createPlot){
   
   if (createInput) {
     inputSunburstPlot(data, path, addNoPaths, index_year)
@@ -283,7 +283,7 @@ createSunburstPlot <- function(data, studyName, path, addNoPaths, index_year, cr
     
     if (JSON) {
       
-      preparationCSVtoJSON(outputFolder, path, index_year)
+     transformCSVtoJSON(outputFolder, path, index_year, maxPathLength)
       
       # TODO: Insert data in script
       
@@ -317,8 +317,8 @@ inputSunburstPlot <- function(data, path, addNoPaths, index_year) {
   write.table(transformed_file, file=paste(path,"_inputsunburst_", index_year, ".csv",sep=''), sep = ",", row.names = FALSE)
 }
 
-transformCSVtoJSON <- function(outputFolder, path, index_year) {
-  # data <- read.csv(paste(path,"_inputsunburst_", index_year, ".csv",sep=''))
+transformCSVtoJSON <- function(outputFolder, path, index_year, maxPathLength) {
+  data <- read.csv(paste(path,"_inputsunburst_", index_year, ".csv",sep=''))
   # data <- read.csv("output/IPCI/asthma1/test.csv")
   
   cohorts <- read.csv(paste(outputFolder, "/cohort.csv",sep=''), stringsAsFactors = FALSE)
@@ -333,9 +333,7 @@ transformCSVtoJSON <- function(outputFolder, path, index_year) {
     paste0('{ "key": "', linking$bitwiseNumbers[row] ,'", "value": "', linking$outcomes[row],'"}')
   })
   
-  lookup <- paste0("[", paste(series, collapse = ","), "]")
-  
-  # TODO: remove backslashes
+  lookup <- writeLines(paste0("[", paste(series, collapse = ","), "]"))
   
   # Order names from longest to shortest to adjust in the right order
   linking <- linking[order(-sapply(linking$outcomes, function(x) str_length(x))),]
@@ -358,20 +356,96 @@ transformCSVtoJSON <- function(outputFolder, path, index_year) {
   })
   
   transformed_csv <- cbind(updated_path, data$freq)
+  transformed_json <- buildHierarchy(transformed_csv, maxPathLength) 
   
-  #  TODO: test function transformed_json <- buildHierarchy(transformed_csv) 
-  
-  # write.table(transformed_json, file="output/IPCI/asthma1/test_transformed.csv", sep = ",", row.names = FALSE)
-  # write.table(transformed_json, file=paste(path,"_inputsunburst_", index_year, ".csv",sep=''), sep = ",", row.names = FALSE)
+  write.table(transformed_json, file=paste(path,"_inputsunburst_", index_year, ".txt",sep=''), sep = ",", row.names = FALSE)
 }
 
+buildHierarchy <- function(csv, maxPathLength) {
+  
+  if (maxPathLength > 5) {
+    stop(paste0("MaxPathLength exceeds 5, currently not supported in buildHierarchy function."))
+  }
+  
+  root = list("name" = "root", "children" = list())
+  
+  # create nested structure of lists 
+  for (i in 1:nrow(csv)) {
+    print(paste0("Row ", i))
+    sequence = csv[i,1]
+    size = csv[i,2]
+    
+    parts = unlist(stringr::str_split(sequence,pattern="-"))
+    
+    currentNode = root
+    
+    for (j in 1:length(parts)) {
+      children = currentNode[["children"]]
+      nodeName = parts[j]
+      
+      if (j < length(parts)) {
+        # not yet at the end of the sequence; move down the tree.
+        foundChild = FALSE
+        
+        if (length(children) != 0) {
+          for (k in 1:length(children)) {
+            if (children[[k]]$name == nodeName) {
+              childNode = children[[k]]
+              foundChild = TRUE
+              break
+            }
+          }
+        }
+        
+        # if we dont already have a child node for this branch, create it.
+        if (!foundChild) {
+          childNode = list("name" = nodeName, "children" = list())
+          children[[nodeName]] <- childNode
+          
+          # add to main root
+          if (j == 1) {
+            # root$children <- children
+            root[['children']] <- children
+          } else if (j == 2) {
+            root[['children']][[parts[1]]][['children']] <- children
+          } else if (j == 3) {
+            root[['children']][[parts[1]]][['children']][[parts[2]]][['children']] <- children
+          } else if (j == 4) {
+            root[['children']][[parts[1]]][['children']][[parts[2]]][['children']][[parts[3]]][['children']] <- children
+          } else if (j == 5) {
+            root[['children']][[parts[1]]][['children']][[parts[2]]][['children']][[parts[3]]][['children']][[parts[4]]][['children']]  <- children
+          }
+        }
+        currentNode = childNode
+      } else {
+        # reached the end of the sequence; create a leaf node.
+        childNode = list("name" = nodeName, "size" = size)
+        children[[nodeName]] <- childNode
+        
+        # add to main root
+        if (j == 1) {
+          root[['children']] <- children
+        } else if (j == 2) {
+          root[['children']][[parts[1]]][['children']] <- children
+        } else if (j == 3) {
+          root[['children']][[parts[1]]][['children']][[parts[2]]][['children']] <- children
+        } else if (j == 4) {
+          root[['children']][[parts[1]]][['children']][[parts[2]]][['children']][[parts[3]]][['children']] <- children
+        } else if (j == 5) {
+          root[['children']][[parts[1]]][['children']][[parts[2]]][['children']][[parts[3]]][['children']][[parts[4]]][['children']]  <- children
+        }
+      }
+    }
+  }
+  
+  # remove list names
+  root <- stripname(root, "children")
 
-# buildHierarchy <- funciton(csv) {
-
-
-
-#  return(json)
-#}
+  # convert nested list structure to json
+  json <- writeLines(rjson::toJSON(root))
+  
+  return(json)
+}
 
 createSankeyDiagram <- function(data) { #TODO: change to more than 3 layers?
   # Sankey diagram for first three treatment layers
