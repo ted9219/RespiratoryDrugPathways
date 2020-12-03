@@ -24,3 +24,5 @@ cohortId,cohortName,cohortDefinition,cohortType
 23,LABA&LAMA&ICS,Custom,outcome
 24,SABA&SAMA,Custom,outcome
 50,Chronic rhinosinusitis,ATLAS,characterization
+51,Gastroesophageal reflux disease,ATLAS,characterization
+52,Nasal polyposis,ATLAS,characterization
