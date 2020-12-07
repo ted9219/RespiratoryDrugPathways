@@ -1,5 +1,4 @@
-<html>
-
+<!DOCTYPE html>
 <head>
 	<title>Visualizations: Sunburst</title>
 	<link href="example.css" rel="stylesheet">
@@ -11,104 +10,11 @@
 	<div>This plot shows a sunburst</div>
 	<div style="width:50%" id="plot"></div>
 	<hr/>
-	<div>Data:</div>
-	<textarea id="chartData" style="width:600px; height:400px">
-{
-	"data": {
-		"name":"root",
-		"children":[
-			{
-				"name":"1",
-				"children":[
-					{
-						"name":"2",
-						"children":[
-							{
-								"name":"end",
-								"size":128
-							}
-						]
-					},
-					{
-						"name":"4",
-						"children":[
-							{
-								"name":"6",
-								"children":[
-									{
-										"name":"end",
-										"size":64
-									}
-								]
-							},
-							{
-								"name":"end",
-								"size":64
-							}
-						]
-					},
-					{
-						"name":"end",
-						"size":512
-					}
-				]
-			},
-			{
-				"name":"2",
-				"children":[
-					{
-						"name":"1",
-						"children":[
-							{
-								"name":"end",
-								"size":128
-							}
-						]
-					},
-					{
-						"name":"end",
-						"size":256
-					}
-				]
-			},
-			{
-				"name":"4",
-				"children":[
-					{
-						"name":"end",
-						"size":128
-					}
-				]
-			},
-			{
-				"name":"8",
-				"children":[
-					{
-						"name":"end",
-						"size":64
-					}
-				]
-			},
-			{
-				"name":"6",
-				"children":[
-					{
-						"name":"end",
-						"size":32
-					}
-				]
-			}
-		]
-	},
-	"lookup" : [
-		{ "key": "1", "value": "Treatment 1"},
-		{ "key": "2", "value": "Treatment 2"},
-		{ "key": "4", "value": "Treatment 3"},
-		{ "key": "8", "value": "Treatment 4"}
-	]
-}
+	<div >Data:</div>
+	<textarea  id="chartData" style="width:600px; height:400px">
+@insert_data
 	</textarea>
-	<button id="reload">Reload</button>
+	<button  id="reload">Reload</button>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.3/require.min.js"></script>
 	<script src="config.js"></script>
 	<script>
@@ -155,3 +61,4 @@
 	</script>
 </body>
 </html>
+
