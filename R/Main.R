@@ -119,48 +119,52 @@ execute <- function(connection = NULL,
                                               counts = cohortCounts,
                                               minCellCount = minCellCount)
     # Selection of standard results
-    settings_characterization <- data.frame(readr::read_csv("inst/Settings/characterization_settings.csv", col_types = readr::cols()))
-    standard_characterization <- data.frame(readr::read_csv(paste0(outputFolder, "/characterization/covariate_value.csv"), col_types = readr::cols()))
-    standard_characterization <- merge(settings_characterization, standard_characterization, by = "covariate_id")
+    settings_characterization <- read.csv("inst/Settings/characterization_settings.csv", stringsAsFactors = FALSE)
+    standard_characterization <- read.csv(paste0(outputFolder, "/characterization/covariate_value.csv"), stringsAsFactors = FALSE)
+    standard_characterization <- merge(settings_characterization[,c("covariate_id", "covariate_name")], standard_characterization, by = "covariate_id")
     
     # Add custom characterization
     ParallelLogger::logInfo("Adding custom cohorts in characterization")
-    cohorts <- read.csv(paste(outputFolder, "/cohort.csv",sep=''), stringsAsFactors = FALSE)
-    custom <- settings_characterization$covariate_name[settings_characterization$covariate_id == "Custom"]
+    custom <- settings_characterization[settings_characterization$covariate_id == "Custom", ]
     
-    custom_characterization <- cohorts[cohorts$cohortName %in% custom,c("cohortId", "cohortName")]
-    colnames(custom_characterization) <- c("covariate_id", "covariate_name")
+    # custom_characterization <- cohorts[cohorts$cohortName %in% custom,c("cohortId", "cohortName")]
+    # colnames(custom_characterization) <- c("covariate_id", "covariate_name")
     
-    all_custom_results <- data.frame()
+    custom_characterization <- data.frame()
     
     for (t in targetCohortIds) {
-      sql <- loadRenderTranslateSql(sql = "CustomCharacterization.sql",
-                                    dbms = connectionDetails$dbms,
-                                    oracleTempSchema = oracleTempSchema,
-                                    resultsSchema=cohortDatabaseSchema,
-                                    databaseName=databaseName,
-                                    targetCohortId=t,
-                                    characterizationCohortIds=custom_characterization$covariate_id,
-                                    cohortTable=cohortTable)
-      DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
-      
-      sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.@tableName",
-                                    dbms = connectionDetails$dbms,
-                                    oracleTempSchema = oracleTempSchema,
-                                    resultsSchema=cohortDatabaseSchema,
-                                    tableName=paste0(databaseName, "_characterization_", t))
-      custom_results <- DatabaseConnector::querySql(connection, sql)
-
-      all_custom_results <- rbind(all_custom_results, cbind(custom_results, cohort_id = t, database_id = databaseId))
+      for (c in 1:nrow(custom)) {
+        
+        # Get concept sets
+        concept_set <- custom$concept_set[c]
+        
+        # Find all occurences before index date in SQL (including outside observation period)
+        sql <- loadRenderTranslateSql(sql = "CustomCharacterization.sql",
+                                      dbms = connectionDetails$dbms,
+                                      oracleTempSchema = oracleTempSchema,
+                                      cdmDatabaseSchema = cdmDatabaseSchema,
+                                      resultsSchema=cohortDatabaseSchema,
+                                      databaseName=databaseName,
+                                      targetCohortId=t,
+                                      characterizationConceptSet=concept_set,
+                                      cohortTable=cohortTable)
+        DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
+        
+        sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.@tableName",
+                                      dbms = connectionDetails$dbms,
+                                      oracleTempSchema = oracleTempSchema,
+                                      resultsSchema=cohortDatabaseSchema,
+                                      tableName=paste0(databaseName, "_characterization"))
+       result <- DatabaseConnector::querySql(connection, sql)
+        
+        # Bind to results
+       custom_characterization <- rbind(custom_characterization, cbind(covariate_id = "Custom", covariate_name = custom$covariate_name[c], cohort_id = t, mean = result, sd = NA, database_id = databaseId))
+        
+      }
     }
     
-    # Add names of custom cohorts
-    custom_characterization <- merge(custom_characterization, all_custom_results, by.x = "covariate_id", by.y = "COVARIATE_ID")
+    # Combine result and save
     colnames(custom_characterization) <- tolower(colnames(custom_characterization))
-    custom_characterization$covariate_id <- paste0("custom_",custom_characterization$covariate_id)
-    custom_characterization$sd <- NA
-    
-    # Combine result and save (TODO: check)
     all_characterization <- rbind(standard_characterization, custom_characterization)
     write.csv(all_characterization, paste0(outputFolder, "/characterization/characterization.csv"), row.names = FALSE)
     
@@ -292,8 +296,7 @@ execute <- function(connection = NULL,
         outputPercentageGroupTreated(data = file_withyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_withyear.csv",sep=''))
         
         # Compute step-up/down of asthma/COPD drugs
-        # TODO: test this
-        # outputStepUpDown(connection = connection, cohortDatabaseSchema = cohortDatabaseSchema, dbms = dbms, studyName = studyName, databaseName = databaseName, path = path, targetCohortId = targetCohortId, minCellCount = minCellCount) 
+        outputStepUpDown(file_noyear = file_noyear, path = path, targetCohortId = targetCohortId)
         
         # Duration of era's
         transformDuration(connection = connection, cohortDatabaseSchema = cohortDatabaseSchema, dbms = dbms, studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, otherCombinations = otherCombinations)
