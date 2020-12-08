@@ -27,6 +27,9 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
     write.csv(summaryCombinations, file=paste(path,"_othercombinations.csv",sep=''), row.names = FALSE)
     
     file[findCombinations] <- "Other combinations"
+  } else {
+    # TODO: process combination treatmetns if other combinations is false
+    
   }
   
   # Apply maxPathLength and group the resulting treatment paths
@@ -98,62 +101,61 @@ outputPercentageGroupTreated <- function(data, outcomeCohortIds, path, outputFol
   write.csv(result, file=outputFile, row.names = FALSE)
 }
 
-outputStepUpDown <- function(connection, cohortDatabaseSchema, dbms, studyName, databaseName, path, targetCohortId, minCellCount) { 
+outputStepUpDown <- function(file_noyear, path, targetCohortId) { 
   
-  # TODO: check if this is correct
-  file <- data.table(extractFile(connection, tableName = "drug_seq", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, dbms = connectionDetails$dbms))
+  # TODO: process combination treatmetns if other combinations is false
+  # (not here but in transformTreatmentSequence)
   
-  # Apply maxPathLength
-  file <- file[DRUG_SEQ <= maxPathLength,]
+  # replace & signs by + (so that definitions match both)
   
-  # TODO: replace & signs by +
-  
-  
-  def_updown <- read.csv("inst/Settings/augment_switch.csv", sep=",")
-  settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
-  targetCohortIds <- unique(as.numeric(study_settings[study_settings$param == "targetCohortId",settings]))
-  
+  def_updown <- read.csv("inst/Settings/augment_switch.csv", stringsAsFactors = FALSE)
   def_groups <- as.vector(unique(def_updown$targetCohortIds))
   
-  for (t in targetCohortIds) {
-    
-    # Define set of rules
-    # TODO: ACO?
-    done <- FALSE
-    group <- 1
-    
-    while(!done & group < length(def_groups)) {
-      if(t %in% strsplit(def_groups[group], split=",")[[1]]) {
-        done <- TRUE
-        group <- def_groups[1]
-      } else {
-        group <- group + 1
-      }
+  # Define set of rules
+  # TODO: ACO?
+  done <- FALSE
+  group <- 1
+  
+  while(!done & group < length(def_groups)) {
+    if(targetCohortId %in% strsplit(def_groups[group], split=",")[[1]]) {
+      done <- TRUE
+      group <- def_groups[1]
+    } else {
+      group <- group + 1
     }
+  }
+  
+  if (!done) {
+    warning(paste0("No definition for augment/switching for target cohort ", targetCohortId))
+  } else {
     
-    if (!done) {
-      warning(paste0("No definition for augment/switching for target cohort ", t))
-      break # TODO: test if this works
-    }
+    # Select definitions for this target cohort
+    def_target <- def_updown[def_updown$targetCohortIds == group,]
+    def_target$targetCohortIds <- NULL
     
-    def_updown_t <- def_updown[def_updown$targetCohortIds == group,]
+    all_results <- data.frame()
     
     # For each treament layer determine total: step up / step down / switching / undefined
-    # TODO:
-    result_t <- merge(file, def_updown_t, by.x=c("TODO","TODO"), by.y=c("from","to"), all.x = TRUE)
+    for (l in 1:(ncol(file_noyear)-2)) {
+      
+      cols <- c(l, l+1, ncol(file_noyear))
+      file <- file_noyear[, ..cols]
+      colnames(file) <- c("from", "to", "freq")
+      
+      result <- merge(file, def_target, by.x=c("from","to"), by.y=c("from","to"), all.x = TRUE)
+      
+      # Fill NA's with 'undefined'
+      result$category[is.na(result$category)] <- 'undefined'
+      
+      # Compute augment/switch
+      total <- sum(result$freq)
+      result <- result[,.(count = sum(freq), perc = round(sum(freq)*100/total,4)), by = "category"]
+      result$layer <- l
+      
+      all_results <- rbind(all_results, result)
+    }
     
-    # Fill NA's with 'undefined'
-    result_t$category[is.na(result_t)] <- 'undefined'
-    
-    # Compute augment/switch
-    # TODO: check + add percentage
-    result_t[,.(COUNT = .N), by = c("DRUG_SEQ", "CONCEPT_NAME", "category")]
-    
-    # Remove minCellCount
-    result_t[COUNT >= minCellCount,]
-    
-    # Save one file per target cohort
-    write.csv(result,  paste(path,"_augmentswitch_targetcohort", t, ".csv",sep=''), row.names = FALSE)
+    write.csv(all_results, paste(path,"_augmentswitch.csv",sep=''), row.names = FALSE)
   }
   
 } 
@@ -258,7 +260,6 @@ createSunburstPlot <- function(data, outcomeCohortIds, studyName, outputFolder, 
     inputFile <- paste(path,"_inputsunburst_", index_year, ".csv",sep='')
     
     if (CSV) {
-      
       # Load template HTML file
       template_html <- paste(readLines("plots/index_template.html"), collapse="\n")
       
@@ -289,7 +290,6 @@ createSunburstPlot <- function(data, outcomeCohortIds, studyName, outputFolder, 
     }
     
     if (JSON) {
-      
       transformCSVtoJSON(outcomeCohortIds, outputFolder, path, index_year, maxPathLength)
       
       # Load template HTML file
@@ -307,11 +307,8 @@ createSunburstPlot <- function(data, outcomeCohortIds, studyName, outputFolder, 
                   col.names = FALSE,
                   row.names = FALSE)
       
-      # TODO: Automatically take screenshot of resulting html (or generate all in one html?)
-      # Cannot view html when no internet connection due to requirejs
-      # library(webshot)
-      # URL <- paste0("file://", getwd(), "/output/plots/sunburst.html")
-      # webshot(URL, file = "file.png", delay = 1)
+      # TODO: Automatically take screenshot of resulting html
+      
     }
   }
 }
