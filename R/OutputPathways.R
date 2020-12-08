@@ -1,11 +1,16 @@
 
-transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLength, minCellCount, otherCombinations) {
+transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLength, minCellCount, removePaths, otherCombinations) {
   
   file <- data.table(extractFile(connection, tableName = "drug_seq_summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, dbms = connectionDetails$dbms))
   
   # Remove unnessary columns
   columns <- colnames(file)[!grepl("CONCEPT_ID", colnames(file))]
   file <- file[,..columns]
+  
+  if (nrow(file) == 0) {
+    warning(paste0("Data is empty for study settings ", studyName))
+    return (TRUE)
+  }
   
   # Group all non-fixed combinations in one group if TRUE
   if (otherCombinations) { # TODO: only group infrequent combinations?
@@ -61,11 +66,13 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
   file_withyear <- file_withyear[freq >= minCellCount,]
   
   summary_counts <- read.csv(paste(path,"_summary_cnt.csv",sep=''), stringsAsFactors = FALSE)
-  summary_counts <- rbind(summary_counts, c("Total number of pathways (before minCellCount)", sum(file_noyear$freq)))
+  summary_counts <- rbind(summary_counts, c("Total number of pathways (after minCellCount)", sum(file_noyear$freq)))
   write.table(summary_counts,file=paste(path,"_summary_cnt.csv",sep=''), sep = ",", row.names = FALSE, col.names = TRUE)
   
   write.csv(file_noyear,  paste(path,"_file_noyear.csv",sep=''), row.names = FALSE)
   write.csv(file_withyear,  paste(path,"_file_withyear.csv",sep=''), row.names = FALSE)
+  
+  return(FALSE)
 }
 
 outputPercentageGroupTreated <- function(data, outcomeCohortIds, path, outputFolder, outputFile) {
@@ -221,10 +228,10 @@ transformDuration <- function(connection, cohortDatabaseSchema, dbms, studyName,
   write.csv(results,  paste(path,"_duration.csv",sep=''), row.names = FALSE)
 }
 
-outputSunburstPlot <- function(data, studyName, path, addNoPaths, maxPathLength, createInput, createPlot) {
+outputSunburstPlot <- function(data, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, createInput, createPlot) {
   if (is.null(data$INDEX_YEAR)) {
     # For file_noyear compute once
-    result <- createSunburstPlot(data, studyName, path, addNoPaths, maxPathLength, index_year = 'all', createInput, createPlot)
+    result <- createSunburstPlot(data, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year = 'all', createInput, createPlot)
     
   } else {
     # For file_withyear compute per year
@@ -232,12 +239,12 @@ outputSunburstPlot <- function(data, studyName, path, addNoPaths, maxPathLength,
     
     for (y in years) {
       subset_data <- data[INDEX_YEAR == as.character(y),]
-      createSunburstPlot(subset_data, studyName, path, addNoPaths, maxPathLength, index_year = y, createInput, createPlot)
+      createSunburstPlot(subset_data, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year = y, createInput, createPlot)
     }
   }
 }
 
-createSunburstPlot <- function(data, studyName, path, addNoPaths, maxPathLength, index_year, createInput, createPlot){
+createSunburstPlot <- function(data, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year, createInput, createPlot){
   
   if (createInput) {
     inputSunburstPlot(data, path, addNoPaths, index_year)
@@ -283,11 +290,25 @@ createSunburstPlot <- function(data, studyName, path, addNoPaths, maxPathLength,
     
     if (JSON) {
       
-     transformCSVtoJSON(outputFolder, path, index_year, maxPathLength)
+      transformCSVtoJSON(outcomeCohortIds, outputFolder, path, index_year, maxPathLength)
       
-      # TODO: Insert data in script
+      # Load template HTML file
+      template_html <- paste(readLines("plots/sunburst_template.html"), collapse="\n")
+      
+      # Replace @insert_data
+      input_plot <- readLines(paste(path,"_inputsunburst_", index_year, ".txt",sep=''))
+      
+      html <- sub("@insert_data", input_plot, template_html)
+      
+      # Save HTML file as sunburst_@studyName
+      write.table(html, 
+                  file=paste0("plots/sunburst_",paste0(studyName,"_", index_year),".html"), 
+                  quote = FALSE,
+                  col.names = FALSE,
+                  row.names = FALSE)
       
       # TODO: Automatically take screenshot of resulting html (or generate all in one html?)
+      # Cannot view html when no internet connection due to requirejs
       # library(webshot)
       # URL <- paste0("file://", getwd(), "/output/plots/sunburst.html")
       # webshot(URL, file = "file.png", delay = 1)
@@ -317,7 +338,7 @@ inputSunburstPlot <- function(data, path, addNoPaths, index_year) {
   write.table(transformed_file, file=paste(path,"_inputsunburst_", index_year, ".csv",sep=''), sep = ",", row.names = FALSE)
 }
 
-transformCSVtoJSON <- function(outputFolder, path, index_year, maxPathLength) {
+transformCSVtoJSON <- function(outcomeCohortIds, outputFolder, path, index_year, maxPathLength) {
   data <- read.csv(paste(path,"_inputsunburst_", index_year, ".csv",sep=''))
   # data <- read.csv("output/IPCI/asthma1/test.csv")
   
@@ -333,10 +354,10 @@ transformCSVtoJSON <- function(outputFolder, path, index_year, maxPathLength) {
     paste0('{ "key": "', linking$bitwiseNumbers[row] ,'", "value": "', linking$outcomes[row],'"}')
   })
   
-  lookup <- writeLines(paste0("[", paste(series, collapse = ","), "]"))
+  lookup <- paste0("[", paste(series, collapse = ","), "]") # TODO: remove backslash? writeLines?
   
   # Order names from longest to shortest to adjust in the right order
-  linking <- linking[order(-sapply(linking$outcomes, function(x) str_length(x))),]
+  linking <- linking[order(-sapply(linking$outcomes, function(x) stringr::str_length(x))),]
   
   # Apply linking
   # Change all outcomes to bitwise number
@@ -346,19 +367,22 @@ transformCSVtoJSON <- function(outputFolder, path, index_year, maxPathLength) {
   
   # Sum the bitwise numbers of combinations (indicated by +)
   updated_path <- sapply(updated_path, function(p) {
-    while(!is.na(str_extract(p, "[[:digit:]]+[+][[:digit:]]+"))) {
-      pattern <- str_extract(p, "[[:digit:]]+[+][[:digit:]]+")
+    while(!is.na(stringr::str_extract(p, "[[:digit:]]+[+][[:digit:]]+"))) {
+      pattern <- stringr::str_extract(p, "[[:digit:]]+[+][[:digit:]]+")
       
       p <- sub("[[:digit:]]+[+][[:digit:]]+", eval(parse(text=pattern)), p)
-      print(p)
     }
     return(p)
   })
   
-  transformed_csv <- cbind(updated_path, data$freq)
+  transformed_csv <- cbind(oath = updated_path, freq = data$freq)
   transformed_json <- buildHierarchy(transformed_csv, maxPathLength) 
   
-  write.table(transformed_json, file=paste(path,"_inputsunburst_", index_year, ".txt",sep=''), sep = ",", row.names = FALSE)
+  result <- paste0("{ \"data\" : ", transformed_json, ", \"lookup\" : ", lookup, "}")
+  
+  file <- file(paste(path,"_inputsunburst_", index_year, ".txt",sep=''))
+  writeLines(result, file)
+  close(file)
 }
 
 buildHierarchy <- function(csv, maxPathLength) {
@@ -371,7 +395,6 @@ buildHierarchy <- function(csv, maxPathLength) {
   
   # create nested structure of lists 
   for (i in 1:nrow(csv)) {
-    print(paste0("Row ", i))
     sequence = csv[i,1]
     size = csv[i,2]
     
@@ -439,10 +462,10 @@ buildHierarchy <- function(csv, maxPathLength) {
   }
   
   # remove list names
-  root <- stripname(root, "children")
-
+  root <- suppressWarnings(stripname(root, "children"))
+  
   # convert nested list structure to json
-  json <- writeLines(rjson::toJSON(root))
+  json <- rjson::toJSON(root)
   
   return(json)
 }

@@ -118,52 +118,52 @@ execute <- function(connection = NULL,
                                               analysisRefFileName = file.path(paste0(outputFolder, "/characterization"), "analysis_ref.csv"),
                                               counts = cohortCounts,
                                               minCellCount = minCellCount)
-    # Selection results
-    # TODO: add custom covariates
-    all_characterization <- data.frame(readr::read_csv(paste0(outputFolder, "/characterization/covariate_value.csv"), col_types = readr::cols()))
+    # Selection of standard results
     settings_characterization <- data.frame(readr::read_csv("inst/Settings/characterization_settings.csv", col_types = readr::cols()))
-    final_characterization <- merge(settings_characterization, all_characterization, by = "covariate_id", all.x = TRUE)
+    standard_characterization <- data.frame(readr::read_csv(paste0(outputFolder, "/characterization/covariate_value.csv"), col_types = readr::cols()))
+    standard_characterization <- merge(settings_characterization, standard_characterization, by = "covariate_id")
     
+    # Add custom characterization
+    ParallelLogger::logInfo("Adding custom cohorts in characterization")
+    cohorts <- read.csv(paste(outputFolder, "/cohort.csv",sep=''), stringsAsFactors = FALSE)
     custom <- settings_characterization$covariate_name[settings_characterization$covariate_id == "Custom"]
-  
-    # TODO: link this to cohort ids using cohort_to_create.csv
-    custom_ids <- 18
-  
-    # Assume custom characterization cohorts already generated   # TODO: add other custom cohorts and generate
+    
+    custom_characterization <- cohorts[cohorts$cohortName %in% custom,c("cohortId", "cohortName")]
+    colnames(custom_characterization) <- c("covariate_id", "covariate_name")
+    
+    all_custom_results <- data.frame()
     
     for (t in targetCohortIds) {
-        # IN SQL:
-        # join the datasets
-        # such that custom characterization cohort first (in history)
-        # group by custom_ids
-        # return count unique persons
-        
-        # TODO: test script
-        # Initial simple characterization
-        sql <- loadRenderTranslateSql(sql = "CustomCharacterization.sql",
-                                      dbms = connectionDetails$dbms,
-                                      oracleTempSchema = oracleTempSchema,
-                                      resultsSchema=cohortDatabaseSchema,
-                                      cdmDatabaseSchema = cdmDatabaseSchema,
-                                      databaseName=databaseName,
-                                      targetCohortId=targetCohortId,
-                                      characterizationCohortIds=custom_ids,
-                                      cohortTable=cohortTable)
-        DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
-        
-        sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.@tableName",
-                                      dbms = connectionDetails$dbms,
-                                      oracleTempSchema = oracleTempSchema,
-                                      resultsSchema=cohortDatabaseSchema,
-                                      tableName=paste0(databaseName, "_characterization_", targetCohortId))
-        custom_counts <- DatabaseConnector::querySql(connection, sql)
-        
-        # TODO: insert result in final_characterization
-        
-      }
-    }
+      sql <- loadRenderTranslateSql(sql = "CustomCharacterization.sql",
+                                    dbms = connectionDetails$dbms,
+                                    oracleTempSchema = oracleTempSchema,
+                                    resultsSchema=cohortDatabaseSchema,
+                                    databaseName=databaseName,
+                                    targetCohortId=t,
+                                    characterizationCohortIds=custom_characterization$covariate_id,
+                                    cohortTable=cohortTable)
+      DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
+      
+      sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.@tableName",
+                                    dbms = connectionDetails$dbms,
+                                    oracleTempSchema = oracleTempSchema,
+                                    resultsSchema=cohortDatabaseSchema,
+                                    tableName=paste0(databaseName, "_characterization_", t))
+      custom_results <- DatabaseConnector::querySql(connection, sql)
 
-    write.csv(final_characterization, paste0(outputFolder, "/characterization/characterization.csv"), row.names = FALSE)
+      all_custom_results <- rbind(all_custom_results, cbind(custom_results, cohort_id = t, database_id = databaseId))
+    }
+    
+    # Add names of custom cohorts
+    custom_characterization <- merge(custom_characterization, all_custom_results, by.x = "covariate_id", by.y = "COVARIATE_ID")
+    colnames(custom_characterization) <- tolower(colnames(custom_characterization))
+    custom_characterization$covariate_id <- paste0("custom_",custom_characterization$covariate_id)
+    custom_characterization$sd <- NA
+    
+    # Combine result and save (TODO: check)
+    all_characterization <- rbind(standard_characterization, custom_characterization)
+    write.csv(all_characterization, paste0(outputFolder, "/characterization/characterization.csv"), row.names = FALSE)
+    
   }
   
   # Treatment pathways are constructed
@@ -279,29 +279,34 @@ execute <- function(connection = NULL,
       # Numbers study population
       extractAndWriteToFile(connection, tableName = "summary_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, path = path, dbms = connectionDetails$dbms)
       
+      
       # Transform results for output
-      transformTreatmentSequence(studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, removePaths = removePaths, otherCombinations = otherCombinations)
-    
-      file_noyear <- as.data.table(read.csv(paste(path,"_file_noyear.csv",sep=''), stringsAsFactors = FALSE))
-      file_withyear <- as.data.table(read.csv(paste(path,"_file_withyear.csv",sep=''), stringsAsFactors = FALSE))
+      empty_data <- transformTreatmentSequence(studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, removePaths = removePaths, otherCombinations = otherCombinations)
       
-      # Compute percentage of people treated with each outcome cohort separately and in the form of combination treatments
-      outputPercentageGroupTreated(data = file_noyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_noyear.csv",sep=''))
-      outputPercentageGroupTreated(data = file_withyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_withyear.csv",sep=''))
+      if (!empty_data) {
+        file_noyear <- as.data.table(read.csv(paste(path,"_file_noyear.csv",sep=''), stringsAsFactors = FALSE))
+        file_withyear <- as.data.table(read.csv(paste(path,"_file_withyear.csv",sep=''), stringsAsFactors = FALSE))
+        
+        # Compute percentage of people treated with each outcome cohort separately and in the form of combination treatments
+        outputPercentageGroupTreated(data = file_noyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_noyear.csv",sep=''))
+        outputPercentageGroupTreated(data = file_withyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_withyear.csv",sep=''))
+        
+        # Compute step-up/down of asthma/COPD drugs
+        # TODO: test this
+        # outputStepUpDown(connection = connection, cohortDatabaseSchema = cohortDatabaseSchema, dbms = dbms, studyName = studyName, databaseName = databaseName, path = path, targetCohortId = targetCohortId, minCellCount = minCellCount) 
+        
+        # Duration of era's
+        transformDuration(connection = connection, cohortDatabaseSchema = cohortDatabaseSchema, dbms = dbms, studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, otherCombinations = otherCombinations)
+        
+        # Treatment pathways sankey diagram
+        createSankeyDiagram(data = file_noyear)
+        
+        # Treatment pathways sunburst plot 
+        outputSunburstPlot(data = file_noyear, outcomeCohortIds = outcomeCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
+        outputSunburstPlot(data = file_withyear, outcomeCohortIds = outcomeCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
+        
+      }
       
-      # Compute step-up/down of asthma/COPD drugs
-      # TODO: test this
-      outputStepUpDown(connection = connection, cohortDatabaseSchema = cohortDatabaseSchema, dbms = dbms, studyName = studyName, databaseName = databaseName, path = path, targetCohortId = targetCohortId, maxPathLength = maxPathLength, minCellCount = minCellCount) 
-      
-      # Duration of era's
-      transformDuration(connection = connection, cohortDatabaseSchema = cohortDatabaseSchema, dbms = dbms, studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, otherCombinations = otherCombinations)
-      
-      # Treatment pathways sankey diagram
-      createSankeyDiagram(data = file_noyear)
-      
-      # Treatment pathways sunburst plot
-      outputSunburstPlot(data = file_noyear, studyName = studyName, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=FALSE)
-      outputSunburstPlot(data = file_withyear, studyName = studyName, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=FALSE)
     }
   }
   
