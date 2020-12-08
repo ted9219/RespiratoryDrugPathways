@@ -111,3 +111,20 @@ depth <- function(this, thisdepth=0){
   }
 }
 
+
+# TODO: check this function, screenshot not working yet
+screenshotHTML <- function(path) {
+  library(webshot)
+  
+  file_list <- list.files(path="plots/", pattern = ".html")
+
+  for (f in file_list) { # f <- file_list[2]
+    
+    # Open all html files in path + take screenshot
+    URL <- paste0("file://", getwd(), "/plots/", f)
+    
+    webshot(URL, file = paste0("plots/screenshot", sub(".html", "", f), ".png"), delay = 1, debug = TRUE)
+    
+  }
+}
+
