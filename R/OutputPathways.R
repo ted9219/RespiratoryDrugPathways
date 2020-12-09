@@ -3,8 +3,12 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
   
   file <- data.table(extractFile(connection, tableName = "drug_seq_summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, dbms = connectionDetails$dbms))
   
-  # Remove unnessary columns
-  columns <- colnames(file)[!grepl("CONCEPT_ID", colnames(file))]
+  # Apply maxPathLength and remove unnessary columns
+  layers <- as.vector(colnames(file)[!grepl("CONCEPT_ID|INDEX_YEAR|NUM_PERSONS", colnames(file))])
+  layers <- layers[1:maxPathLength]
+  
+  columns <- c(layers, "INDEX_YEAR", "NUM_PERSONS")
+  
   file <- file[,..columns]
   
   if (nrow(file) == 0) {
@@ -12,30 +16,30 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
     return (TRUE)
   }
   
+  # Summarize all non-fixed combinations occuring
+  findCombinations <- apply(file, 2, function(x) grepl("+", x, fixed = TRUE))
+  
+  combinations <- as.matrix(file)[findCombinations == TRUE]
+  num_columns <-  sum(grepl("CONCEPT_NAME", colnames(file)))
+  freqCombinations <- matrix(rep(file$NUM_PERSONS, times = num_columns), ncol = num_columns)[findCombinations == TRUE]
+  
+  summaryCombinations <- data.table(combination = combinations, freq = freqCombinations)
+  summaryCombinations <- summaryCombinations[,.(freq=sum(freq)), by=combination][order(-freq)]
+  summaryCombinations <- summaryCombinations[freq >= minCellCount,]
+  
+  write.csv(summaryCombinations, file=paste(path,"_combinations.csv",sep=''), row.names = FALSE)
+  
   # Group all non-fixed combinations in one group if TRUE
-  if (otherCombinations) { # TODO: only group infrequent combinations?
-    findCombinations <- apply(file, 2, function(x) grepl("+", x, fixed = TRUE))
-    
-    otherCombinations <- as.matrix(file)[findCombinations == TRUE]
-    num_columns <-  sum(grepl("CONCEPT_NAME", colnames(file)))
-    freqCombinations <- matrix(rep(file$NUM_PERSONS, times =num_columns), ncol = num_columns)[findCombinations == TRUE]
-    
-    summaryCombinations <- data.table(combination = otherCombinations, freq = freqCombinations)
-    summaryCombinations <- summaryCombinations[,.(freq=sum(freq)), by=combination][order(-freq)]
-    summaryCombinations <- summaryCombinations[freq >= minCellCount,]
-    
-    write.csv(summaryCombinations, file=paste(path,"_othercombinations.csv",sep=''), row.names = FALSE)
-    
+  if (otherCombinations) {
     file[findCombinations] <- "Other combinations"
   } else {
-    # TODO: process combination treatmetns if other combinations is false
-    
+    # Otherwise: process combination treatments
+
+    # TODO: Group infrequent treatments below 25 as otherCombinations
+  
   }
-  
-  # Apply maxPathLength and group the resulting treatment paths
-  layers <- as.vector(colnames(file)[!grepl("INDEX_YEAR|NUM_PERSONS", colnames(file))])
-  layers <- layers[1:maxPathLength]
-  
+
+  # Group the resulting treatment paths
   file_noyear <- file[,.(freq=sum(NUM_PERSONS)), by=layers]
   file_withyear <- file[,.(freq=sum(NUM_PERSONS)), by=c(layers, "INDEX_YEAR")]
   
@@ -103,16 +107,14 @@ outputPercentageGroupTreated <- function(data, outcomeCohortIds, path, outputFol
 
 outputStepUpDown <- function(file_noyear, path, targetCohortId) { 
   
-  # TODO: process combination treatmetns if other combinations is false
-  # (not here but in transformTreatmentSequence)
-  
-  # replace & signs by + (so that definitions match both)
+  # Replace & signs by + (so that definitions match both)
+  file_noyear <- data.table(apply(file_noyear, 2, function(x) gsub("&", "+", x, fixed = TRUE)))
+  file_noyear$freq <- as.numeric(file_noyear$freq)
   
   def_updown <- read.csv("inst/Settings/augment_switch.csv", stringsAsFactors = FALSE)
   def_groups <- as.vector(unique(def_updown$targetCohortIds))
   
-  # Define set of rules
-  # TODO: ACO?
+  # Define set of rules # TODO: ACO?
   done <- FALSE
   group <- 1
   
@@ -230,10 +232,10 @@ transformDuration <- function(connection, cohortDatabaseSchema, dbms, studyName,
   write.csv(results,  paste(path,"_duration.csv",sep=''), row.names = FALSE)
 }
 
-outputSunburstPlot <- function(data, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, createInput, createPlot) {
+outputSunburstPlot <- function(data, databaseId, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, createInput, createPlot) {
   if (is.null(data$INDEX_YEAR)) {
     # For file_noyear compute once
-    result <- createSunburstPlot(data, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year = 'all', createInput, createPlot)
+    result <- createSunburstPlot(data, databaseId, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year = 'all', createInput, createPlot)
     
   } else {
     # For file_withyear compute per year
@@ -241,19 +243,18 @@ outputSunburstPlot <- function(data, outcomeCohortIds, studyName, outputFolder, 
     
     for (y in years) {
       subset_data <- data[INDEX_YEAR == as.character(y),]
-      createSunburstPlot(subset_data, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year = y, createInput, createPlot)
+      createSunburstPlot(subset_data, databaseId, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year = y, createInput, createPlot)
     }
   }
 }
 
-createSunburstPlot <- function(data, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year, createInput, createPlot){
+createSunburstPlot <- function(data, databaseId, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year, createInput, createPlot){
   
   if (createInput) {
     inputSunburstPlot(data, path, addNoPaths, index_year)
   }
   
   if (createPlot) {
-    
     CSV <- FALSE
     JSON <- TRUE
     
@@ -285,20 +286,20 @@ createSunburstPlot <- function(data, outcomeCohortIds, studyName, outputFolder, 
                   quote = FALSE,
                   col.names = FALSE,
                   row.names = FALSE)
-      
-      # TODO: Automatically take screenshot of resulting html
     }
     
     if (JSON) {
       transformCSVtoJSON(outcomeCohortIds, outputFolder, path, index_year, maxPathLength)
       
       # Load template HTML file
-      template_html <- paste(readLines("plots/sunburst_template.html"), collapse="\n")
+      html <- paste(readLines("plots/sunburst.html"), collapse="\n")
       
       # Replace @insert_data
       input_plot <- readLines(paste(path,"_inputsunburst_", index_year, ".txt",sep=''))
+      html <- sub("@insert_data", input_plot, html)
       
-      html <- sub("@insert_data", input_plot, template_html)
+      # Replace @name
+      html <- sub("@name", paste0("(", databaseId, " ", studyName," ", index_year, ")"), html)
       
       # Save HTML file as sunburst_@studyName
       write.table(html, 
@@ -306,9 +307,6 @@ createSunburstPlot <- function(data, outcomeCohortIds, studyName, outputFolder, 
                   quote = FALSE,
                   col.names = FALSE,
                   row.names = FALSE)
-      
-      # TODO: Automatically take screenshot of resulting html
-      
     }
   }
 }
@@ -322,9 +320,15 @@ inputSunburstPlot <- function(data, path, addNoPaths, index_year) {
   transformed_file <- paste0(transformed_file, "-End")
   transformed_file <- data.frame(path=transformed_file, freq=data$freq, stringsAsFactors = FALSE)
   
-  if (addNoPaths) { # TODO: change for separate years (but first merge summary + person_cnt file?)
+  if (addNoPaths) {
     summary_counts <- read.csv(paste(path,"_summary_cnt.csv",sep=''), stringsAsFactors = FALSE)
-    noPath <- as.integer(summary_counts[summary_counts$COUNT_TYPE == "Number of persons in target cohort", "NUM_PERSONS"]) - sum(transformed_file$freq)
+    
+    if (index_year == "all") {
+      noPath <- as.integer(summary_counts[summary_counts$COUNT_TYPE == "Number of persons in target cohort", "NUM_PERSONS"]) - sum(transformed_file$freq)
+    } else {
+      # TODO: change for separate years (but first add to summary_cnt.csv)
+    }
+    
     transformed_file <- rbind(transformed_file, c("End", noPath))
   }
   
@@ -351,7 +355,8 @@ transformCSVtoJSON <- function(outcomeCohortIds, outputFolder, path, index_year,
     paste0('{ "key": "', linking$bitwiseNumbers[row] ,'", "value": "', linking$outcomes[row],'"}')
   })
   
-  lookup <- paste0("[", paste(series, collapse = ","), "]") # TODO: remove backslash? writeLines?
+  series <- c(series, '{ "key": "End", "value": "End"}')
+  lookup <- paste0("[", paste(series, collapse = ","), "]")
   
   # Order names from longest to shortest to adjust in the right order
   linking <- linking[order(-sapply(linking$outcomes, function(x) stringr::str_length(x))),]
@@ -467,7 +472,8 @@ buildHierarchy <- function(csv, maxPathLength) {
   return(json)
 }
 
-createSankeyDiagram <- function(data) { #TODO: change to more than 3 layers?
+createSankeyDiagram <- function(data) {
+  
   # Sankey diagram for first three treatment layers
   data$D1_CONCEPT_NAME <- paste0("1. ",data$D1_CONCEPT_NAME)
   data$D2_CONCEPT_NAME <- paste0("2. ",data$D2_CONCEPT_NAME)
@@ -504,8 +510,7 @@ createSankeyDiagram <- function(data) { #TODO: change to more than 3 layers?
                                    Value = 'value', 
                                    NodeID = 'name',
                                    units = 'votes')
-  networkD3::saveNetwork(plot, file="sankeydiagram.html", selfcontained=TRUE)
-  
-  # TODO: change path to output folder (there seems to be an error in this package function)
+  networkD3::saveNetwork(plot, file="sankeydiagram_all.html", selfcontained=TRUE)
+  # there seems to be an error in this package -> cannot change path to output folder
   
 }
