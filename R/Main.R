@@ -305,9 +305,10 @@ execute <- function(connection = NULL,
         createSankeyDiagram(data = file_noyear)
         
         # Treatment pathways sunburst plot 
-        outputSunburstPlot(data = file_noyear, outcomeCohortIds = outcomeCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
-        outputSunburstPlot(data = file_withyear, outcomeCohortIds = outcomeCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
+        outputSunburstPlot(data = file_noyear, databaseId = databaseId, outcomeCohortIds = outcomeCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
+        outputSunburstPlot(data = file_withyear, databaseId = databaseId, outcomeCohortIds = outcomeCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
         
+        # screenshotHTML()
       }
       
     }
