@@ -8,108 +8,14 @@
 </head>
 
 <body>
-	<h1>Sunburst Example</h1>
+	<h1>Sunburst plot @name </h1>
 	<div>Sunburst plot of treatment patterns showing the first treatment in the center and subsequent treatments in the surrounding outer layers. Each color represents a drug class and a layer with multiple colors indicates a combination therapy. </div>
 	<div id="main">
 	<div style="width:80%" id="plot"></div>
 	<hr/>
 	<h1>Data</h1>
 	<textarea  id="chartData" style="width:600px; height:400px">
-{
-	"data": {
-		"name":"root",
-		"children":[
-			{
-				"name":"1",
-				"children":[
-					{
-						"name":"2",
-						"children":[
-							{
-								"name":"end",
-								"size":128
-							}
-						]
-					},
-					{
-						"name":"4",
-						"children":[
-							{
-								"name":"6",
-								"children":[
-									{
-										"name":"end",
-										"size":64
-									}
-								]
-							},
-							{
-								"name":"end",
-								"size":64
-							}
-						]
-					},
-					{
-						"name":"end",
-						"size":512
-					}
-				]
-			},
-			{
-				"name":"2",
-				"children":[
-					{
-						"name":"1",
-						"children":[
-							{
-								"name":"end",
-								"size":128
-							}
-						]
-					},
-					{
-						"name":"end",
-						"size":256
-					}
-				]
-			},
-			{
-				"name":"4",
-				"children":[
-					{
-						"name":"end",
-						"size":128
-					}
-				]
-			},
-			{
-				"name":"8",
-				"children":[
-					{
-						"name":"end",
-						"size":64
-					}
-				]
-			},
-			{
-				"name":"6",
-				"children":[
-					{
-						"name":"end",
-						"size":32
-					}
-				]
-			}
-		]
-	},
-	"lookup" : [
-		{ "key": "1", "value": "Treatment 1"},
-		{ "key": "2", "value": "Treatment 2"},
-		{ "key": "4", "value": "Treatment 3"},
-		{ "key": "8", "value": "Treatment 4"},
-			{ "key": "end", "value": "End"}
-	]
-}
+@insert_data
 	</textarea>
 	<button id="reload">Reload</button>
 	</div>  
@@ -161,3 +67,4 @@
 	</script>
 </body>
 </html>
+
