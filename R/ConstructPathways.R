@@ -166,19 +166,33 @@ doFirstTreatment <- function(data) {
 }
 
 addLabels <- function(data, outputFolder) {
-  cohortIds <- readr::read_csv(paste(outputFolder, "/cohort.csv",sep=''), col_types = readr::cols())
-  labels <- data.frame(DRUG_CONCEPT_ID = as.character(cohortIds$cohortId), CONCEPT_NAME = cohortIds$cohortName, stringsAsFactors = FALSE)
-  data <- merge(data, labels, all.x = TRUE)
+  labels <- data.frame(readr::read_csv(paste(outputFolder, "/cohort.csv",sep=''), col_types = list("c", "c", "c", "c")))
+  labels <- labels[labels$cohortType == "outcome",c("cohortId", "cohortName")]
+  colnames(labels) <- c("DRUG_CONCEPT_ID", "CONCEPT_NAME")
+
+  data <- merge(data, labels, all.x = TRUE, by = "DRUG_CONCEPT_ID")
   
   data$CONCEPT_NAME[is.na(data$CONCEPT_NAME)] <- sapply(data$DRUG_CONCEPT_ID[is.na(data$CONCEPT_NAME)], function(x) {
+    
     # revert search to look for longest concept_ids first
     for (l in nrow(labels):1)
     {
-      x <- gsub(labels$DRUG_CONCEPT_ID[l], labels$CONCEPT_NAME[l], x)
+      
+      # if treatment occurs twice in a combination (as monotherapy and in fixed-combination) -> remove monotherapy occurence
+      if (any(grep(labels$CONCEPT_NAME[l], x))) {
+        x <- gsub(labels$DRUG_CONCEPT_ID[l], "", x)
+      } else {
+        x <- gsub(labels$DRUG_CONCEPT_ID[l], labels$CONCEPT_NAME[l], x)
+      }
     }
     
     return(x)
   })
   
+  # Filter out + at beginning/end or repetitions
+  data$CONCEPT_NAME <- gsub("\\++", "+", data$CONCEPT_NAME)
+  data$CONCEPT_NAME <- gsub("^\\+", "", data$CONCEPT_NAME)
+  data$CONCEPT_NAME <- gsub("\\+$", "", data$CONCEPT_NAME)
+ 
   return(data)
 }
