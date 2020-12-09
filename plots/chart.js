@@ -64,7 +64,9 @@ define(["d3", "lodash", "d3-tip"],
 		    // clone objects
 			  Object.assign({}, chartSpecificDefaults),
 			  Object.assign({}, customOptions)
+
 		  );
+		  
 		  return options;
 	  }
 

@@ -1,17 +1,19 @@
+<!DOCTYPE html>
 <html>
-
 <head>
-	<title>Visualizations: Sunburst</title>
-	<link href="example.css" rel="stylesheet">
-	<link href="chart.css" rel="stylesheet">
+	<title>Visualization: Sunburst</title>
+	<link rel="stylesheet" type="text/css"
+      href="https://fonts.googleapis.com/css?family=Open+Sans:400,600">
+		<link href="chart.css" rel="stylesheet">
 </head>
 
 <body>
 	<h1>Sunburst Example</h1>
-	<div>This plot shows a sunburst</div>
-	<div style="width:50%" id="plot"></div>
+	<div>Sunburst plot of treatment patterns showing the first treatment in the center and subsequent treatments in the surrounding outer layers. Each color represents a drug class and a layer with multiple colors indicates a combination therapy. </div>
+	<div id="main">
+	<div style="width:80%" id="plot"></div>
 	<hr/>
-	<div >Data:</div>
+	<h1>Data</h1>
 	<textarea  id="chartData" style="width:600px; height:400px">
 {
 	"data": {
@@ -104,11 +106,16 @@
 		{ "key": "1", "value": "Treatment 1"},
 		{ "key": "2", "value": "Treatment 2"},
 		{ "key": "4", "value": "Treatment 3"},
-		{ "key": "8", "value": "Treatment 4"}
+		{ "key": "8", "value": "Treatment 4"},
+			{ "key": "end", "value": "End"}
 	]
 }
 	</textarea>
-	<button  id="reload">Reload</button>
+	<button id="reload">Reload</button>
+	</div>  
+	<div id="sidebar">
+    <div id="legend"></div>
+	</div>  
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.3/require.min.js"></script>
 	<script src="config.js"></script>
 	<script>
@@ -143,9 +150,8 @@
 
 			function refreshPlot() {
 				chartData = JSON.parse(document.querySelector("#chartData").value);
-				plot.render(chartData.data, target, 600,600, {split: split});
+				plot.render(chartData.data, target, 600,600, {split: split}, chartData.lookup);
 			}
-			
 			
 			document.querySelector("#reload").addEventListener("click", function() {
 				refreshPlot();	

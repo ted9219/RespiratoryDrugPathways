@@ -36,14 +36,49 @@ define(["d3", "./chart"], function (d3, Chart) {
 			let tipOffsetY = Math.abs(bbox.y - arcCenter[1]);
 			return([tipOffsetY-10,tipOffsetX]);
 		}
+
 		
-		render(data, target, width, height, chartOptions) {
+		
+drawLegend(colors) {
+
+  // Dimensions of legend item: width, height, spacing, radius of rounded rect.
+  var li = {
+    w: 200, h: 30, s: 3, r: 3
+  };
+
+  var legend = d3.select("#legend").append("svg:svg")
+      .attr("width", li.w)
+      .attr("height", d3.keys(colors).length * (li.h + li.s));
+
+  var g = legend.selectAll("g")
+      .data(d3.entries(colors))
+      .enter().append("svg:g")
+      .attr("transform", function(d, i) {
+              return "translate(0," + i * (li.h + li.s) + ")";
+           });
+
+  g.append("svg:rect")
+      .attr("rx", li.r)
+      .attr("ry", li.r)
+      .attr("width", li.w)
+      .attr("height", li.h)
+      .style("fill", function(d) { return d.value; });
+      
+  g.append("svg:text")
+      .attr("x", li.w / 2)
+      .attr("y", li.h / 2)
+      .attr("dy", "0.35em")
+      .attr("text-anchor", "middle")
+      .text(function(d) { return d.key; });
+}
+		
+		render(data, target, width, height, chartOptions, lookup) {
 			
 			super.render(data, target, width, height, chartOptions);
 
 			const defaultOptions = {
 				tooltip: (d) => {
-					return `<div>No Tooltip Set</div>`
+					return '' //`<div>No Tooltip Set</div>`
 				}
 
 			};
@@ -100,6 +135,32 @@ define(["d3", "./chart"], function (d3, Chart) {
 
 			let nodes = partition(root).descendants().filter(d => (d.x1 - d.x0 > 0.005)).reverse(); // 0.005 radians = 0.29 degrees
 
+function search(nameKey){
+    for (var i=0; i < lookup.length; i++) {
+        if (lookup[i].key === nameKey) {
+            return lookup[i].value;
+        }
+    }
+}
+
+var colors = {
+      "ICS": "#1E8449",
+       "LABA": "#F94144",
+           "LABA&ICS": "#F8961E", 
+   "LABA&LAMA": "#85C1E9",
+  "LABA&LAMA&ICS": "#90BE6D", 
+    "LAMA": "#577590", 
+      "LTRA": "#A569BD", 
+  "SABA": "#1F618D", 
+    "SABA&SAMA": "#43AA8B",
+  "SAMA": "#76448A  ", 
+ "Systemic glucocorticosteroids": "#F9C74F", 
+       "Xanthines": "#1D493C",
+    "Other combinations": "#465D72",
+             "End": "ffffff"
+}
+
+
 			if (options.split) {
 				const multiNodes = nodes.reduce((result, node) => {
 					let splitNodes = options.split(node);
@@ -120,7 +181,7 @@ define(["d3", "./chart"], function (d3, Chart) {
 					.attr("d", arc)
 					.attr("fill-rule", "evenodd")
 					.attr("class", "partial")
-					.style("fill", d => options.colors(d.data.name))
+					.style("fill", function(d) { return colors[search(d.data.name)]; })
 			}
 
 			const self = this;
@@ -136,14 +197,13 @@ define(["d3", "./chart"], function (d3, Chart) {
 				.attr("d", arc)
 				.attr("fill-rule", "evenodd")
 				.attr("class", d => (options.nodeClass && options.nodeClass(d)) || "node")
-				.style("fill", d => d.isSplit ? "#000" : options.colors(d.data.name))
+				.style("fill", d => d.isSplit ? "#000" : colors[search(d.data.name)]) 
 				.style("opacity", d => d.isSplit ? 0 : 1)
 				.on('mouseover', d => self.tip.show(Object.assign({}, d, { tipDirection: self.getTipDirection(d), tipOffset: self.getTipOffset(d, arc)}), event.target))
 				.on('mouseout', d => self.tip.hide(d, event.target))
 				.on('click', (d) => options.onclick && options.onclick(d));
 
-
-			//todo: .on("mouseover", mouseover);
+this.drawLegend(colors);
 
 		}
 	}
