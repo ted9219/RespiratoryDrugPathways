@@ -47,7 +47,7 @@ mean NUMERIC
 );
 
 INSERT INTO @resultsSchema.@databaseName_characterization (mean)
-SELECT round(count(DISTINCT t.person_id) * 1.0 / (SELECT count(DISTINCT person_id) FROM @resultsSchema.@databaseName_targetcohort_@targetCohortId),4)
+SELECT round(count(DISTINCT t.person_id) * 1.0 / (SELECT count(DISTINCT person_id) FROM @resultsSchema.@databaseName_targetcohort),4)
 FROM @resultsSchema.@databaseName_targetcohort as t
 JOIN @resultsSchema.@databaseName_customcohort as c
 ON t.person_id = c.person_id
