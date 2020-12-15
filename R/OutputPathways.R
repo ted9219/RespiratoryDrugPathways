@@ -121,14 +121,14 @@ outputStepUpDown <- function(file_noyear, path, targetCohortId) {
   
   # Define set of rules # TODO: ACO?
   done <- FALSE
-  group <- 1
+  counter <- 1
   
-  while(!done & group < length(def_groups)) {
-    if(targetCohortId %in% strsplit(def_groups[group], split=",")[[1]]) {
+  while(!done & counter <= length(def_groups)) {
+    if(targetCohortId %in% strsplit(def_groups[counter], split=",")[[1]]) {
       done <- TRUE
-      group <- def_groups[1]
+      group <- def_groups[counter]
     } else {
-      group <- group + 1
+      counter <- counter + 1
     }
   }
   

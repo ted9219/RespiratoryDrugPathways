@@ -1,129 +1,129 @@
 targetCohortIds,from,to,category
-"1,4,7,8",SABA,SABA+SAMA,stepup
-"1,4,7,8",SABA,SABA+ICS,stepup
-"1,4,7,8",SABA,ICS,stepup
-"1,4,7,8",SABA,LTRA,stepup
-"1,4,7,8",SAMA,SABA+SAMA,stepup
-"1,4,7,8",SAMA,SABA+ICS,stepup
-"1,4,7,8",SAMA,ICS,stepup
-"1,4,7,8",SAMA,LTRA,stepup
-"1,4,7,8",ICS,ICS+LABA,stepup
-"1,4,7,8",ICS,ICS+LAMA,stepup
-"1,4,7,8",ICS,ICS+LTRA,stepup
-"1,4,7,8",ICS+LABA,ICS+LABA+LAMA,stepup
-"1,4,7,8",ICS+LABA,ICS+LABA+OCS,stepup
-"1,4,7,8",ICS+LABA,ICS+LABA+Anti IgE,stepup
-"1,4,7,8",ICS+LABA,ICS+LABA+Anti IL5,stepup
-"1,4,7,8",ICS+LABA,ICS+LABA+Anti IL4R,stepup
-"1,4,7,8",ICS+LTRA,ICS+LABA+LAMA,stepup
-"1,4,7,8",ICS+LTRA,ICS+LABA+LAMA,stepup
-"1,4,7,8",ICS+LTRA,ICS+LABA+OCS,stepup
-"1,4,7,8",ICS+LTRA,ICS+LABA+Anti IgE,stepup
-"1,4,7,8",ICS+LTRA,ICS+LABA+Anti IL5,stepup
-"1,4,7,8",ICS+LTRA,ICS+LABA+Anti IL4R,stepup
-"1,4,7,8",SABA,SAMA,switching
-"1,4,7,8",SAMA,SABA,switching
-"1,4,7,8",ICS,LTRA,switching
-"1,4,7,8",LTRA,ICS,switching
-"1,4,7,8",ICS+LABA,ICS+LTRA,switching
-"1,4,7,8",ICS+LTRA,ICS+LABA,switching
-"1,4,7,8",ICS+LABA,ICS+LAMA,switching
-"1,4,7,8",ICS+LAMA,ICS+LABA,switching
-"1,4,7,8",ICS+LABA+LAMA,ICS+LABA+OCS,switching
-"1,4,7,8",ICS+LABA+LAMA,ICS+LABA+Anti IgE,switching
-"1,4,7,8",ICS+LABA+LAMA,ICS+LABA+Anti IL5,switching
-"1,4,7,8",ICS+LABA+LAMA,ICS+LABA+Anti IL4R,switching
-"1,4,7,8",ICS+LABA+OCS,ICS+LABA+LAMA,switching
-"1,4,7,8",ICS+LABA+OCS,ICS+LABA+Anti IgE,switching
-"1,4,7,8",ICS+LABA+OCS,ICS+LABA+Anti IL5,switching
-"1,4,7,8",ICS+LABA+OCS,ICS+LABA+Anti IL4R,switching
-"1,4,7,8",ICS+LABA+Anti IgE,ICS+LABA+OCS,switching
-"1,4,7,8",ICS+LABA+Anti IgE,ICS+LABA+Anti IL5,switching
-"1,4,7,8",ICS+LABA+Anti IgE,ICS+LABA+Anti IL4R,switching
-"1,4,7,8",ICS+LABA+Anti IL5,ICS+LABA+LAMA,switching
-"1,4,7,8",ICS+LABA+Anti IL5,ICS+LABA+Anti IgE,switching
-"1,4,7,8",ICS+LABA+Anti IL5,ICS+LABA+Anti IL4R,switching
-"1,4,7,8",ICS+LABA+Anti IL4R,ICS+LABA+OCS,switching
-"1,4,7,8",ICS+LABA+Anti IL4R,ICS+LABA+LAMA,switching
-"1,4,7,8",ICS+LABA+Anti IL4R,ICS+LABA+Anti IgE,switching
-"1,4,7,8",ICS+LABA+Anti IL4R,ICS+LABA+Anti IL5,switching
-"1,4,7,8",SABA+SAMA,SABA,stepdown
-"1,4,7,8",SABA+ICS,SABA,stepdown
-"1,4,7,8",ICS,SABA,stepdown
-"1,4,7,8",LTRA,SABA,stepdown
-"1,4,7,8",SABA+SAMA,SAMA,stepdown
-"1,4,7,8",SABA+ICS,SAMA,stepdown
-"1,4,7,8",ICS,SAMA,stepdown
-"1,4,7,8",LTRA,SAMA,stepdown
-"1,4,7,8",ICS+LABA,ICS,stepdown
-"1,4,7,8",ICS+LAMA,ICS,stepdown
-"1,4,7,8",ICS+LTRA,ICS,stepdown
-"1,4,7,8",ICS+LABA+LAMA,ICS+LABA,stepdown
-"1,4,7,8",ICS+LABA+OCS,ICS+LABA,stepdown
-"1,4,7,8",ICS+LABA+Anti IgE,ICS+LABA,stepdown
-"1,4,7,8",ICS+LABA+Anti IL5,ICS+LABA,stepdown
-"1,4,7,8",ICS+LABA+Anti IL4R,ICS+LABA,stepdown
-"1,4,7,8",ICS+LABA+LAMA,ICS+LTRA,stepdown
-"1,4,7,8",ICS+LABA+LAMA,ICS+LTRA,stepdown
-"1,4,7,8",ICS+LABA+OCS,ICS+LTRA,stepdown
-"1,4,7,8",ICS+LABA+Anti IgE,ICS+LTRA,stepdown
-"1,4,7,8",ICS+LABA+Anti IL5,ICS+LTRA,stepdown
-"1,4,7,8",ICS+LABA+Anti IL4R,ICS+LTRA,stepdown
-"2,5",SABA,SABA+SAMA,stepup
-"2,5",SABA,LABA,stepup
-"2,5",SABA,LAMA,stepup
-"2,5",SABA,Xanthines,stepup
-"2,5",SAMA,SABA+SAMA,stepup
-"2,5",SAMA,LABA,stepup
-"2,5",SAMA,LAMA,stepup
-"2,5",SAMA,Xanthines,stepup
-"2,5",LABA,LABA+LAMA,stepup
-"2,5",LABA,LABA+ICS,stepup
-"2,5",LABA,LAMA+ICS,stepup
-"2,5",LAMA,LABA+LAMA,stepup
-"2,5",LAMA,LABA+ICS,stepup
-"2,5",LAMA,LAMA+ICS,stepup
-"2,5",Xanthines,LABA+LAMA,stepup
-"2,5",Xanthines,LABA+ICS,stepup
-"2,5",Xanthines,LAMA+ICS,stepup
-"2,5",LABA+LAMA,LABA+LAMA+ICS,stepup
-"2,5",LABA+ICS,LABA+LAMA+ICS,stepup
-"2,5",LABA+ICS,LABA+ICS+PDE4,stepup
-"2,5",LAMA+ICS,LABA+LAMA+ICS,stepup
-"2,5",SABA,SAMA,switching
-"2,5",SAMA,SABA,switching
-"2,5",LABA,LAMA,switching
-"2,5",LABA,Xanthines,switching
-"2,5",LAMA,LABA,switching
-"2,5",LAMA,Xanthines,switching
-"2,5",Xanthines,LABA,switching
-"2,5",Xanthines,LAMA,switching
-"2,5",LABA+LAMA,LABA+ICS,switching
-"2,5",LABA+LAMA,LAMA+ICS,switching
-"2,5",LABA+ICS,LABA+LAMA,switching
-"2,5",LABA+ICS,LAMA+ICS,switching
-"2,5",LAMA+ICS,LABA+LAMA,switching
-"2,5",LAMA+ICS,LABA+ICS,switching
-"2,5",LABA+LAMA+ICS,LABA+ICS+PDE4,switching
-"2,5",LABA+ICS+PDE4,LABA+LAMA+ICS,switching
-"2,5",SABA+SAMA,SABA,stepdown
-"2,5",LABA,SABA,stepdown
-"2,5",LAMA,SABA,stepdown
-"2,5",Xanthines,SABA,stepdown
-"2,5",SABA+SAMA,SAMA,stepdown
-"2,5",LABA,SAMA,stepdown
-"2,5",LAMA,SAMA,stepdown
-"2,5",Xanthines,SAMA,stepdown
-"2,5",LABA+LAMA,LABA,stepdown
-"2,5",LABA+ICS,LABA,stepdown
-"2,5",LAMA+ICS,LABA,stepdown
-"2,5",LABA+LAMA,LAMA,stepdown
-"2,5",LABA+ICS,LAMA,stepdown
-"2,5",LAMA+ICS,LAMA,stepdown
-"2,5",LABA+LAMA,Xanthines,stepdown
-"2,5",LABA+ICS,Xanthines,stepdown
-"2,5",LAMA+ICS,Xanthines,stepdown
-"2,5",LABA+LAMA+ICS,LABA+LAMA,stepdown
-"2,5",LABA+LAMA+ICS,LABA+ICS,stepdown
-"2,5",LABA+ICS+PDE4,LABA+ICS,stepdown
-"2,5",LABA+LAMA+ICS,LAMA+ICS,stepdown
+"1,4,5",SABA,SABA+SAMA,stepup
+"1,4,5",SABA,SABA+ICS,stepup
+"1,4,5",SABA,ICS,stepup
+"1,4,5",SABA,LTRA,stepup
+"1,4,5",SAMA,SABA+SAMA,stepup
+"1,4,5",SAMA,SABA+ICS,stepup
+"1,4,5",SAMA,ICS,stepup
+"1,4,5",SAMA,LTRA,stepup
+"1,4,5",ICS,ICS+LABA,stepup
+"1,4,5",ICS,ICS+LAMA,stepup
+"1,4,5",ICS,ICS+LTRA,stepup
+"1,4,5",ICS+LABA,ICS+LABA+LAMA,stepup
+"1,4,5",ICS+LABA,ICS+LABA+OCS,stepup
+"1,4,5",ICS+LABA,ICS+LABA+Anti IgE,stepup
+"1,4,5",ICS+LABA,ICS+LABA+Anti IL5,stepup
+"1,4,5",ICS+LABA,ICS+LABA+Anti IL4R,stepup
+"1,4,5",ICS+LTRA,ICS+LABA+LAMA,stepup
+"1,4,5",ICS+LTRA,ICS+LABA+LAMA,stepup
+"1,4,5",ICS+LTRA,ICS+LABA+OCS,stepup
+"1,4,5",ICS+LTRA,ICS+LABA+Anti IgE,stepup
+"1,4,5",ICS+LTRA,ICS+LABA+Anti IL5,stepup
+"1,4,5",ICS+LTRA,ICS+LABA+Anti IL4R,stepup
+"1,4,5",SABA,SAMA,switching
+"1,4,5",SAMA,SABA,switching
+"1,4,5",ICS,LTRA,switching
+"1,4,5",LTRA,ICS,switching
+"1,4,5",ICS+LABA,ICS+LTRA,switching
+"1,4,5",ICS+LTRA,ICS+LABA,switching
+"1,4,5",ICS+LABA,ICS+LAMA,switching
+"1,4,5",ICS+LAMA,ICS+LABA,switching
+"1,4,5",ICS+LABA+LAMA,ICS+LABA+OCS,switching
+"1,4,5",ICS+LABA+LAMA,ICS+LABA+Anti IgE,switching
+"1,4,5",ICS+LABA+LAMA,ICS+LABA+Anti IL5,switching
+"1,4,5",ICS+LABA+LAMA,ICS+LABA+Anti IL4R,switching
+"1,4,5",ICS+LABA+OCS,ICS+LABA+LAMA,switching
+"1,4,5",ICS+LABA+OCS,ICS+LABA+Anti IgE,switching
+"1,4,5",ICS+LABA+OCS,ICS+LABA+Anti IL5,switching
+"1,4,5",ICS+LABA+OCS,ICS+LABA+Anti IL4R,switching
+"1,4,5",ICS+LABA+Anti IgE,ICS+LABA+OCS,switching
+"1,4,5",ICS+LABA+Anti IgE,ICS+LABA+Anti IL5,switching
+"1,4,5",ICS+LABA+Anti IgE,ICS+LABA+Anti IL4R,switching
+"1,4,5",ICS+LABA+Anti IL5,ICS+LABA+LAMA,switching
+"1,4,5",ICS+LABA+Anti IL5,ICS+LABA+Anti IgE,switching
+"1,4,5",ICS+LABA+Anti IL5,ICS+LABA+Anti IL4R,switching
+"1,4,5",ICS+LABA+Anti IL4R,ICS+LABA+OCS,switching
+"1,4,5",ICS+LABA+Anti IL4R,ICS+LABA+LAMA,switching
+"1,4,5",ICS+LABA+Anti IL4R,ICS+LABA+Anti IgE,switching
+"1,4,5",ICS+LABA+Anti IL4R,ICS+LABA+Anti IL5,switching
+"1,4,5",SABA+SAMA,SABA,stepdown
+"1,4,5",SABA+ICS,SABA,stepdown
+"1,4,5",ICS,SABA,stepdown
+"1,4,5",LTRA,SABA,stepdown
+"1,4,5",SABA+SAMA,SAMA,stepdown
+"1,4,5",SABA+ICS,SAMA,stepdown
+"1,4,5",ICS,SAMA,stepdown
+"1,4,5",LTRA,SAMA,stepdown
+"1,4,5",ICS+LABA,ICS,stepdown
+"1,4,5",ICS+LAMA,ICS,stepdown
+"1,4,5",ICS+LTRA,ICS,stepdown
+"1,4,5",ICS+LABA+LAMA,ICS+LABA,stepdown
+"1,4,5",ICS+LABA+OCS,ICS+LABA,stepdown
+"1,4,5",ICS+LABA+Anti IgE,ICS+LABA,stepdown
+"1,4,5",ICS+LABA+Anti IL5,ICS+LABA,stepdown
+"1,4,5",ICS+LABA+Anti IL4R,ICS+LABA,stepdown
+"1,4,5",ICS+LABA+LAMA,ICS+LTRA,stepdown
+"1,4,5",ICS+LABA+LAMA,ICS+LTRA,stepdown
+"1,4,5",ICS+LABA+OCS,ICS+LTRA,stepdown
+"1,4,5",ICS+LABA+Anti IgE,ICS+LTRA,stepdown
+"1,4,5",ICS+LABA+Anti IL5,ICS+LTRA,stepdown
+"1,4,5",ICS+LABA+Anti IL4R,ICS+LTRA,stepdown
+"2",SABA,SABA+SAMA,stepup
+"2",SABA,LABA,stepup
+"2",SABA,LAMA,stepup
+"2",SABA,Xanthines,stepup
+"2",SAMA,SABA+SAMA,stepup
+"2",SAMA,LABA,stepup
+"2",SAMA,LAMA,stepup
+"2",SAMA,Xanthines,stepup
+"2",LABA,LABA+LAMA,stepup
+"2",LABA,LABA+ICS,stepup
+"2",LABA,LAMA+ICS,stepup
+"2",LAMA,LABA+LAMA,stepup
+"2",LAMA,LABA+ICS,stepup
+"2",LAMA,LAMA+ICS,stepup
+"2",Xanthines,LABA+LAMA,stepup
+"2",Xanthines,LABA+ICS,stepup
+"2",Xanthines,LAMA+ICS,stepup
+"2",LABA+LAMA,LABA+LAMA+ICS,stepup
+"2",LABA+ICS,LABA+LAMA+ICS,stepup
+"2",LABA+ICS,LABA+ICS+PDE4,stepup
+"2",LAMA+ICS,LABA+LAMA+ICS,stepup
+"2",SABA,SAMA,switching
+"2",SAMA,SABA,switching
+"2",LABA,LAMA,switching
+"2",LABA,Xanthines,switching
+"2",LAMA,LABA,switching
+"2",LAMA,Xanthines,switching
+"2",Xanthines,LABA,switching
+"2",Xanthines,LAMA,switching
+"2",LABA+LAMA,LABA+ICS,switching
+"2",LABA+LAMA,LAMA+ICS,switching
+"2",LABA+ICS,LABA+LAMA,switching
+"2",LABA+ICS,LAMA+ICS,switching
+"2",LAMA+ICS,LABA+LAMA,switching
+"2",LAMA+ICS,LABA+ICS,switching
+"2",LABA+LAMA+ICS,LABA+ICS+PDE4,switching
+"2",LABA+ICS+PDE4,LABA+LAMA+ICS,switching
+"2",SABA+SAMA,SABA,stepdown
+"2",LABA,SABA,stepdown
+"2",LAMA,SABA,stepdown
+"2",Xanthines,SABA,stepdown
+"2",SABA+SAMA,SAMA,stepdown
+"2",LABA,SAMA,stepdown
+"2",LAMA,SAMA,stepdown
+"2",Xanthines,SAMA,stepdown
+"2",LABA+LAMA,LABA,stepdown
+"2",LABA+ICS,LABA,stepdown
+"2",LAMA+ICS,LABA,stepdown
+"2",LABA+LAMA,LAMA,stepdown
+"2",LABA+ICS,LAMA,stepdown
+"2",LAMA+ICS,LAMA,stepdown
+"2",LABA+LAMA,Xanthines,stepdown
+"2",LABA+ICS,Xanthines,stepdown
+"2",LAMA+ICS,Xanthines,stepdown
+"2",LABA+LAMA+ICS,LABA+LAMA,stepdown
+"2",LABA+LAMA+ICS,LABA+ICS,stepdown
+"2",LABA+ICS+PDE4,LABA+ICS,stepdown
+"2",LABA+LAMA+ICS,LAMA+ICS,stepdown
