@@ -1,0 +1,166 @@
+route,med_group,dose_form
+inhalation,SAMA,Inhalant
+inhalation,SAMA,Inhalation Powder
+inhalation,SAMA,Inhalation Solution
+inhalation,SAMA,Inhalation Suspension
+inhalation,SAMA,Metered Dose Inhaler
+inhalation,SAMA,Dry Powder Inhaler
+inhalation,SAMA,Gas for Inhalation
+inhalation,SABA,Inhalant
+inhalation,SABA,Inhalation Powder
+inhalation,SABA,Inhalation Solution
+inhalation,SABA,Inhalation Suspension
+inhalation,SABA,Metered Dose Inhaler
+inhalation,SABA,Dry Powder Inhaler
+inhalation,SABA,Gas for Inhalation
+inhalation,LAMA,Inhalant
+inhalation,LAMA,Inhalation Powder
+inhalation,LAMA,Inhalation Solution
+inhalation,LAMA,Inhalation Suspension
+inhalation,LAMA,Metered Dose Inhaler
+inhalation,LAMA,Dry Powder Inhaler
+inhalation,LAMA,Gas for Inhalation
+inhalation,LABA,Inhalant
+inhalation,LABA,Inhalation Powder
+inhalation,LABA,Inhalation Solution
+inhalation,LABA,Inhalation Suspension
+inhalation,LABA,Metered Dose Inhaler
+inhalation,LABA,Dry Powder Inhaler
+inhalation,LABA,Gas for Inhalation
+inhalation,ICS,Inhalant
+inhalation,ICS,Inhalation Powder
+inhalation,ICS,Inhalation Solution
+inhalation,ICS,Inhalation Suspension
+inhalation,ICS,Metered Dose Inhaler
+inhalation,ICS,Dry Powder Inhaler
+inhalation,ICS,Gas for Inhalation
+injection,Systemic glucocorticosteroids,Injectable Solution
+injection,Systemic glucocorticosteroids,Injectable Suspension
+injection,Systemic glucocorticosteroids,Auto-Injector
+injection,Systemic glucocorticosteroids,Intravenous Solution
+injection,Systemic glucocorticosteroids,Prefilled Syringe
+injection,Systemic glucocorticosteroids,Injection
+injection,Systemic glucocorticosteroids,Intramuscular Solution
+injection,Systemic B2 agonist,Injectable Solution
+injection,Systemic B2 agonist,Injectable Suspension
+injection,Systemic B2 agonist,Auto-Injector
+injection,Systemic B2 agonist,Intravenous Solution
+injection,Systemic B2 agonist,Prefilled Syringe
+injection,Systemic B2 agonist,Injection
+injection,Systemic B2 agonist,Intramuscular Solution
+injection,Anti IL5,Injectable Solution
+injection,Anti IL5,Injectable Suspension
+injection,Anti IL5,Auto-Injector
+injection,Anti IL5,Intravenous Solution
+injection,Anti IL5,Prefilled Syringe
+injection,Anti IL5,Injection
+injection,Anti IL5,Intramuscular Solution
+injection,Anti IgE,Injectable Solution
+injection,Anti IgE,Injectable Suspension
+injection,Anti IgE,Auto-Injector
+injection,Anti IgE,Intravenous Solution
+injection,Anti IgE,Prefilled Syringe
+injection,Anti IgE,Injection
+injection,Anti IgE,Intramuscular Solution
+oral,xanthines,Buccal Tablet
+oral,xanthines,Delayed Release Oral Tablet
+oral,xanthines,Disintegrating Oral Tablet
+oral,xanthines,Chewable Tablet
+oral,xanthines,Delayed Release Oral Capsule
+oral,xanthines,Extended Release Oral Tablet
+oral,xanthines,Extended Release Suspension
+oral,xanthines,Oral Capsule
+oral,xanthines,Oral Gel
+oral,xanthines,Oral Granules
+oral,xanthines,Oral Lozenge
+oral,xanthines,Oral Ointment
+oral,xanthines,Oral Paste
+oral,xanthines,Oral Powder
+oral,xanthines,Oral Solution
+oral,xanthines,Oral Suspension
+oral,xanthines,Effervescent Oral Tablet
+oral,xanthines,Extended Release Oral Capsule
+oral,xanthines,Powder for Oral Suspension
+oral,xanthines,Sublingual Tablet
+oral,xanthines,Tablet for Oral Suspension
+oral,xanthines,Oral Tablet
+oral,xanthines,Pack
+oral,Systemic glucocorticosteroids,Buccal Tablet
+oral,Systemic glucocorticosteroids,Delayed Release Oral Tablet
+oral,Systemic glucocorticosteroids,Disintegrating Oral Tablet
+oral,Systemic glucocorticosteroids,Chewable Tablet
+oral,Systemic glucocorticosteroids,Delayed Release Oral Capsule
+oral,Systemic glucocorticosteroids,Extended Release Oral Tablet
+oral,Systemic glucocorticosteroids,Extended Release Suspension
+oral,Systemic glucocorticosteroids,Oral Capsule
+oral,Systemic glucocorticosteroids,Oral Gel
+oral,Systemic glucocorticosteroids,Oral Granules
+oral,Systemic glucocorticosteroids,Oral Lozenge
+oral,Systemic glucocorticosteroids,Oral Ointment
+oral,Systemic glucocorticosteroids,Oral Paste
+oral,Systemic glucocorticosteroids,Oral Powder
+oral,Systemic glucocorticosteroids,Oral Solution
+oral,Systemic glucocorticosteroids,Oral Suspension
+oral,Systemic glucocorticosteroids,Effervescent Oral Tablet
+oral,Systemic glucocorticosteroids,Extended Release Oral Capsule
+oral,Systemic glucocorticosteroids,Powder for Oral Suspension
+oral,Systemic glucocorticosteroids,Sublingual Tablet
+oral,Systemic glucocorticosteroids,Tablet for Oral Suspension
+oral,Systemic glucocorticosteroids,Oral Tablet
+oral,Systemic glucocorticosteroids,Pack
+oral,Systemic B2 agonist,Buccal Tablet
+oral,Systemic B2 agonist,Delayed Release Oral Tablet
+oral,Systemic B2 agonist,Disintegrating Oral Tablet
+oral,Systemic B2 agonist,Chewable Tablet
+oral,Systemic B2 agonist,Delayed Release Oral Capsule
+oral,Systemic B2 agonist,Extended Release Oral Tablet
+oral,Systemic B2 agonist,Extended Release Suspension
+oral,Systemic B2 agonist,Oral Capsule
+oral,Systemic B2 agonist,Oral Gel
+oral,Systemic B2 agonist,Oral Granules
+oral,Systemic B2 agonist,Oral Lozenge
+oral,Systemic B2 agonist,Oral Ointment
+oral,Systemic B2 agonist,Oral Paste
+oral,Systemic B2 agonist,Oral Powder
+oral,Systemic B2 agonist,Oral Solution
+oral,Systemic B2 agonist,Oral Suspension
+oral,Systemic B2 agonist,Effervescent Oral Tablet
+oral,Systemic B2 agonist,Extended Release Oral Capsule
+oral,Systemic B2 agonist,Powder for Oral Suspension
+oral,Systemic B2 agonist,Sublingual Tablet
+oral,Systemic B2 agonist,Tablet for Oral Suspension
+oral,Systemic B2 agonist,Oral Tablet
+oral,Systemic B2 agonist,Pack
+oral,LTRA,Buccal Tablet
+oral,LTRA,Delayed Release Oral Tablet
+oral,LTRA,Disintegrating Oral Tablet
+oral,LTRA,Chewable Tablet
+oral,LTRA,Delayed Release Oral Capsule
+oral,LTRA,Extended Release Oral Tablet
+oral,LTRA,Extended Release Suspension
+oral,LTRA,Oral Capsule
+oral,LTRA,Oral Gel
+oral,LTRA,Oral Granules
+oral,LTRA,Oral Lozenge
+oral,LTRA,Oral Ointment
+oral,LTRA,Oral Paste
+oral,LTRA,Oral Powder
+oral,LTRA,Oral Solution
+oral,LTRA,Oral Suspension
+oral,LTRA,Effervescent Oral Tablet
+oral,LTRA,Extended Release Oral Capsule
+oral,LTRA,Powder for Oral Suspension
+oral,LTRA,Sublingual Tablet
+oral,LTRA,Tablet for Oral Suspension
+oral,LTRA,Oral Tablet
+oral,LTRA,Pack
+,SAMA,
+,SABA,
+,LAMA,
+,LABA,
+,ICS,
+,Systemic glucocorticosteroids,
+,Anti IL5,
+,Anti IgE,
+,xanthines,
+,LTRA,

@@ -1,0 +1,120 @@
+atc_code,description,med_group,name_single_ingredient,concept_id
+R03CC53,"Terbutaline, combinations",Systemic B2 agonist,0,0
+R03CC04,Fenoterol,Systemic B2 agonist,fenoterol,19053979
+R03CC14,Reproterol,Systemic B2 agonist,reproterol,19035396
+R03CC06,Isoetarine,Systemic B2 agonist,isoetharine,1181809
+R03CC02,Salbutamol,Systemic B2 agonist,albuterol,1154343
+R03CC09,Tretoquinol,Systemic B2 agonist,trimetoquinol hydrochloride hydrate,35198052
+R03CC12,Bambuterol,Systemic B2 agonist,bambuterol,19034275
+R03CC05,Hexoprenaline,Systemic B2 agonist,hexoprenaline,19068969
+R03CC03,Terbutaline,Systemic B2 agonist,terbutaline,1236744
+R03CC11,Tulobuterol,Systemic B2 agonist,tulobuterol,19043191
+R03CC08,Procaterol,Systemic B2 agonist,procaterol,19028950
+R03CC10,Carbuterol,Systemic B2 agonist,carbuterol,40798689
+R03CC90,"Clenbuterol, combinations",Systemic B2 agonist,0,0
+R03CC13,Clenbuterol,Systemic B2 agonist,clenbuterol,19097824
+R03CC07,Pirbuterol,Systemic B2 agonist,pirbuterol,1125449
+0,Vilanterol,LABA,vilanterol,43532539
+R03BB01,Ipratropium bromide,SAMA,ipratropium,1112921
+R03BB02,Oxitropium bromide,SAMA,oxitropium,19018882
+R03BB04,Tiotropium bromide,LAMA,tiotropium,1106776
+R03BB05,Aclidinium bromide,LAMA,aclidinium,42873639
+R03BB06,Glycopyrronium bromide,LAMA,glycopyrronium,45775571
+R03BB07,Umeclidinium bromide,LAMA,umeclidinium,44785907
+R03AC02,Salbutamol,SABA,albuterol,1154343
+R03AC03,Terbutaline,SABA,terbutaline,1236744
+R03AC04,Fenoterol,SABA,fenoterol,19053979
+R03AC05,Rimiterol,SABA,rimiterol,19063387
+R03AC06,Hexoprenaline,SABA,hexoprenaline,19068969
+R03AC07,Isoetarine,SABA,isoetharine,1181809
+R03AC08,Pirbuterol,SABA,pirbuterol,1125449
+R03AC09,Tretoquinol,SABA,trimetoquinol hydrochloride hydrate,35198052
+R03AC10,Carbuterol,SABA,carbuterol,40798689
+R03AC15,Reproterol,SABA,reproterol,19035396
+R03AC16,Procaterol,SABA,procaterol,19028950
+R03AC17,Bitolterol,SABA,bitolterol,1138050
+R03AC11,Tulobuterol,LABA,tulobuterol,19043191
+R03AC12,Salmeterol,LABA,salmeterol,1137529
+R03AC13,Formoterol,LABA,formoterol,1196677
+R03AC14,Clenbuterol,LABA,clenbuterol,19097824
+R03AC18,Indacaterol,LABA,indacaterol,40240664
+R03AC19,Olodaterol,LABA,olodaterol,45775116
+R03AL01,Fenoterol and ipratropium bromide,SABA+SAMA,0,0
+R03AL02,Salbutamol and ipratropium bromide,SABA+SAMA,0,0
+R03AL03,Vilanterol and umeclidinium bromide,LABA+LAMA,0,0
+R03AL04,Indacaterol and glycopyrronium bromide,LABA+LAMA,0,0
+R03AL05,Formoterol and aclidinium bromide,LABA+LAMA,0,0
+R03AL06,Olodaterol and etiotropium bromide,LABA+LAMA,0,0
+R03AL07,Formoterol and glycopyrronium bromide,LABA+LAMA,0,0
+R03AL08,"Vilanterol, umeclidinium bromide and fluticasone f",LABA+LAMA+ICS,0,0
+R03AL09,"Formoterol, glycopyrronium bromide and beclometaso",LABA+LAMA+ICS,0,0
+R03AK06,Salmeterol and fluticasone,LABA+ICS,0,0
+R03AK07,Formoterol and budesonide,LABA+ICS,0,0
+R03AK08,Formoterol and beclomethasone,LABA+ICS,0,0
+R03AK09,Formoterol and momethasone,LABA+ICS,0,0
+R03AK10,Vilanterol and fluticasone furoate,LABA+ICS,0,0
+R03AK11,Formoterol and fluticasone,LABA+ICS,0,0
+R03AK12,Salmeterol and budesonide,LABA+ICS,0,0
+R03AK13,Salbutamol and beclometasone,LABA+ICS,0,0
+R03BA01,Beclometasone,ICS,0,1115572
+R03BA02,Budesonide,ICS,budesonide,939259
+R03BA03,Flunisolide,ICS,flunisolide,1196514
+R03BA05,Fluticasone,ICS,fluticasone,1149380
+R03BA07,Mometasone,ICS,mometasone,905233
+R03BA08,Ciclesonide,ICS,ciclesonide,902938
+R03BA09,Fluticasone furoate,ICS,fluticasone,1149380
+R03AK01,Epinephrine and other drugs for obstructive airway,OFC,0,0
+R03AK02,Isoprenaline and other drugs for obstructive airwa,OFC,0,0
+R03AK04,Salbutamol and sodium cromoglicate,OFC,0,0
+R03AK05,Reproterol and sodium cromoglicate,OFC,0,0
+R03DA01,Diprophylline,xanthines,dyphylline,1140088
+R03DA02,Choline theophyllinate,xanthines,choline,1195334
+R03DA03,Proxyphylline,xanthines,proxyphylline,19029547
+R03DA04,Theophylline,xanthines,theophylline,1237049
+R03DA05,Aminophylline,xanthines,aminophylline,1105775
+R03DA06,Etamiphylline,xanthines,etamiphyllin,40798802
+R03DA07,Theobromine,xanthines,theobromine,19137056
+R03DA08,Bamifylline,xanthines,bamifylline,19018518
+R03DA09,Acefylline piperazine,xanthines,acefylline piperazine,40798596
+R03DA10,Bufylline,xanthines,ambuphylline,0
+R03DA11,Doxofylline,xanthines,doxofylline,43009019
+R03DA20,Combinations of xanthines,xanthines,0,0
+R03DA51,"Diprophylline, combinations",xanthines,0,0
+R03DA54,"Theophylline, combinations excluding psycholeptics",xanthines,0,0
+R03DA55,"Aminophylline, combinations",xanthines,0,0
+R03DA57,"Theobromine, combinations",xanthines,0,0
+R03DA74,"Theophylline, combinations with psycholeptics",xanthines,0,0
+R03DB01,Diprophylline and adrenergics,xanthines,0,0
+R03DB02,Choline theophyllinate and adrenergics,xanthines,0,0
+R03DB03,Proxyphylline and adrenergics,xanthines,0,0
+R03DB04,Theophylline and adrenergics,xanthines,0,0
+R03DB05,Aminophylline and adrenergics,xanthines,0,0
+R03DB06,Etamiphylline and adrenergics,xanthines,0,0
+R03DC01,Zafirlukast,LTRA,zafirlukast,1111706
+R03DC02,Pranlukast,LTRA,pranlukast hydrate,43009065
+R03DC03,Montelukast,LTRA,montelukast,1154161
+R03DC04,Ibudilast,LTRA,ibudilast,43009091
+R03DX05,Omalizumab,Anti IgE,omalizumab,1110942
+R03DX08,Reslizumab,Anti IL5,reslizumab,35603983
+R03DX09,Mepolizumab,Anti IL5,mepolizumab,35606631
+R03DX10,Benralizumab,Anti IL5,benralizumab,792993
+H02AB01,Betamethasone,Systemic glucocorticosteroids,betamethasone,920458
+H02AB02,Dexamethasone,Systemic glucocorticosteroids,dexamethasone,1518254
+H02AB03,Fluocortolone,Systemic glucocorticosteroids,fluocortolone,19055344
+H02AB04,Methylprednisolone,Systemic glucocorticosteroids,methylprednisolone,1506270
+H02AB05,Paramethasone,Systemic glucocorticosteroids,paramethasone,19027186
+H02AB06,Prednisolone,Systemic glucocorticosteroids,prednisolone,1550557
+H02AB07,Prednisone,Systemic glucocorticosteroids,prednisone,1551099
+H02AB08,Triamcinolone,Systemic glucocorticosteroids,triamcinolone,903963
+H02AB09,Hydrocortisone,Systemic glucocorticosteroids,hydrocortisone,975125
+H02AB10,Cortisone,Systemic glucocorticosteroids,cortisone,1507705
+H02AB11,Prednylidene,Systemic glucocorticosteroids,prednylidene,19011127
+H02AB12,Rimexolone,Systemic glucocorticosteroids,rimexolone,977421
+H02AB13,Deflazacort,Systemic glucocorticosteroids,deflazacort,19086888
+H02AB14,Cloprednol,Systemic glucocorticosteroids,cloprednol,19050907
+H02AB15,Meprednisone,Systemic glucocorticosteroids,meprednisone,19009116
+H02AB17,Cortivazol,Systemic glucocorticosteroids,cortivazol,19061907
+H02AB30,Combinations of glucocorticoids,Systemic glucocorticosteroids,0,0
+H02AB56,"Prednisolone, combinations",Systemic glucocorticosteroids,0,0
+H02AB57,"Prednisone, combinations",Systemic glucocorticosteroids,0,0
+H02AB90,Flumetasone,Systemic glucocorticosteroids,flumethasone,19055156

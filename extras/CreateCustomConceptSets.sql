@@ -1,50 +1,8 @@
--- Defining asthma drug classes from scratch
+-- Defining asthma drug classes
 
-/*
-Import the ingredients
- */
+-- MANUAL IMPORT 'asthma_drugs.csv'
 
--- MANUAL IMPORT 'asthma_drugs.csv' -> NO SUPERUSER ACCESS
-
-/*
--- option 1
-DROP TABLE asthma_drugs;
-CREATE TABLE amarkus.asthma_drugs
-				(
-				atc_code TEXT,
-				description TEXT,
-				med_group TEXT,
-				name_single_ingredient TEXT,
-				concept_id INT
-				)
-
-COPY asthma_drugs(atc_code, description, med_group, name_single_ingredient, concept_id)
-FROM 	'J:\amarkus\Documents\Asthma_definitions\asthma_drugs.csv'
-DELIMITER ','
-CSV HEADER;
-
--- option 2
-cat 'J:\amarkus\Documents\Asthma_definitions\asthma_drugs.csv'
-psql -c 'COPY asthma_drugs(atc_code, description, med_group, name_single_ingredient, concept_id) FROM STDIN CSV;'
- */
-
-
-/*
-Filter based on dose form
-
- */
-
--- MANUAL IMPORT 'medgroup_dosefrom.csv' -> NO SUPERUSER ACCESS
-
-/*
-DROP TABLE medgroup_doseform;
-CREATE TABLE amarkus.medgroup_doseform
-					(
-					route TEXT,
-					med_group TEXT,
-					dose_form TEXT
-					)
- */
+-- MANUAL IMPORT 'medgroup_dosefrom.csv'
 
 -- UPDATE medgroup_doseform SET dose_form = NULL WHERE dose_form = ''; -- convert to NULL values
 
