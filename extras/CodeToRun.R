@@ -70,6 +70,9 @@ for (sourceId in 1:length(cdmDatabaseSchemaList)) {
     outputResults = outputResults,
     study_settings = study_settings
   )
-  }
+  
+}
+
+DatabaseConnector::disconnect(connection)
 
 

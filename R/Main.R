@@ -186,7 +186,7 @@ execute <- function(connection = NULL,
       
       # Analyis settings
       minEraDuration <-  as.integer(study_settings[study_settings$param == "minEraDuration",s]) # Minimum time an era should last to be included in analysis
-      minStepDuration <-  as.integer(study_settings[study_settings$param == "minStepDuration",s]) # Minimum time a step (split drug era) before or after a combination treatment should last to be included in analysis
+      minStepDuration <-  as.integer(study_settings[study_settings$param == "minStepDuration",s]) # Minimum time a step (generated drug era) before or after a combination treatment should last to be included in analysis
       eraCollapseSize <-  as.integer(study_settings[study_settings$param == "eraCollapseSize",s]) # Window of time between two same evnt cohorts that are considered one era
       combinationWindow <-  as.integer(study_settings[study_settings$param == "combinationWindow",s]) # Window of time when two event cohorts need to overlap to be considered a combination
       sequentialRepetition <-  study_settings[study_settings$param == "sequentialRepetition",s] # Select to only remove sequential occurences of each outcome cohort
