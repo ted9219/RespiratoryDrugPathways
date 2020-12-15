@@ -260,6 +260,19 @@ FROM @resultsSchema.@databaseName_@studyName_targetcohort;
 
 INSERT INTO @resultsSchema.@databaseName_@studyName_summary_cnt (count_type, num_persons)
 SELECT
+  CONCAT('Number of persons in target cohort in ', index_year) AS count_type,
+  num_persons            AS num_persons
+FROM
+  (
+    SELECT
+      year(index_date) as index_year,
+      count(DISTINCT person_id) AS num_persons
+    FROM @resultsSchema.@databaseName_@studyName_targetcohort
+    GROUP BY year(index_date)
+  ) t1;
+
+INSERT INTO @resultsSchema.@databaseName_@studyName_summary_cnt (count_type, num_persons)
+SELECT
   'Total number of pathways (before minCellCount)' AS count_type,
   sum(num_persons)            AS num_persons
 FROM @resultsSchema.@databaseName_@studyName_drug_seq_summary;

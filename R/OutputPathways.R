@@ -74,6 +74,11 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
   
   summary_counts <- read.csv(paste(path,"_summary_cnt.csv",sep=''), stringsAsFactors = FALSE)
   summary_counts <- rbind(summary_counts, c("Total number of pathways (after minCellCount)", sum(file_noyear$freq)))
+  
+  for (y in unique(file_withyear$INDEX_YEAR)) {
+    summary_counts <- rbind(summary_counts, c(paste0("Number of pathways (after minCellCount) in ", y), sum(file_withyear$freq[file_withyear$INDEX_YEAR == y])))
+  }
+  
   write.table(summary_counts,file=paste(path,"_summary_cnt.csv",sep=''), sep = ",", row.names = FALSE, col.names = TRUE)
   
   write.csv(file_noyear,  paste(path,"_file_noyear.csv",sep=''), row.names = FALSE)
@@ -326,7 +331,7 @@ inputSunburstPlot <- function(data, path, addNoPaths, index_year) {
     if (index_year == "all") {
       noPath <- as.integer(summary_counts[summary_counts$COUNT_TYPE == "Number of persons in target cohort", "NUM_PERSONS"]) - sum(transformed_file$freq)
     } else {
-      # TODO: change for separate years (but first add to summary_cnt.csv)
+      noPath <- as.integer(summary_counts[summary_counts$COUNT_TYPE == paste0("Number of persons in target cohort in ", index_year), "NUM_PERSONS"]) - sum(transformed_file$freq)
     }
     
     transformed_file <- rbind(transformed_file, c("End", noPath))
