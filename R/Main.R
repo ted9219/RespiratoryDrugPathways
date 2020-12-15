@@ -127,9 +127,6 @@ execute <- function(connection = NULL,
     ParallelLogger::logInfo("Adding custom cohorts in characterization")
     custom <- settings_characterization[settings_characterization$covariate_id == "Custom", ]
     
-    # custom_characterization <- cohorts[cohorts$cohortName %in% custom,c("cohortId", "cohortName")]
-    # colnames(custom_characterization) <- c("covariate_id", "covariate_name")
-    
     custom_characterization <- data.frame()
     
     for (t in targetCohortIds) {

@@ -1,13 +1,9 @@
 cohortId,cohortName,cohortDefinition,cohortType
 1,Asthma,ATLAS,target
 2,COPD,ATLAS,target
-3,Asthma&COPD,ATLAS,target
-4,Asthma2311,ATLAS,target
-5,COPD2311,ATLAS,target
-6,ACO2311,ATLAS,target
-7,Asthma6plus2311,ATLAS,target
-8,Asthma6min2311,ATLAS,target
-9,AsthmaCOPD2311,ATLAS,target
+3,AsthmaCOPD,ATLAS,target
+4,Asthma6plus,ATLAS,target
+5,Asthma6min,ATLAS,target
 10,Anti IgE,Custom,outcome
 11,Anti IL5,Custom,outcome
 12,LAMA,Custom,outcome
@@ -23,6 +19,3 @@ cohortId,cohortName,cohortDefinition,cohortType
 22,LABA&LAMA,Custom,outcome
 23,LABA&LAMA&ICS,Custom,outcome
 24,SABA&SAMA,Custom,outcome
-50,Chronic rhinosinusitis,ATLAS,characterization
-51,Gastroesophageal reflux disease,ATLAS,characterization
-52,Nasal polyposis,ATLAS,characterization

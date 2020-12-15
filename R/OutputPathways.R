@@ -34,11 +34,11 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
     file[findCombinations] <- "Other combinations"
   } else {
     # Otherwise: process combination treatments
-
+    
     # TODO: Group infrequent treatments below 25 as otherCombinations
-  
+    
   }
-
+  
   # Group the resulting treatment paths
   file_noyear <- file[,.(freq=sum(NUM_PERSONS)), by=layers]
   file_withyear <- file[,.(freq=sum(NUM_PERSONS)), by=c(layers, "INDEX_YEAR")]
@@ -260,59 +260,26 @@ createSunburstPlot <- function(data, databaseId, outcomeCohortIds, studyName, ou
   }
   
   if (createPlot) {
-    CSV <- FALSE
-    JSON <- TRUE
     
-    inputFile <- paste(path,"_inputsunburst_", index_year, ".csv",sep='')
+    transformCSVtoJSON(outcomeCohortIds, outputFolder, path, index_year, maxPathLength)
     
-    if (CSV) {
-      # Load template HTML file
-      template_html <- paste(readLines("plots/index_template.html"), collapse="\n")
-      
-      # Replace @studyName
-      html <- sub("@studyName", paste0(studyName,"_", index_year), template_html)
-      
-      # Save HTML file as index_@studyName
-      write.table(html, 
-                  file=paste0("plots/index_",paste0(studyName,"_", index_year),".html"), 
-                  quote = FALSE,
-                  col.names = FALSE,
-                  row.names = FALSE)
-      
-      # Load template JS file
-      template_js <- paste(readLines("plots/sequences_template.js"), collapse="\n")
-      
-      # Replace @file
-      js <- sub("@file", inputFile, template_js)
-      
-      # Save JS file as sequences_@studyName
-      write.table(js, 
-                  file=paste0("plots/sequences_",paste0(studyName,"_", index_year),".js"), 
-                  quote = FALSE,
-                  col.names = FALSE,
-                  row.names = FALSE)
-    }
+    # Load template HTML file
+    html <- paste(readLines("plots/sunburst.html"), collapse="\n")
     
-    if (JSON) {
-      transformCSVtoJSON(outcomeCohortIds, outputFolder, path, index_year, maxPathLength)
-      
-      # Load template HTML file
-      html <- paste(readLines("plots/sunburst.html"), collapse="\n")
-      
-      # Replace @insert_data
-      input_plot <- readLines(paste(path,"_inputsunburst_", index_year, ".txt",sep=''))
-      html <- sub("@insert_data", input_plot, html)
-      
-      # Replace @name
-      html <- sub("@name", paste0("(", databaseId, " ", studyName," ", index_year, ")"), html)
-      
-      # Save HTML file as sunburst_@studyName
-      write.table(html, 
-                  file=paste0("plots/sunburst_",paste0(studyName,"_", index_year),".html"), 
-                  quote = FALSE,
-                  col.names = FALSE,
-                  row.names = FALSE)
-    }
+    # Replace @insert_data
+    input_plot <- readLines(paste(path,"_inputsunburst_", index_year, ".txt",sep=''))
+    html <- sub("@insert_data", input_plot, html)
+    
+    # Replace @name
+    html <- sub("@name", paste0("(", databaseId, " ", studyName," ", index_year, ")"), html)
+    
+    # Save HTML file as sunburst_@studyName
+    write.table(html, 
+                file=paste0("plots/sunburst_",paste0(studyName,"_", index_year),".html"), 
+                quote = FALSE,
+                col.names = FALSE,
+                row.names = FALSE)
+    
   }
 }
 
