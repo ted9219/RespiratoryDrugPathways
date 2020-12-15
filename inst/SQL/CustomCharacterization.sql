@@ -43,7 +43,7 @@ WHERE C.condition_concept_id IN (@characterizationConceptSet);
 -- Do characterization
 CREATE TABLE @resultsSchema.@databaseName_characterization
 (
-mean NUMERIC
+mean REAL
 );
 
 INSERT INTO @resultsSchema.@databaseName_characterization (mean)

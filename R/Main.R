@@ -313,7 +313,6 @@ execute <- function(connection = NULL,
       
     }
   }
-  
-  DatabaseConnector::disconnect(connection)
+
   invisible(NULL)
 }
