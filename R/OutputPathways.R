@@ -25,19 +25,20 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
   
   summaryCombinations <- data.table(combination = combinations, freq = freqCombinations)
   summaryCombinations <- summaryCombinations[,.(freq=sum(freq)), by=combination][order(-freq)]
-  summaryCombinations <- summaryCombinations[freq >= minCellCount,]
-  
-  write.csv(summaryCombinations, file=paste(path,"_combinations.csv",sep=''), row.names = FALSE)
   
   # Group all non-fixed combinations in one group if TRUE
   if (otherCombinations) {
     file[findCombinations] <- "Other combinations"
   } else {
-    # Otherwise: process combination treatments
-    
-    # TODO: Group infrequent treatments below 25 as otherCombinations
-    
+    # Otherwise: group infrequent treatments below minFreqCombination as otherCombinations
+    minFreqCombination <- 25
+    selectedCombinations <- apply(file, 2, function(x) x %in% summaryCombinations$combination[summaryCombinations$freq >= minFreqCombination])
+    file[findCombinations] <- "Other combinations"
   }
+  
+  summaryCombinations <- summaryCombinations[freq >= minCellCount,]
+  write.csv(summaryCombinations, file=paste(path,"_combinations.csv",sep=''), row.names = FALSE)
+  
   
   # Group the resulting treatment paths
   file_noyear <- file[,.(freq=sum(NUM_PERSONS)), by=layers]
