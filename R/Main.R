@@ -299,7 +299,7 @@ execute <- function(connection = NULL,
         transformDuration(connection = connection, cohortDatabaseSchema = cohortDatabaseSchema, dbms = dbms, studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, otherCombinations = otherCombinations)
         
         # Treatment pathways sankey diagram
-        createSankeyDiagram(data = file_noyear)
+        createSankeyDiagram(data = file_noyear, databaseId = databaseId)
         
         # Treatment pathways sunburst plot 
         outputSunburstPlot(data = file_noyear, databaseId = databaseId, outcomeCohortIds = outcomeCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)

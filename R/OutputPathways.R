@@ -275,7 +275,7 @@ createSunburstPlot <- function(data, databaseId, outcomeCohortIds, studyName, ou
     
     # Save HTML file as sunburst_@studyName
     write.table(html, 
-                file=paste0("plots/sunburst_",paste0(studyName,"_", index_year),".html"), 
+                file=paste0("plots/sunburst_", paste0(databaseId, "_", studyName,"_", index_year),".html"), 
                 quote = FALSE,
                 col.names = FALSE,
                 row.names = FALSE)
@@ -444,7 +444,7 @@ buildHierarchy <- function(csv, maxPathLength) {
   return(json)
 }
 
-createSankeyDiagram <- function(data) {
+createSankeyDiagram <- function(data, databaseId) {
   
   # Sankey diagram for first three treatment layers
   data$D1_CONCEPT_NAME <- paste0("1. ",data$D1_CONCEPT_NAME)
@@ -482,7 +482,7 @@ createSankeyDiagram <- function(data) {
                                    Value = 'value', 
                                    NodeID = 'name',
                                    units = 'votes')
-  networkD3::saveNetwork(plot, file="sankeydiagram_all.html", selfcontained=TRUE)
+  networkD3::saveNetwork(plot, file=paste0("sankeydiagram_", databaseId,"_all.html"), selfcontained=TRUE)
   # there seems to be an error in this package -> cannot change path to output folder
   
 }
