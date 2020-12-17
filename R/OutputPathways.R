@@ -275,7 +275,7 @@ createSunburstPlot <- function(data, databaseId, outcomeCohortIds, studyName, ou
     
     # Save HTML file as sunburst_@studyName
     write.table(html, 
-                file=paste0("plots/sunburst_", paste0(databaseId, "_", studyName,"_", index_year),".html"), 
+                file=paste0("plots/sunburst_", databaseId, "_", studyName,"_", index_year,".html"), 
                 quote = FALSE,
                 col.names = FALSE,
                 row.names = FALSE)
@@ -313,8 +313,7 @@ inputSunburstPlot <- function(data, path, addNoPaths, index_year) {
 
 transformCSVtoJSON <- function(outcomeCohortIds, outputFolder, path, index_year, maxPathLength) {
   data <- read.csv(paste(path,"_inputsunburst_", index_year, ".csv",sep=''))
-  # data <- read.csv("output/IPCI/asthma1/test.csv")
-  
+
   cohorts <- read.csv(paste(outputFolder, "/cohort.csv",sep=''), stringsAsFactors = FALSE)
   outcomes <- c(cohorts$cohortName[cohorts$cohortId %in% unlist(strsplit(outcomeCohortIds, ","))], "Other combinations")
   
