@@ -39,7 +39,6 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
   summaryCombinations <- summaryCombinations[freq >= minCellCount,]
   write.csv(summaryCombinations, file=paste(path,"_combinations.csv",sep=''), row.names = FALSE)
   
-  
   # Group the resulting treatment paths
   file_noyear <- file[,.(freq=sum(NUM_PERSONS)), by=layers]
   file_withyear <- file[,.(freq=sum(NUM_PERSONS)), by=c(layers, "INDEX_YEAR")]
