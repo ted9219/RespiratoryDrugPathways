@@ -11,13 +11,13 @@ targetCohortIds,from,to,category
 "1,4,5",ICS,ICS+LAMA,stepup
 "1,4,5",ICS,ICS+LTRA,stepup
 "1,4,5",ICS+LABA,ICS+LABA+LAMA,stepup
-"1,4,5",ICS+LABA,ICS+LABA+OCS,stepup
+"1,4,5",ICS+LABA,ICS+LABA+Systemic glucocorticosteroids,stepup
 "1,4,5",ICS+LABA,ICS+LABA+Anti IgE,stepup
 "1,4,5",ICS+LABA,ICS+LABA+Anti IL5,stepup
 "1,4,5",ICS+LABA,ICS+LABA+Anti IL4R,stepup
 "1,4,5",ICS+LTRA,ICS+LABA+LAMA,stepup
 "1,4,5",ICS+LTRA,ICS+LABA+LAMA,stepup
-"1,4,5",ICS+LTRA,ICS+LABA+OCS,stepup
+"1,4,5",ICS+LTRA,ICS+LABA+Systemic glucocorticosteroids,stepup
 "1,4,5",ICS+LTRA,ICS+LABA+Anti IgE,stepup
 "1,4,5",ICS+LTRA,ICS+LABA+Anti IL5,stepup
 "1,4,5",ICS+LTRA,ICS+LABA+Anti IL4R,stepup
@@ -29,21 +29,21 @@ targetCohortIds,from,to,category
 "1,4,5",ICS+LTRA,ICS+LABA,switching
 "1,4,5",ICS+LABA,ICS+LAMA,switching
 "1,4,5",ICS+LAMA,ICS+LABA,switching
-"1,4,5",ICS+LABA+LAMA,ICS+LABA+OCS,switching
+"1,4,5",ICS+LABA+LAMA,ICS+LABA+Systemic glucocorticosteroids,switching
 "1,4,5",ICS+LABA+LAMA,ICS+LABA+Anti IgE,switching
 "1,4,5",ICS+LABA+LAMA,ICS+LABA+Anti IL5,switching
 "1,4,5",ICS+LABA+LAMA,ICS+LABA+Anti IL4R,switching
-"1,4,5",ICS+LABA+OCS,ICS+LABA+LAMA,switching
-"1,4,5",ICS+LABA+OCS,ICS+LABA+Anti IgE,switching
-"1,4,5",ICS+LABA+OCS,ICS+LABA+Anti IL5,switching
-"1,4,5",ICS+LABA+OCS,ICS+LABA+Anti IL4R,switching
-"1,4,5",ICS+LABA+Anti IgE,ICS+LABA+OCS,switching
+"1,4,5",ICS+LABA+Systemic glucocorticosteroids,ICS+LABA+LAMA,switching
+"1,4,5",ICS+LABA+Systemic glucocorticosteroids,ICS+LABA+Anti IgE,switching
+"1,4,5",ICS+LABA+Systemic glucocorticosteroids,ICS+LABA+Anti IL5,switching
+"1,4,5",ICS+LABA+Systemic glucocorticosteroids,ICS+LABA+Anti IL4R,switching
+"1,4,5",ICS+LABA+Anti IgE,ICS+LABA+Systemic glucocorticosteroids,switching
 "1,4,5",ICS+LABA+Anti IgE,ICS+LABA+Anti IL5,switching
 "1,4,5",ICS+LABA+Anti IgE,ICS+LABA+Anti IL4R,switching
 "1,4,5",ICS+LABA+Anti IL5,ICS+LABA+LAMA,switching
 "1,4,5",ICS+LABA+Anti IL5,ICS+LABA+Anti IgE,switching
 "1,4,5",ICS+LABA+Anti IL5,ICS+LABA+Anti IL4R,switching
-"1,4,5",ICS+LABA+Anti IL4R,ICS+LABA+OCS,switching
+"1,4,5",ICS+LABA+Anti IL4R,ICS+LABA+Systemic glucocorticosteroids,switching
 "1,4,5",ICS+LABA+Anti IL4R,ICS+LABA+LAMA,switching
 "1,4,5",ICS+LABA+Anti IL4R,ICS+LABA+Anti IgE,switching
 "1,4,5",ICS+LABA+Anti IL4R,ICS+LABA+Anti IL5,switching
@@ -59,13 +59,13 @@ targetCohortIds,from,to,category
 "1,4,5",ICS+LAMA,ICS,stepdown
 "1,4,5",ICS+LTRA,ICS,stepdown
 "1,4,5",ICS+LABA+LAMA,ICS+LABA,stepdown
-"1,4,5",ICS+LABA+OCS,ICS+LABA,stepdown
+"1,4,5",ICS+LABA+Systemic glucocorticosteroids,ICS+LABA,stepdown
 "1,4,5",ICS+LABA+Anti IgE,ICS+LABA,stepdown
 "1,4,5",ICS+LABA+Anti IL5,ICS+LABA,stepdown
 "1,4,5",ICS+LABA+Anti IL4R,ICS+LABA,stepdown
 "1,4,5",ICS+LABA+LAMA,ICS+LTRA,stepdown
 "1,4,5",ICS+LABA+LAMA,ICS+LTRA,stepdown
-"1,4,5",ICS+LABA+OCS,ICS+LTRA,stepdown
+"1,4,5",ICS+LABA+Systemic glucocorticosteroids,ICS+LTRA,stepdown
 "1,4,5",ICS+LABA+Anti IgE,ICS+LTRA,stepdown
 "1,4,5",ICS+LABA+Anti IL5,ICS+LTRA,stepdown
 "1,4,5",ICS+LABA+Anti IL4R,ICS+LTRA,stepdown
