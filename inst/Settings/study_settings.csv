@@ -6,7 +6,7 @@ minEraDuration,0,5,5,5,1,1,1
 minStepDuration,30,30,30,30,30,30,30
 eraCollapseSize,0,30,30,30,30,30,30
 combinationWindow,30,30,30,30,30,30,30
-sequentialRepetition,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE
+sequentialRepetition,FALSE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE
 firstTreatment,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE
 maxPathLength,5,5,5,5,5,5,5
 minCellCount,0,5,5,5,5,5,5
