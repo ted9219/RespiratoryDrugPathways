@@ -217,6 +217,11 @@ execute <- function(connection = NULL,
       data <- doEraDuration(data, minEraDuration)
       data <- doEraCollapse(data, eraCollapseSize)
       data <- doCombinationWindow(data, combinationWindow, minStepDuration)
+      
+      # Order the combinations
+      concept_ids <- strsplit(data$DRUG_CONCEPT_ID, split="+", fixed=TRUE)
+      data$DRUG_CONCEPT_ID <- sapply(concept_ids, function(x) paste(sort(x), collapse = "+"))
+      
       if (sequentialRepetition) {data <- doSequentialRepetition(data)}
       if (firstTreatment) {data <- doFirstTreatment(data)}
       
@@ -224,12 +229,12 @@ execute <- function(connection = NULL,
       data <- data[order(PERSON_ID, DRUG_START_DATE, DRUG_END_DATE),]
       data[, DRUG_SEQ:=seq_len(.N), by= .(PERSON_ID)]
       
-      # Order the combinations
-      concept_ids <- strsplit(data$DRUG_CONCEPT_ID, split="+", fixed=TRUE)
-      data$DRUG_CONCEPT_ID <- sapply(concept_ids, function(x) paste(sort(x), collapse = "+"))
-      
       # Add concept_name
       data <- addLabels(data, outputFolder)
+      
+      # Order the combinations
+      concept_names <- strsplit(data$CONCEPT_NAME, split="+", fixed=TRUE)
+      data$CONCEPT_NAME <- sapply(concept_names, function(x) paste(sort(x), collapse = "+"))
       
       # Move table back to SQL
       DatabaseConnector::insertTable(connection = connection,
@@ -280,7 +285,6 @@ execute <- function(connection = NULL,
       # Numbers study population
       extractAndWriteToFile(connection, tableName = "summary_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, path = path, dbms = connectionDetails$dbms)
       
-      
       # Transform results for output
       empty_data <- transformTreatmentSequence(studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, removePaths = removePaths, otherCombinations = otherCombinations)
       
@@ -289,8 +293,8 @@ execute <- function(connection = NULL,
         file_withyear <- as.data.table(read.csv(paste(path,"_file_withyear.csv",sep=''), stringsAsFactors = FALSE))
         
         # Compute percentage of people treated with each outcome cohort separately and in the form of combination treatments
-        outputPercentageGroupTreated(data = file_noyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_noyear.csv",sep=''))
-        outputPercentageGroupTreated(data = file_withyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_withyear.csv",sep=''))
+        outputPercentageGroupTreated(data = file_noyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_noyear.csv",sep=''), otherCombinations = otherCombinations)
+        outputPercentageGroupTreated(data = file_withyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_withyear.csv",sep=''), otherCombinations = otherCombinations)
         
         # Compute step-up/down of asthma/COPD drugs
         outputStepUpDown(file_noyear = file_noyear, path = path, targetCohortId = targetCohortId)

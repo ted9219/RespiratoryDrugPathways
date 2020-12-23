@@ -29,11 +29,6 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
   # Group all non-fixed combinations in one group if TRUE
   if (otherCombinations) {
     file[findCombinations] <- "Other combinations"
-  } else {
-    # Otherwise: group infrequent treatments below minFreqCombination as otherCombinations
-    minFreqCombination <- 25
-    selectedCombinations <- apply(file, 2, function(x) x %in% summaryCombinations$combination[summaryCombinations$freq >= minFreqCombination])
-    file[findCombinations] <- "Other combinations"
   }
   
   summaryCombinations <- summaryCombinations[freq >= minCellCount,]
@@ -87,10 +82,10 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
   return(FALSE)
 }
 
-outputPercentageGroupTreated <- function(data, outcomeCohortIds, path, outputFolder, outputFile) {
+outputPercentageGroupTreated <- function(data, outcomeCohortIds, path, outputFolder, outputFile, otherCombinations) {
   if (is.null(data$INDEX_YEAR)) {
     # For file_noyear compute once
-    result <- computePercentageGroupTreated(data, outcomeCohortIds, outputFolder)
+    result <- computePercentageGroupTreated(data, outcomeCohortIds, outputFolder, otherCombinations)
     
   } else {
     # For file_withyear compute per year
@@ -99,11 +94,10 @@ outputPercentageGroupTreated <- function(data, outcomeCohortIds, path, outputFol
     results <- lapply(years, function(y) {
       subset_data <- data[INDEX_YEAR == as.character(y),]
       
-      subset_result <- cbind(y, computePercentageGroupTreated(subset_data, outcomeCohortIds, outputFolder))
+      subset_result <- cbind(y, computePercentageGroupTreated(subset_data, outcomeCohortIds, outputFolder, otherCombinations))
     }) 
     
     result <- rbindlist(results)
-    # colnames(result[,1:2]) <- c("INDEX_YEAR" ,"outcomes")
     result$y <- as.character(result$y)
   }
   
@@ -113,10 +107,31 @@ outputPercentageGroupTreated <- function(data, outcomeCohortIds, path, outputFol
 outputStepUpDown <- function(file_noyear, path, targetCohortId) { 
   
   # Replace & signs by + (so that definitions match both)
-  file_noyear <- data.table(apply(file_noyear, 2, function(x) gsub("&", "+", x, fixed = TRUE)))
+  file_noyear <- data.table(apply(file_noyear, 2, function(x) 
+  {
+    x <- gsub("&", "+", x, fixed = TRUE)
+    
+    # Order the combinations (again)
+    concept_names <- strsplit(x, split="+", fixed=TRUE)
+    x <- sapply(concept_names, function(c) paste(sort(c), collapse = "+"))
+    
+    # Fill gaps with NA
+    x[x==""] <- NA
+  
+    return(x)
+  }))
+  
   file_noyear$freq <- as.numeric(file_noyear$freq)
   
   def_updown <- read.csv("inst/Settings/augment_switch.csv", stringsAsFactors = FALSE)
+  
+  # Order the definition columns from/to
+  from <- strsplit(def_updown$from, split="+", fixed=TRUE)
+  def_updown$from <- sapply(from, function(c) paste(sort(c), collapse = "+"))
+  
+  to <- strsplit(def_updown$to, split="+", fixed=TRUE)
+  def_updown$to <- sapply(to, function(c) paste(sort(c), collapse = "+"))
+  
   def_groups <- as.vector(unique(def_updown$targetCohortIds))
   
   # Define set of rules # TODO: ACO?
@@ -134,6 +149,7 @@ outputStepUpDown <- function(file_noyear, path, targetCohortId) {
   
   if (!done) {
     warning(paste0("No definition for augment/switching for target cohort ", targetCohortId))
+    
   } else {
     
     # Select definitions for this target cohort
@@ -151,6 +167,12 @@ outputStepUpDown <- function(file_noyear, path, targetCohortId) {
       
       result <- merge(file, def_target, by.x=c("from","to"), by.y=c("from","to"), all.x = TRUE)
       
+      # Remove paths of inviduals who already stopped treatment
+      result <- result[!is.na(result$from),]
+      
+      # Define stop treatment
+      result$category[is.na(result$to)] <- 'stopped'
+      
       # Fill NA's with 'undefined'
       result$category[is.na(result$category)] <- 'undefined'
       
@@ -167,10 +189,25 @@ outputStepUpDown <- function(file_noyear, path, targetCohortId) {
   
 } 
 
-computePercentageGroupTreated <- function(data, outcomeCohortIds, outputFolder) {
+computePercentageGroupTreated <- function(data, outcomeCohortIds, outputFolder, otherCombinations) {
   layers <- as.vector(colnames(data)[!grepl("INDEX_YEAR|freq", colnames(data))])
   cohorts <- read.csv(paste(outputFolder, "/cohort.csv",sep=''), stringsAsFactors = FALSE)
   outcomes <- cohorts$cohortName[cohorts$cohortId %in% unlist(strsplit(outcomeCohortIds, ","))]
+  
+  # Group infrequent treatments below minFreqCombination as otherCombinations if otherTreatments FALSE
+  if (!otherCombinations) {
+    findCombinations <- apply(data, 2, function(x) grepl("+", x, fixed = TRUE))
+    
+    combinations <- as.matrix(data)[findCombinations == TRUE]
+    num_columns <-  sum(grepl("CONCEPT_NAME", colnames(data)))
+    freqCombinations <- matrix(rep(data$freq, times = num_columns), ncol = num_columns)[findCombinations == TRUE]
+    
+    summaryCombinations <- data.table(combination = combinations, freq = freqCombinations)
+    
+    minFreqCombination <- 25
+    selectedCombinations <- apply(data, 2, function(x) x %in% summaryCombinations$combination[summaryCombinations$freq <= minFreqCombination])
+    data[selectedCombinations] <- "Other combinations"
+  }
   
   percentGroupLayer <- sapply(layers, function(l) {
     percentGroup <- sapply(outcomes, function(g) {
@@ -199,10 +236,23 @@ transformDuration <- function(connection, cohortDatabaseSchema, dbms, studyName,
   file <- file[,..columns]
   file$DURATION_ERA <- as.numeric(file$DURATION_ERA)
   
+  # Summarize all non-fixed combinations occuring
+  findCombinations <- apply(file, 2, function(x) grepl("+", x, fixed = TRUE))
+  
   # Group all non-fixed combinations in one group if TRUE
   if (otherCombinations) {
-    findCombinations <- apply(file, 2, function(x) grepl("+", x, fixed = TRUE))
     file[findCombinations] <- "Other combinations"
+  } else {
+    # Otherwise: group infrequent treatments below minFreqCombination as otherCombinations
+    combinations <- as.matrix(file)[findCombinations == TRUE]
+    num_columns <-  sum(grepl("CONCEPT_NAME", colnames(file)))
+    freqCombinations <- matrix(rep(file$freq, times = num_columns), ncol = num_columns)[findCombinations == TRUE]
+    
+    summaryCombinations <- data.table(combination = combinations, freq = freqCombinations)
+    
+    minFreqCombination <- 25
+    selectedCombinations <- apply(file, 2, function(x) x %in% summaryCombinations$combination[summaryCombinations$freq <= minFreqCombination])
+    file[selectedCombinations] <- "Other combinations"
   }
   
   # Apply maxPathLength
@@ -313,7 +363,7 @@ inputSunburstPlot <- function(data, path, addNoPaths, index_year) {
 
 transformCSVtoJSON <- function(outcomeCohortIds, outputFolder, path, index_year, maxPathLength) {
   data <- read.csv(paste(path,"_inputsunburst_", index_year, ".csv",sep=''))
-
+  
   cohorts <- read.csv(paste(outputFolder, "/cohort.csv",sep=''), stringsAsFactors = FALSE)
   outcomes <- c(cohorts$cohortName[cohorts$cohortId %in% unlist(strsplit(outcomeCohortIds, ","))], "Other combinations")
   
