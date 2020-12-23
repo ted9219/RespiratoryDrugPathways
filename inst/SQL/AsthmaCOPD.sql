@@ -222,12 +222,12 @@ SELECT C.person_id, C.condition_occurrence_id as event_id, C.condition_start_dat
        C.condition_start_date as sort_date
 FROM
 (
-  SELECT co.*
+  SELECT co.* , row_number() over (PARTITION BY co.person_id ORDER BY co.condition_start_date, co.condition_occurrence_id) as ordinal
   FROM @cdm_database_schema.CONDITION_OCCURRENCE co
   JOIN #Codesets codesets on ((co.condition_concept_id = codesets.concept_id and codesets.codeset_id = 17))
 ) C
 
-
+WHERE C.ordinal = 1
 -- End Condition Occurrence Criteria
 
 ) PE
@@ -244,12 +244,12 @@ SELECT C.person_id, C.condition_occurrence_id as event_id, C.condition_start_dat
        C.condition_start_date as sort_date
 FROM
 (
-  SELECT co.*
+  SELECT co.* , row_number() over (PARTITION BY co.person_id ORDER BY co.condition_start_date, co.condition_occurrence_id) as ordinal
   FROM @cdm_database_schema.CONDITION_OCCURRENCE co
   JOIN #Codesets codesets on ((co.condition_concept_id = codesets.concept_id and codesets.codeset_id = 17))
 ) C
 
-
+WHERE C.ordinal = 1
 -- End Condition Occurrence Criteria
 ) Q
 JOIN @cdm_database_schema.OBSERVATION_PERIOD OP on Q.person_id = OP.person_id
@@ -266,12 +266,12 @@ SELECT C.person_id, C.condition_occurrence_id as event_id, C.condition_start_dat
        C.condition_start_date as sort_date
 FROM
 (
-  SELECT co.*
+  SELECT co.* , row_number() over (PARTITION BY co.person_id ORDER BY co.condition_start_date, co.condition_occurrence_id) as ordinal
   FROM @cdm_database_schema.CONDITION_OCCURRENCE co
   JOIN #Codesets codesets on ((co.condition_concept_id = codesets.concept_id and codesets.codeset_id = 17))
 ) C
 
-
+WHERE C.ordinal = 1
 -- End Condition Occurrence Criteria
 ) Q
 JOIN @cdm_database_schema.OBSERVATION_PERIOD OP on Q.person_id = OP.person_id
