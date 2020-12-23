@@ -21,12 +21,12 @@ concept_set_SABA <- custom_definitions[custom_definitions$name == "SABA combi","
 concept_set_SABA <- substr(concept_set_SABA, 2, nchar(concept_set_SABA)-1)
 concept_set_SABA <- as.numeric(unlist(strsplit(concept_set_SABA, ",")))
 
-LABA_ICS <- intersect(concept_set_LABA,concept_set_ICS)
-LABA_LAMA <- intersect(concept_set_LABA,concept_set_LAMA)
 LABA_LAMA_ICS <- intersect(concept_set_LABA,intersect(concept_set_LAMA,concept_set_ICS))
+LABA_ICS <- setdiff(intersect(concept_set_LABA,concept_set_ICS), LABA_LAMA_ICS)
+LABA_LAMA <- setdiff(intersect(concept_set_LABA,concept_set_LAMA), LABA_LAMA_ICS)
 SABA_SAMA <- intersect(concept_set_SABA,concept_set_SAMA)
 
+LABA_LAMA_ICS <- paste0("{", paste0(LABA_LAMA_ICS, collapse = ","), "}")
 LABA_ICS <- paste0("{", paste0(LABA_ICS, collapse = ","), "}")
 LABA_LAMA <- paste0("{", paste0(LABA_LAMA, collapse = ","), "}")
-LABA_LAMA_ICS <- paste0("{", paste0(LABA_LAMA_ICS, collapse = ","), "}")
 SABA_SAMA <- paste0("{", paste0(SABA_SAMA, collapse = ","), "}")
