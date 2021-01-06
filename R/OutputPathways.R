@@ -195,7 +195,7 @@ computePercentageGroupTreated <- function(data, outcomeCohortIds, outputFolder, 
   outcomes <- cohorts$cohortName[cohorts$cohortId %in% unlist(strsplit(outcomeCohortIds, ","))]
   
   # Group infrequent treatments below minFreqCombination as otherCombinations if otherTreatments FALSE
-  if (!otherCombinations) {
+  if (otherCombinations == "FALSE") {
     findCombinations <- apply(data, 2, function(x) grepl("+", x, fixed = TRUE))
     
     combinations <- as.matrix(data)[findCombinations == TRUE]
@@ -236,27 +236,24 @@ transformDuration <- function(connection, cohortDatabaseSchema, dbms, studyName,
   file <- file[,..columns]
   file$DURATION_ERA <- as.numeric(file$DURATION_ERA)
   
-  # Summarize all non-fixed combinations occuring
-  findCombinations <- apply(file, 2, function(x) grepl("+", x, fixed = TRUE))
+  # Apply maxPathLength
+  file <- file[DRUG_SEQ <= maxPathLength,]
   
   # Group all non-fixed combinations in one group if TRUE
   if (otherCombinations) {
+    # Summarize all non-fixed combinations occuring
+    findCombinations <- apply(file, 2, function(x) grepl("+", x, fixed = TRUE))
     file[findCombinations] <- "Other combinations"
   } else {
     # Otherwise: group infrequent treatments below minFreqCombination as otherCombinations
-    combinations <- as.matrix(file)[findCombinations == TRUE]
-    num_columns <-  sum(grepl("CONCEPT_NAME", colnames(file)))
-    freqCombinations <- matrix(rep(file$freq, times = num_columns), ncol = num_columns)[findCombinations == TRUE]
-    
-    summaryCombinations <- data.table(combination = combinations, freq = freqCombinations)
     
     minFreqCombination <- 25
-    selectedCombinations <- apply(file, 2, function(x) x %in% summaryCombinations$combination[summaryCombinations$freq <= minFreqCombination])
+    freqCombinations <- file[grepl("+", CONCEPT_NAME, fixed = TRUE),.N, by = "CONCEPT_NAME"]
+    summarizeCombinations <- freqCombinations$CONCEPT_NAME[freqCombinations$N <= minFreqCombination]
+    
+    selectedCombinations <- apply(file, 2, function(x) x %in% summarizeCombinations)
     file[selectedCombinations] <- "Other combinations"
   }
-  
-  # Apply maxPathLength
-  file <- file[DRUG_SEQ <= maxPathLength,]
   
   # Add column for total, fixed combinations, all combinations
   file$total <- 1
