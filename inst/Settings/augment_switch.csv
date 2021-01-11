@@ -213,6 +213,94 @@ targetCohortIds,from,to,category,exception
 "1,4,5",Systemic glucocorticosteroids,SABA,step_down_broad,end_of_acute_exacerbation
 "1,4,5",Systemic glucocorticosteroids,SABA+Systemic glucocorticosteroids,step_up_broad,
 "1,4,5",Systemic glucocorticosteroids,SAMA,step_down_broad,end_of_acute_exacerbation
+"2",ICS,ICS+LABA,step_up_broad,
+"2",ICS,ICS+LAMA,step_up_broad,
+"2",ICS,ICS+SABA,step_up_broad,
+"2",ICS,ICS+Systemic glucocorticosteroids,step_up_broad,acute_exacerbation
+"2",ICS,LAMA,step_up_broad,
+"2",ICS,SABA,step_down_broad,
+"2",ICS,Systemic glucocorticosteroids,step_up_broad,acute_exacerbation
+"2",ICS+LABA,ICS+LABA,switching,
+"2",ICS+LABA,ICS+LABA+SABA,step_up_broad,
+"2",ICS+LABA,ICS+LABA+SAMA,step_up_broad,
+"2",ICS+LABA,ICS+LABA+Systemic glucocorticosteroids,step_up_broad,acute_exacerbation
+"2",ICS+LABA,SABA,step_down_broad,
+"2",ICS+LABA,SAMA,step_down_broad,
+"2",ICS+LABA,Systemic glucocorticosteroids,step_up_broad,acute_exacerbation
+"2",ICS+LABA+LAMA,ICS+LABA+LAMA,switching,
+"2",ICS+LABA+LAMA,ICS+LABA+LAMA+Systemic glucocorticoster,step_up_broad,acute_exacerbation
+"2",ICS+LABA+LAMA,LAMA,step_down_broad,
+"2",ICS+LABA+LAMA+SABA,ICS+LABA+LAMA,step_down_broad,
+"2",ICS+LABA+LAMA+Systemic glucocorticosteroids,ICS+LABA+LAMA,step_down_broad,end_of_acute_exacerbation
+"2",ICS+LABA+SABA,ICS+LABA,step_down_broad,
+"2",ICS+LABA+SABA,SABA,step_down_broad,
+"2",ICS+LABA+SAMA,ICS+LABA,step_down_broad,
+"2",ICS+LABA+Systemic glucocorticosteroids,ICS+LABA,step_down_broad,end_of_acute_exacerbation
+"2",ICS+LABA+Systemic glucocorticosteroids,Systemic glucocorticosteroids,step_down_broad,
+"2",ICS+LAMA,ICS,step_down_broad,
+"2",ICS+SABA,ICS,step_down_broad,
+"2",ICS+SABA,SABA,step_down_broad,
+"2",ICS+SAMA,ICS,step_down_broad,
+"2",ICS+Systemic glucocorticosteroids,ICS,step_down_broad,end_of_acute_exacerbation
+"2",LABA,LABA+Systemic glucocorticosteroids,step_up_broad,acute_exacerbation
+"2",LABA,Systemic glucocorticosteroids,step_up_broad,acute_exacerbation
+"2",LABA+LAMA,LABA+LAMA,switching,
+"2",LABA+LAMA,LABA+LAMA+SABA,step_up_broad,
+"2",LABA+LAMA,LABA+LAMA+Systemic glucocorticosteroids,step_up_broad,acute_exacerbation
+"2",LABA+LAMA,SABA,step_down_broad,
+"2",LABA+LAMA,Systemic glucocorticosteroids,step_up_broad,acute_exacerbation
+"2",LABA+LAMA+SABA,LABA+LAMA,step_down_broad,
+"2",LABA+LAMA+SABA,SABA,step_down_broad,
+"2",LABA+LAMA+Systemic glucocorticosteroids,LABA+LAMA,step_down_broad,end_of_acute_exacerbation
+"2",LABA+Systemic glucocorticosteroids,LABA,step_down_broad,end_of_acute_exacerbation
+"2",LAMA,ICS,step_down_broad,
+"2",LAMA,ICS+LABA+LAMA,step_up_broad,
+"2",LAMA,LAMA+SABA,step_up_broad,
+"2",LAMA,LAMA+SABA+Systemic glucocorticosteroids,step_up_broad,acute_exacerbation
+"2",LAMA,LAMA+SAMA,step_up_broad,
+"2",LAMA,LAMA+Systemic glucocorticosteroids,step_up_broad,acute_exacerbation
+"2",LAMA,Systemic glucocorticosteroids,step_up_broad,acute_exacerbation
+"2",LAMA+SABA,LAMA,step_down_broad,
+"2",LAMA+SABA,SABA,step_down_broad,
+"2",LAMA+SAMA,LAMA,step_down_broad,
+"2",LAMA+Systemic glucocorticosteroids,LAMA,step_down_broad,end_of_acute_exacerbation
+"2",LAMA+Systemic glucocorticosteroids,Systemic glucocorticosteroids,step_down_broad,
+"2",SABA,ICS,step_up_broad,
+"2",SABA,ICS+LABA,step_up_broad,
+"2",SABA,ICS+LABA+LAMA,step_up_broad,
+"2",SABA,ICS+LABA+SABA,step_up_broad,
+"2",SABA,ICS+SABA,step_up_broad,
+"2",SABA,LABA+LAMA,step_up_broad,
+"2",SABA,LAMA+SABA,step_up_broad,
+"2",SABA,LAMA+Systemic glucocorticosteroids,step_up_broad,acute_exacerbation + step_up
+"2",SABA,SABA+Systemic glucocorticosteroids,step_up_broad,acute_exacerbation
+"2",SABA,Systemic glucocorticosteroids,step_up_broad,acute_exacerbation
+"2",SABA+Systemic glucocorticosteroids,ICS,step_down_broad,end_of_acute_exacerbation + step_up
+"2",SABA+Systemic glucocorticosteroids,LAMA,step_down_broad,end_of_acute_exacerbation + step_up
+"2",SABA+Systemic glucocorticosteroids,SABA,step_down_broad,end_of_acute_exacerbation
+"2",SABA+Systemic glucocorticosteroids,Systemic glucocorticosteroids,step_down_broad,
+"2",SAMA,ICS,step_up_broad,
+"2",SAMA,ICS+LABA,step_up_broad,
+"2",SAMA,ICS+LABA+SAMA,step_up_broad,
+"2",SAMA,ICS+SAMA,step_up_broad,
+"2",SAMA,LABA+LAMA,step_up_broad,
+"2",SAMA,LAMA+SAMA,step_up_broad,
+"2",SAMA,SAMA+Systemic glucocorticosteroids,step_up_broad,acute_exacerbation
+"2",SAMA,Systemic glucocorticosteroids,step_up_broad,acute_exacerbation
+"2",SAMA+Systemic glucocorticosteroids,SAMA,step_down_broad,end_of_acute_exacerbation
+"2",Systemic glucocorticosteroids,ICS,step_down_broad,end_of_acute_exacerbation + step_up
+"2",Systemic glucocorticosteroids,ICS+LABA,step_down_broad,end_of_acute_exacerbation + step_up
+"2",Systemic glucocorticosteroids,ICS+LABA+LAMA,step_down_broad,end_of_acute_exacerbation + step_up
+"2",Systemic glucocorticosteroids,ICS+LABA+Systemic glucocorticosteroids,step_up_broad,
+"2",Systemic glucocorticosteroids,LABA,step_down_broad,end_of_acute_exacerbation + step_up
+"2",Systemic glucocorticosteroids,LABA+LAMA,step_down_broad,end_of_acute_exacerbation + step_up
+"2",Systemic glucocorticosteroids,LAMA,step_down_broad,end_of_acute_exacerbation + step_up
+"2",Systemic glucocorticosteroids,LAMA+Systemic glucocorticosteroids,step_up_broad,
+"2",Systemic glucocorticosteroids,SABA,step_down_broad,end_of_acute_exacerbation
+"2",Systemic glucocorticosteroids,SABA+SAMA,step_down_broad,end_of_acute_exacerbation
+"2",Systemic glucocorticosteroids,SABA+Systemic glucocorticosteroids,step_up_broad,
+"2",Systemic glucocorticosteroids,SAMA,step_down_broad,end_of_acute_exacerbation
+"2",Systemic glucocorticosteroids,SAMA+Systemic glucocorticosteroids,step_up_broad,
 "3",ICS,ICS+LABA,step_up_broad,
 "3",ICS,ICS+LAMA,step_up_broad,
 "3",ICS,ICS+SABA,step_up_broad,
