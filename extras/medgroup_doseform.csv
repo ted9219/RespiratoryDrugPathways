@@ -154,6 +154,29 @@ oral,LTRA,Sublingual Tablet
 oral,LTRA,Tablet for Oral Suspension
 oral,LTRA,Oral Tablet
 oral,LTRA,Pack
+oral,PDE4,Buccal Tablet
+oral,PDE4,Delayed Release Oral Tablet
+oral,PDE4,Disintegrating Oral Tablet
+oral,PDE4,Chewable Tablet
+oral,PDE4,Delayed Release Oral Capsule
+oral,PDE4,Extended Release Oral Tablet
+oral,PDE4,Extended Release Suspension
+oral,PDE4,Oral Capsule
+oral,PDE4,Oral Gel
+oral,PDE4,Oral Granules
+oral,PDE4,Oral Lozenge
+oral,PDE4,Oral Ointment
+oral,PDE4,Oral Paste
+oral,PDE4,Oral Powder
+oral,PDE4,Oral Solution
+oral,PDE4,Oral Suspension
+oral,PDE4,Effervescent Oral Tablet
+oral,PDE4,Extended Release Oral Capsule
+oral,PDE4,Powder for Oral Suspension
+oral,PDE4,Sublingual Tablet
+oral,PDE4,Tablet for Oral Suspension
+oral,PDE4,Oral Tablet
+oral,PDE4,Pack
 ,SAMA,
 ,SABA,
 ,LAMA,
@@ -164,3 +187,4 @@ oral,LTRA,Pack
 ,Anti IgE,
 ,xanthines,
 ,LTRA,
+,PDE4,
