@@ -203,9 +203,12 @@ computePercentageGroupTreated <- function(data, outcomeCohortIds, outputFolder, 
     freqCombinations <- matrix(rep(data$freq, times = num_columns), ncol = num_columns)[findCombinations == TRUE]
     
     summaryCombinations <- data.table(combination = combinations, freq = freqCombinations)
+    summaryCombinations <- summaryCombinations[,.(freq=sum(freq)), by=combination][order(-freq)]
     
     minFreqCombination <- 25
-    selectedCombinations <- apply(data, 2, function(x) x %in% summaryCombinations$combination[summaryCombinations$freq <= minFreqCombination])
+    replaceCombinations <- summaryCombinations$combination[summaryCombinations$freq <= minFreqCombination]
+   
+    selectedCombinations <- apply(data, 1:2, function(x) x %in% replaceCombinations)
     data[selectedCombinations] <- "Other combinations"
   }
   
