@@ -156,6 +156,10 @@ var colors = {
   "SAMA": "#76448A  ", 
  "Systemic glucocorticosteroids": "#F9C74F", 
        "Xanthines": "#1D493C",
+       "Anti IgE": "#FB7476",
+   "Anti IL5": "#FFA07A", 
+   "Systemic B2 agonist": "#F3722C", 
+   "PDE4": "#819AB1", 
     "Other combinations": "#465D72",
              "End": "ffffff"
 }
