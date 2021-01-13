@@ -79,6 +79,8 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
   write.csv(file_noyear,  paste(path,"_file_noyear.csv",sep=''), row.names = FALSE)
   write.csv(file_withyear,  paste(path,"_file_withyear.csv",sep=''), row.names = FALSE)
   
+  ParallelLogger::logInfo("transformTreatmentSequence done")
+  
   return(FALSE)
 }
 
@@ -102,6 +104,7 @@ outputPercentageGroupTreated <- function(data, outcomeCohortIds, path, outputFol
   }
   
   write.csv(result, file=outputFile, row.names = FALSE)
+  ParallelLogger::logInfo("outputPercentageGroupTreated done")
 }
 
 outputStepUpDown <- function(file_noyear, path, targetCohortId) { 
@@ -187,6 +190,7 @@ outputStepUpDown <- function(file_noyear, path, targetCohortId) {
     write.csv(all_results, paste(path,"_augmentswitch.csv",sep=''), row.names = FALSE)
   }
   
+  ParallelLogger::logInfo("outputStepUpDown done")
 } 
 
 computePercentageGroupTreated <- function(data, outcomeCohortIds, outputFolder, otherCombinations) {
@@ -285,6 +289,8 @@ transformDuration <- function(connection, cohortDatabaseSchema, dbms, studyName,
   results[COUNT < minCellCount,c("AVG_DURATION", "COUNT")] <- NA
   
   write.csv(results,  paste(path,"_duration.csv",sep=''), row.names = FALSE)
+  
+  ParallelLogger::logInfo("transformDuration done")
 }
 
 outputSunburstPlot <- function(data, databaseId, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, createInput, createPlot) {
@@ -301,6 +307,8 @@ outputSunburstPlot <- function(data, databaseId, outcomeCohortIds, studyName, ou
       createSunburstPlot(subset_data, databaseId, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year = y, createInput, createPlot)
     }
   }
+  
+  ParallelLogger::logInfo("outputSunburstPlot done")
 }
 
 createSunburstPlot <- function(data, databaseId, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year, createInput, createPlot){
@@ -534,4 +542,5 @@ createSankeyDiagram <- function(data, databaseId) {
   networkD3::saveNetwork(plot, file=paste0("sankeydiagram_", databaseId,"_all.html"), selfcontained=TRUE)
   # there seems to be an error in this package -> cannot change path to output folder
   
+  ParallelLogger::logInfo("createSankeyDiagram done")
 }
