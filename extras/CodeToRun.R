@@ -7,7 +7,7 @@ password <- 'todo'
 cdmDatabaseSchemaList <- 'todo'
 cohortSchema <- 'todo'
 oracleTempSchema <- NULL
-databaseList <- 'todo'
+databaseList <- 'todo' # name of the data source
 fftempdir <- paste0(getwd(),"/temp")
 
 dbms <- 'todo'
