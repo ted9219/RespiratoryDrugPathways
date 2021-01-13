@@ -55,7 +55,7 @@ populatePackageCohorts <- function(targetCohortIds,
                                 type = c(rep('target', length(targetCohortIds)), rep('outcome',length(outcomeIds)))
   )
   
-  write.csv(cohortsToCreate, file.path("./inst/settings",'CohortsToCreate.csv' ), row.names = FALSE)
+  write.csv(cohortsToCreate, file.path("./inst/Settings",'CohortsToCreate.csv' ), row.names = FALSE)
   
   for (i in 1:nrow(cohortsToCreate)) {
     writeLines(paste("Inserting cohort:", cohortsToCreate$name[i]))

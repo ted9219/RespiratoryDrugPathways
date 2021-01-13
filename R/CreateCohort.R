@@ -51,7 +51,7 @@ createCohorts <- function(connectionDetails,
   
   # Load cohorts to create
   # (One can add ATLAS cohorts to package using populatePackageCohorts())
-  pathToCsv <- "inst/settings/cohorts_to_create.csv"
+  pathToCsv <- "inst/Settings/cohorts_to_create.csv"
   cohortsToCreate <- readr::read_csv(pathToCsv, col_types = readr::cols())
   write.csv(cohortsToCreate, file.path(outputFolder, "cohort.csv"), row.names = FALSE)
   
@@ -65,7 +65,7 @@ createCohorts <- function(connectionDetails,
   DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
   
   # In case of custom definitions: load custom definitions
-  pathToCsv <- "inst/settings/drug_classes.csv"
+  pathToCsv <- "inst/Settings/drug_classes.csv"
   custom_definitions <- readr::read_csv(pathToCsv, col_types = readr::cols())
   
   # Instantiate cohorts
