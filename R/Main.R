@@ -94,30 +94,30 @@ execute <- function(connection = NULL,
     targetCohortIds <- unique(as.numeric(study_settings[study_settings$param == "targetCohortId",settings]))
     minCellCount <- max(as.integer(study_settings[study_settings$param == "minCellCount",settings])) # Minimum number of subjects in the target cohort for a given eent in order to be counted in the pathway
     
-    cohortCounts <- CohortDiagnostics::getCohortCounts(connection = connection,
-                                                       cohortDatabaseSchema = cohortDatabaseSchema,
-                                                       cohortTable = cohortTable, 
-                                                       cohortIds = targetCohortIds)
+    cohortCounts <- getCohortCounts(connection = connection,
+                                    cohortDatabaseSchema = cohortDatabaseSchema,
+                                    cohortTable = cohortTable, 
+                                    cohortIds = targetCohortIds)
     
     cohortCounts <- cohortCounts %>% 
       dplyr::mutate(databaseId = !!databaseId)
     
-    characteristics <- CohortDiagnostics::getCohortCharacteristics(connection = connection,
-                                                                   cdmDatabaseSchema = cdmDatabaseSchema,
-                                                                   oracleTempSchema = oracleTempSchema,
-                                                                   cohortDatabaseSchema = cohortDatabaseSchema,
-                                                                   cohortTable = cohortTable,
-                                                                   cohortIds = targetCohortIds,
-                                                                   covariateSettings = FeatureExtraction::createCovariateSettings(useDemographicsAge = TRUE, useDemographicsGender = TRUE, useDemographicsTimeInCohort = TRUE, useDemographicsPostObservationTime = TRUE, useConditionGroupEraAnyTimePrior = TRUE, useCharlsonIndex = TRUE))
+    characteristics <- getCohortCharacteristics(connection = connection,
+                                                cdmDatabaseSchema = cdmDatabaseSchema,
+                                                oracleTempSchema = oracleTempSchema,
+                                                cohortDatabaseSchema = cohortDatabaseSchema,
+                                                cohortTable = cohortTable,
+                                                cohortIds = targetCohortIds,
+                                                covariateSettings = FeatureExtraction::createCovariateSettings(useDemographicsAge = TRUE, useDemographicsGender = TRUE, useDemographicsTimeInCohort = TRUE, useDemographicsPostObservationTime = TRUE, useConditionGroupEraAnyTimePrior = TRUE, useCharlsonIndex = TRUE))
     
-    CohortDiagnostics::exportCharacterization(characteristics = characteristics,
-                                              databaseId = databaseId,
-                                              incremental = FALSE,
-                                              covariateValueFileName = file.path(paste0(outputFolder, "/characterization"), "covariate_value.csv"),
-                                              covariateRefFileName = file.path(paste0(outputFolder, "/characterization"), "covariate_ref.csv"),
-                                              analysisRefFileName = file.path(paste0(outputFolder, "/characterization"), "analysis_ref.csv"),
-                                              counts = cohortCounts,
-                                              minCellCount = minCellCount)
+    exportCharacterization(characteristics = characteristics,
+                           databaseId = databaseId,
+                           incremental = FALSE,
+                           covariateValueFileName = file.path(paste0(outputFolder, "/characterization"), "covariate_value.csv"),
+                           covariateRefFileName = file.path(paste0(outputFolder, "/characterization"), "covariate_ref.csv"),
+                           analysisRefFileName = file.path(paste0(outputFolder, "/characterization"), "analysis_ref.csv"),
+                           counts = cohortCounts,
+                           minCellCount = minCellCount)
     # Selection of standard results
     settings_characterization <- read.csv("inst/Settings/characterization_settings.csv", stringsAsFactors = FALSE)
     standard_characterization <- read.csv(paste0(outputFolder, "/characterization/covariate_value.csv"), stringsAsFactors = FALSE)
@@ -152,10 +152,10 @@ execute <- function(connection = NULL,
                                       oracleTempSchema = oracleTempSchema,
                                       resultsSchema=cohortDatabaseSchema,
                                       tableName=paste0(databaseName, "_characterization"))
-       result <- DatabaseConnector::querySql(connection, sql)
+        result <- DatabaseConnector::querySql(connection, sql)
         
         # Bind to results
-       custom_characterization <- rbind(custom_characterization, cbind(covariate_id = "Custom", covariate_name = custom$covariate_name[c], cohort_id = t, mean = result, sd = NA, database_id = databaseId))
+        custom_characterization <- rbind(custom_characterization, cbind(covariate_id = "Custom", covariate_name = custom$covariate_name[c], cohort_id = t, mean = result, sd = NA, database_id = databaseId))
         
       }
     }
@@ -314,6 +314,6 @@ execute <- function(connection = NULL,
       
     }
   }
-
+  
   invisible(NULL)
 }

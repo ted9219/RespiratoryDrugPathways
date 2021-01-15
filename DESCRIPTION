@@ -10,13 +10,13 @@ Description: This package gives insight in treatment patterns, the following tas
     3. Treatment pathways are constructed
     4. Output is generated (sunburst plots and more)
     Go to extras -> CodeToRun.R to execute package
-    NOTE: need to add two functions to NAMESPACE of package CohortDiagnostics (getCohortCharacteristics and exportCharacterization)
 Depends:
     R (>= 3.6.1),
     DatabaseConnector,
-    CohortDiagnostics,
+    FeatureExtraction,
     data.table
 Imports: 
+    Andromeda,
     SqlRender,
     dplyr,
     stringr,
