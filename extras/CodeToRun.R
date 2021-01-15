@@ -38,6 +38,7 @@ runTreatmentPathways <- FALSE
 outputResults <- FALSE
 
 study_settings <- data.frame(readr::read_csv("inst/Settings/study_settings.csv", col_types = readr::cols()))
+study_settings <- study_settings[,c("param", "analysis1", "analysis2", "analysis3", "analysis4", "analysis5", "analysis6", "analysis7", "analysis8")]
 
 # ------------------------------------------------------------------------
 # Run the study
