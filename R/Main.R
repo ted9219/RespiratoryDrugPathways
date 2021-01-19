@@ -303,13 +303,14 @@ execute <- function(connection = NULL,
         transformDuration(connection = connection, cohortDatabaseSchema = cohortDatabaseSchema, dbms = dbms, studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, otherCombinations = otherCombinations)
         
         # Treatment pathways sankey diagram
-        createSankeyDiagram(data = file_noyear, databaseId = databaseId)
+        createSankeyDiagram(data = file_noyear, databaseName = databaseName, studyName = studyName)
         
         # Treatment pathways sunburst plot 
-        outputSunburstPlot(data = file_noyear, databaseId = databaseId, outcomeCohortIds = outcomeCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
-        outputSunburstPlot(data = file_withyear, databaseId = databaseId, outcomeCohortIds = outcomeCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
+        outputSunburstPlot(data = file_noyear, databaseName = databaseName, outcomeCohortIds = outcomeCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
+        outputSunburstPlot(data = file_withyear, databaseName = databaseName, outcomeCohortIds = outcomeCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
         
-        # screenshotHTML()
+        # Launch shiny application
+        # shiny::runApp('shiny')
       }
       
     }

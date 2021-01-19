@@ -293,10 +293,10 @@ transformDuration <- function(connection, cohortDatabaseSchema, dbms, studyName,
   ParallelLogger::logInfo("transformDuration done")
 }
 
-outputSunburstPlot <- function(data, databaseId, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, createInput, createPlot) {
+outputSunburstPlot <- function(data, databaseName, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, createInput, createPlot) {
   if (is.null(data$INDEX_YEAR)) {
     # For file_noyear compute once
-    result <- createSunburstPlot(data, databaseId, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year = 'all', createInput, createPlot)
+    result <- createSunburstPlot(data, databaseName, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year = 'all', createInput, createPlot)
     
   } else {
     # For file_withyear compute per year
@@ -304,14 +304,14 @@ outputSunburstPlot <- function(data, databaseId, outcomeCohortIds, studyName, ou
     
     for (y in years) {
       subset_data <- data[INDEX_YEAR == as.character(y),]
-      createSunburstPlot(subset_data, databaseId, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year = y, createInput, createPlot)
+      createSunburstPlot(subset_data, databaseName, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year = y, createInput, createPlot)
     }
   }
   
   ParallelLogger::logInfo("outputSunburstPlot done")
 }
 
-createSunburstPlot <- function(data, databaseId, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year, createInput, createPlot){
+createSunburstPlot <- function(data, databaseName, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year, createInput, createPlot){
   
   if (createInput) {
     inputSunburstPlot(data, path, addNoPaths, index_year)
@@ -329,11 +329,11 @@ createSunburstPlot <- function(data, databaseId, outcomeCohortIds, studyName, ou
     html <- sub("@insert_data", input_plot, html)
     
     # Replace @name
-    html <- sub("@name", paste0("(", databaseId, " ", studyName," ", index_year, ")"), html)
+    html <- sub("@name", paste0("(", databaseName, " ", studyName," ", index_year, ")"), html)
     
     # Save HTML file as sunburst_@studyName
     write.table(html, 
-                file=paste0("plots/sunburst_", databaseId, "_", studyName,"_", index_year,".html"), 
+                file=paste0("plots/sunburst_", databaseName, "_", studyName,"_", index_year,".html"), 
                 quote = FALSE,
                 col.names = FALSE,
                 row.names = FALSE)
@@ -501,7 +501,7 @@ buildHierarchy <- function(csv, maxPathLength) {
   return(json)
 }
 
-createSankeyDiagram <- function(data, databaseId) {
+createSankeyDiagram <- function(data, databaseName, studyName) {
   
   # Sankey diagram for first three treatment layers
   data$D1_CONCEPT_NAME <- paste0("1. ",data$D1_CONCEPT_NAME)
@@ -539,7 +539,7 @@ createSankeyDiagram <- function(data, databaseId) {
                                    Value = 'value', 
                                    NodeID = 'name',
                                    units = 'votes')
-  networkD3::saveNetwork(plot, file=paste0("sankeydiagram_", databaseId,"_all.html"), selfcontained=TRUE)
+  networkD3::saveNetwork(plot, file=paste0("sankeydiagram_", databaseName,"_", studyName, "_all.html"), selfcontained=TRUE)
   # there seems to be an error in this package -> cannot change path to output folder
   
   ParallelLogger::logInfo("createSankeyDiagram done")

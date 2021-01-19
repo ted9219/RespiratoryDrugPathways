@@ -127,7 +127,7 @@ screenshotHTML <- function() {
   }
 }
 
-# functions from CohortDiagnostics
+# borrowed function from CohortDiagnostics
 getCohortCounts <- function(connectionDetails = NULL,
                             connection = NULL,
                             cohortDatabaseSchema,
@@ -156,6 +156,7 @@ getCohortCounts <- function(connectionDetails = NULL,
   
 }
 
+# borrowed function from CohortDiagnostics
 getCohortCharacteristics <- function(connectionDetails = NULL,
                                      connection = NULL,
                                      cdmDatabaseSchema,
@@ -258,6 +259,7 @@ getCohortCharacteristics <- function(connectionDetails = NULL,
   return(results)
 }
 
+# borrowed function from CohortDiagnostics
 exportCharacterization <- function(characteristics,
                                    databaseId,
                                    incremental,
@@ -306,6 +308,7 @@ exportCharacterization <- function(characteristics,
   } 
 }
 
+# borrowed function from CohortDiagnostics
 writeCovariateDataAndromedaToCsv <- function(data, fileName, incremental = FALSE) {
   if (incremental && file.exists(fileName)) {
     ParallelLogger::logDebug("Appending records to ", fileName)
