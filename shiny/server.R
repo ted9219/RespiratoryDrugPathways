@@ -720,7 +720,7 @@ shinyServer(function(input, output, session) {
     
     result <- lapply(input$dataset,
            function(d) {
-             tagList(tags$h4(paste0("workingdirectory/plots/sunburst_", d, "_",input$population,"1_" ,input$year,".html")), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", d, "_",input$population,"1_" ,input$year,".html"), width=400, height=400, scrolling = "no",frameborder = "no"))
+             tagList(tags$h4(d), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", d, "_",input$population,"_" ,input$year,".html"), width=400, height=400, scrolling = "no",frameborder = "no"))
            })
     
     return(result)
