@@ -15,7 +15,8 @@ cohortId,cohortName,cohortDefinition,cohortType
 18,SABA,Custom,outcome
 19,ICS,Custom,outcome
 20,Systemic glucocorticosteroids,Custom,outcome
-21,LABA&ICS,Custom,outcome
-22,LABA&LAMA,Custom,outcome
-23,LABA&LAMA&ICS,Custom,outcome
-24,SABA&SAMA,Custom,outcome
+21,PDE4,Custom,outcome
+22,LABA&ICS,Custom,outcome
+23,LABA&LAMA,Custom,outcome
+24,LABA&LAMA&ICS,Custom,outcome
+25,SABA&SAMA,Custom,outcome
