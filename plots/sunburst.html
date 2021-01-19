@@ -8,19 +8,19 @@
 </head>
 
 <body>
-	<h1>Sunburst plot @name </h1>
-	<div>Sunburst plot of treatment patterns showing the first treatment in the center and subsequent treatments in the surrounding outer layers. Each color represents a drug class and a layer with multiple colors indicates a combination therapy. </div>
+<!--	<h1>Sunburst plot @name </h1>
+	<div>Sunburst plot of treatment patterns showing the first treatment in the center and subsequent treatments in the surrounding outer layers. Each color represents a drug class and a layer with multiple colors indicates a combination therapy. </div> -->
 	<div id="main">
-	<div style="width:80%" id="plot"></div>
-	<hr/>
-	<h1>Data</h1>
-	<textarea  id="chartData" style="width:600px; height:400px">
+	<div style="width:100%" id="plot"></div>
+<!--	<hr/>
+<h1>Data</h1> -->
+	<textarea  id="chartData" style="visibility:hidden; width:400px; height:400px">
 @insert_data
 	</textarea>
-	<button id="reload">Reload</button>
+	<button id="reload" style="visibility:hidden;">Reload</button>
 	</div>  
 	<div id="sidebar">
-    <div id="legend"></div>
+    <div id="legend" style="visibility:hidden;"></div>
 	</div>  
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.3/require.min.js"></script>
 	<script src="config.js"></script>
@@ -56,7 +56,7 @@
 
 			function refreshPlot() {
 				chartData = JSON.parse(document.querySelector("#chartData").value);
-				plot.render(chartData.data, target, 600,600, {split: split}, chartData.lookup);
+				plot.render(chartData.data, target, 700,700, {split: split}, chartData.lookup);
 			}
 			
 			document.querySelector("#reload").addEventListener("click", function() {
