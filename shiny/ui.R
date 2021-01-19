@@ -26,37 +26,18 @@ dashboardPage(
       addInfo(menuItem("Databases", tabName = "databases"), "databaseInfo"),
       addInfo(menuItem("Characterization", tabName = "characterization"), "characterizationInfo"),
       addInfo(menuItem("Treatment pathways", tabName = "pathways"), "treatmentPathwaysInfo"),
-      addInfo(menuItem("Analyses", tabName = "results"), "resultsInfo"),
+      # addInfo(menuItem("Analyses", tabName = "results"), "resultsInfo"),
       
       ## Option panel
       conditionalPanel(
-        condition = "input.tabs=='pathways'",
-        checkboxGroupInput("dataset", label = "Database", choices = list("IPCI" = "IPCI", 
-                                                                         "CCAE" = "ccae", 
-                                                                         "MDCD" = "mdcd", 
-                                                                         "MDCR" = "mdcr",
-                                                                         "Estonia" = "Asthma"), selected = "IPCI")
+        condition = "input.tabs=='pathways' || input.tabs=='characterization' ",
+        radioButtons("viewer", label = "Viewer", choices = c("Compare databases", "Compare study populations", "Compare over time"), selected = "Compare databases")
       ),
       
       conditionalPanel(
         condition = "input.tabs=='pathways'",
-        selectInput("population", label = "Study participants", choices = list("Asthma > 18"= "asthma",
-                                                                               "COPD > 40" = "copd",
-                                                                               "ACO > 40" = "aco",
-                                                                               "Asthma 6-17" = "asthma6plus",
-                                                                               "Asthma < 5" = "asthma6min"), selected = "asthma")),
+      htmlOutput("dynamic_input"))
       
-      conditionalPanel(
-        condition = "input.tabs=='pathways'",
-        selectInput("year", label = "Year", choices = c("all", 
-                                                        "2010",
-                                                        "2011",
-                                                        "2012",
-                                                        "2013",
-                                                        "2014", 
-                                                        "2015",
-                                                        "2016",
-                                                        "2017"), selected = "all"))
     )
     
   ),
@@ -109,10 +90,11 @@ dashboardPage(
               )
       ),
       tabItem(tabName = "pathways",
-              box(
-                title = "Treatment Pathways", width = NULL, status = "primary",
-                htmlOutput("sunburstplots")
-              )
+              column(width = 6, 
+                     box(
+                       title = "Treatment Pathways", width = NULL, status = "primary",
+                       htmlOutput("sunburstplots"))),
+              column(width = 3, tags$img(src = paste0("workingdirectory/plots/legend.png"), height = 400))
       ),
       tabItem(
         tabName = "results",
@@ -127,9 +109,9 @@ dashboardPage(
             br(),
             
             conditionalPanel(condition = "input.analysis != 'Indications' && input.analysis != 'Renal Impairment'",
-                            ),
+            ),
             conditionalPanel(condition = "input.analysis == 'Indications'",
-                             ),
+            ),
             hr(),
             textOutput("tableBTitle"),
             br(),

@@ -21,11 +21,11 @@ addThousandsSeparator<-function(table){
 
 getHoveroverStyle <- function(left_px, top_px) {
   style <- paste0("position:absolute; z-index:100; background-color: rgba(245, 245, 245, 0.85); ",
-                   "left:",
-                   left_px - 200,
-                   "px; top:",
-                   top_px - 130,
-                   "px; width:400px;")
+                  "left:",
+                  left_px - 200,
+                  "px; top:",
+                  top_px - 130,
+                  "px; width:400px;")
 }
 
 addResourcePath("workingdirectory", stringr::str_replace(getwd(),"/shiny",""))
@@ -133,39 +133,39 @@ shinyServer(function(input, output, session) {
   })
   colnamesTableA <- reactive({
     tableA1Columns <- c("Variable",
-                       "Value",
-                       "N users",
-                     #  "Excluded",
-                       "Mean",
-                       "Median",
-                       "P5",
-                       "Q1",
-                       "Q3",
-                       "P95",
-                       "Min",
-                       "Max",
-                       "0-1 Month",
-                       "1-12 Months",
-                       "1-10 Year",
-                       ">10 Years")
+                        "Value",
+                        "N users",
+                        #  "Excluded",
+                        "Mean",
+                        "Median",
+                        "P5",
+                        "Q1",
+                        "Q3",
+                        "P95",
+                        "Min",
+                        "Max",
+                        "0-1 Month",
+                        "1-12 Months",
+                        "1-10 Year",
+                        ">10 Years")
     
     tableA2Columns <- c("Variable",
-                       "Value",
-                       "N users",
-                     #  "Excluded",
-                       "Mean",
-                       "Median",
-                       "P5",
-                       "Q1",
-                       "Q3",
-                       "P95",
-                       "Min",
-                       "Max")
+                        "Value",
+                        "N users",
+                        #  "Excluded",
+                        "Mean",
+                        "Median",
+                        "P5",
+                        "Q1",
+                        "Q3",
+                        "P95",
+                        "Min",
+                        "Max")
     
     tableA3Columns <- c("Variable",
                         "Value",
                         "N users",
-                      #  "Excluded",
+                        #  "Excluded",
                         "Mean",
                         "Median",
                         "P5",
@@ -206,7 +206,7 @@ shinyServer(function(input, output, session) {
       table <- clearSecondOccurrenceVariable(table, "variable")
       drops <- c("ingredient", "order")
       table <- table[,!(names(table) %in% drops)]
-
+      
       colnames(table) <- colnamesTableA()
       table$Mean <- prettyHr(table$Mean)
       table$Median <- prettyHr(table$Median)
@@ -221,7 +221,7 @@ shinyServer(function(input, output, session) {
       table[,"N users"]<-addThousandsSeparator(unname(unlist(table[,"N users"])))
       
       selection = list(mode = "single", target = "row")
-
+      
       table <- datatable(
         table,
         extensions = c('Buttons','FixedColumns'),
@@ -256,57 +256,57 @@ shinyServer(function(input, output, session) {
   
   output$TableB <- renderDataTable({
     if (!is.null(tableBSelected())) {
-    table <- tableBSelected()  %>% select(-excluded) %>%
-      filter(ingredient == input$ingredient)  %>%
-      filter(indication == input$indication)  %>%
-      filter(formulation == input$formulation) %>%
-      filter(databaseid == input$database) %>%
-      mutate(cumulativeDurationGroup=case_when(
-        cumulativeDurationGroup=="1>10 Years" ~ ">10 Years",
-        TRUE ~ cumulativeDurationGroup
-      ))
-    
-    drops <- c("databaseid","ingredient","indication","formulation")
-    table <- table[ , !(names(table) %in% drops)]
-    
-    colnames(table) <- tableBColumns
-    table <- clearSecondOccurrenceVariable(table,"ICH_group")
-    table <- clearSecondOccurrenceVariable(table,"Age")
-    
-    table$Mean <- prettyHr(table$Mean)
-    table$Median <- prettyHr(table$Median)
-    table$P5 <- prettyHr(table$P5)
-    table$Q1 <- prettyHr(table$Q1)
-    table$Q3 <- prettyHr(table$Q3)
-    table$P95 <- prettyHr(table$P95)
-    table$Min <- prettyHr(table$Min)
-    table$Max <- prettyHr(table$Max)
-    
-    table<-addThousandsSeparator(table)
-    table[,"N users"]<-addThousandsSeparator(unname(unlist(table[,"N users"])))
-    
-    selection = list(mode = "single", target = "row")
-    table <- datatable(
-      table,
-      extensions = c('Buttons','FixedColumns'), 
-      options = list(
-        aoColumnDefs = list(list(className= 'dt-left', targets = "_all")),
-        pageLength = 100,
-        ordering = FALSE,
-        dom = 'tB',
-        scrollX = TRUE,
-        fixedColumns = TRUE,
-        buttons = 
-          list('copy', 'print', list(
-            extend = 'collection',
-            buttons = c('csv', 'excel', 'pdf'),
-            text = 'Download'
-          ))),
-      selection = selection,
-      rownames = FALSE,
-      escape = FALSE,
-      class = "stripe nowrap compact"
-    )
+      table <- tableBSelected()  %>% select(-excluded) %>%
+        filter(ingredient == input$ingredient)  %>%
+        filter(indication == input$indication)  %>%
+        filter(formulation == input$formulation) %>%
+        filter(databaseid == input$database) %>%
+        mutate(cumulativeDurationGroup=case_when(
+          cumulativeDurationGroup=="1>10 Years" ~ ">10 Years",
+          TRUE ~ cumulativeDurationGroup
+        ))
+      
+      drops <- c("databaseid","ingredient","indication","formulation")
+      table <- table[ , !(names(table) %in% drops)]
+      
+      colnames(table) <- tableBColumns
+      table <- clearSecondOccurrenceVariable(table,"ICH_group")
+      table <- clearSecondOccurrenceVariable(table,"Age")
+      
+      table$Mean <- prettyHr(table$Mean)
+      table$Median <- prettyHr(table$Median)
+      table$P5 <- prettyHr(table$P5)
+      table$Q1 <- prettyHr(table$Q1)
+      table$Q3 <- prettyHr(table$Q3)
+      table$P95 <- prettyHr(table$P95)
+      table$Min <- prettyHr(table$Min)
+      table$Max <- prettyHr(table$Max)
+      
+      table<-addThousandsSeparator(table)
+      table[,"N users"]<-addThousandsSeparator(unname(unlist(table[,"N users"])))
+      
+      selection = list(mode = "single", target = "row")
+      table <- datatable(
+        table,
+        extensions = c('Buttons','FixedColumns'), 
+        options = list(
+          aoColumnDefs = list(list(className= 'dt-left', targets = "_all")),
+          pageLength = 100,
+          ordering = FALSE,
+          dom = 'tB',
+          scrollX = TRUE,
+          fixedColumns = TRUE,
+          buttons = 
+            list('copy', 'print', list(
+              extend = 'collection',
+              buttons = c('csv', 'excel', 'pdf'),
+              text = 'Download'
+            ))),
+        selection = selection,
+        rownames = FALSE,
+        escape = FALSE,
+        class = "stripe nowrap compact"
+      )
     } else
       table <- NULL
     return(table)
@@ -369,43 +369,43 @@ shinyServer(function(input, output, session) {
       return(table)
     }
   })
-
+  
   output$Table7A <- renderDataTable({
     table <- tableASelected() 
     if ((is.null(table) || nrow(table) == 0) || input$analysis != 'Renal Impairment') {
       return(NULL)
     } else {
-    table <- table %>%
-      filter(databaseid == input$database) %>%
-      select(-databaseid)
-    colnames(table) <- colnamesTableA()
-    table$Percentage <- prettyHr(table$Percentage)
-    table<-addThousandsSeparator(table)
-    selection = list(mode = "single", target = "row")
-    table <- datatable(
-      table,
-      extensions = 'Buttons',
-      options = list(
-        aoColumnDefs = list(list(className= 'dt-left', targets = "_all")),
-        pageLength = 100,
-        ordering = FALSE,
-        dom = 'tB',
-        buttons =
-          list(
-            'copy',
-            'print',
+      table <- table %>%
+        filter(databaseid == input$database) %>%
+        select(-databaseid)
+      colnames(table) <- colnamesTableA()
+      table$Percentage <- prettyHr(table$Percentage)
+      table<-addThousandsSeparator(table)
+      selection = list(mode = "single", target = "row")
+      table <- datatable(
+        table,
+        extensions = 'Buttons',
+        options = list(
+          aoColumnDefs = list(list(className= 'dt-left', targets = "_all")),
+          pageLength = 100,
+          ordering = FALSE,
+          dom = 'tB',
+          buttons =
             list(
-              extend = 'collection',
-              buttons = c('csv', 'excel', 'pdf'),
-              text = 'Download'
+              'copy',
+              'print',
+              list(
+                extend = 'collection',
+                buttons = c('csv', 'excel', 'pdf'),
+                text = 'Download'
+              )
             )
-          )
-      ),
-      selection = selection,
-      rownames = FALSE,
-      escape = FALSE,
-      class = "stripe nowrap compact"
-    )}
+        ),
+        selection = selection,
+        rownames = FALSE,
+        escape = FALSE,
+        class = "stripe nowrap compact"
+      )}
     return(table)
   })
   
@@ -573,7 +573,7 @@ shinyServer(function(input, output, session) {
                  aes(
                    x = factor(cumulativeDurationGroup, 
                               levels = c("0-1 Month","1-12 Months","1-10 Year",">10 Years","Overal exposure")
-                              ),
+                   ),
                    ymin = p5,
                    lower = q1,
                    middle = median,
@@ -591,7 +591,7 @@ shinyServer(function(input, output, session) {
           theme(text = element_text(size=15)) +
           theme(strip.text=element_text(size=15))+
           theme(legend.position = "none")#+
-          #scale_y_continuous(trans='log10')
+        #scale_y_continuous(trans='log10')
       }
     }
     else {
@@ -619,8 +619,8 @@ shinyServer(function(input, output, session) {
           theme(axis.text.x = element_text(angle = 90, vjust = .5),legend.position = "none",text = element_text(size=18))
         return(girafe(code = print(p),pointsize = 18,
                       width_svg = (1*input$pltChange$width/input$pltChange$dpi),
-                    height_svg = (1.2*input$pltChange$height/input$pltChange$dpi)
-                    ))
+                      height_svg = (1.2*input$pltChange$height/input$pltChange$dpi)
+        ))
       }
     } else {
       return(NULL)
@@ -675,7 +675,7 @@ shinyServer(function(input, output, session) {
   observeEvent(input$databaseInfo, {
     showInfoBox("Databases", "html/databases.html")
   })
-  observeEvent(input$characteriztionInfo, {
+  observeEvent(input$characterizationInfo, {
     showInfoBox("Characterization", "html/characterization.html")
   })
   observeEvent(input$treatmentPathwaysInfo, {
@@ -687,12 +687,116 @@ shinyServer(function(input, output, session) {
   
   output$sunburstplots <- renderUI({
     
-    result <- lapply(input$dataset,
-           function(d) {
-             tagList(tags$h4(d), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", d, "_",input$population,"_" ,input$year,".html"), width=400, height=400, scrolling = "no",frameborder = "no"))
-           })
-    
+    if (input$viewer == "Compare databases") {
+      result <- lapply(input$dataset,
+                       function(d) {
+                         tagList(tags$h4(d), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", d, "_",input$population,"_" ,input$year,".html"), width=400, height=400, scrolling = "no",frameborder = "no"))
+                       })
+      
+    } else if  (input$viewer == "Compare study populations") {
+      result <- lapply(input$population,
+                       function(p) {
+                         tagList(tags$h4(p), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", input$dataset, "_",p,"_" ,input$year,".html"), width=400, height=400, scrolling = "no",frameborder = "no"))
+                       })
+      
+      
+    } else if (input$viewer == "Compare over time") {
+      result <- lapply(input$year,
+                       function(y) {
+                         tagList(tags$h4(y), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", input$dataset, "_",input$population,"_" ,y,".html"), width=400, height=400, scrolling = "no",frameborder = "no"))
+                       })
+      
+    }
+   
     return(result)
   })
+  
+  
+  output$dynamic_input = renderUI({
+    
+    if (input$viewer == "Compare databases") {
+      # Select multiple databases
+      one <- checkboxGroupInput("dataset", label = "Database", choices = list("IPCI" = "IPCI", 
+                                                                              "CCAE" = "ccae", 
+                                                                              "MDCD" = "mdcd", 
+                                                                              "MDCR" = "mdcr",
+                                                                              "Estonia" = "Asthma"), selected = "IPCI")
+      
+      # Select single population, year
+      two <- selectInput("population", label = "Study population", choices = list("Asthma > 18"= "asthma",
+                                                                                   "COPD > 40" = "copd",
+                                                                                   "ACO > 40" = "aco",
+                                                                                   "Asthma 6-17" = "asthma6plus",
+                                                                                   "Asthma < 5" = "asthma6min"), selected = "asthma", multiple = FALSE)
+      three <- selectInput("year", label = "Year", choices = c("all", 
+                                                               "2010",
+                                                               "2011",
+                                                               "2012",
+                                                               "2013",
+                                                               "2014", 
+                                                               "2015",
+                                                               "2016",
+                                                               "2017"), selected = "all")
+      return(tagList(one, two, three))
+      
+    } else if (input$viewer == "Compare study populations") {
+      # Select multiple databases
+      one <- checkboxGroupInput("population", label = "Study population", choices = list("Asthma > 18"= "asthma",
+                                                                                  "COPD > 40" = "copd",
+                                                                                  "ACO > 40" = "aco",
+                                                                                  "Asthma 6-17" = "asthma6plus",
+                                                                                  "Asthma < 5" = "asthma6min"), selected = "asthma")
+     
+      
+      # Select single population, year
+      two <- selectInput("dataset", label = "Database", choices = list("IPCI" = "IPCI", 
+                                                                                "CCAE" = "ccae", 
+                                                                                "MDCD" = "mdcd", 
+                                                                                "MDCR" = "mdcr",
+                                                                                "Estonia" = "Asthma"), selected = "IPCI")
+        
+      three <- selectInput("year", label = "Year", choices = c("all", 
+                                                               "2010",
+                                                               "2011",
+                                                               "2012",
+                                                               "2013",
+                                                               "2014", 
+                                                               "2015",
+                                                               "2016",
+                                                               "2017"), selected = "all")
+      return(tagList(one, two, three))
+      
+    } else if (input$viewer == "Compare over time") {
+      # Select multiple databases
+      one <- checkboxGroupInput("year", label = "Year", choices = c("all", 
+                                                               "2010",
+                                                               "2011",
+                                                               "2012",
+                                                               "2013",
+                                                               "2014", 
+                                                               "2015",
+                                                               "2016",
+                                                               "2017"), selected = "all")
+      
+      # Select single population, year
+      two <- selectInput("dataset", label = "Database", choices = list("IPCI" = "IPCI", 
+                                                                       "CCAE" = "ccae", 
+                                                                       "MDCD" = "mdcd", 
+                                                                       "MDCR" = "mdcr",
+                                                                       "Estonia" = "Asthma"), selected = "IPCI")
+      
+      three <- selectInput("population", label = "Study population", choices = list("Asthma > 18"= "asthma",
+                                                                                  "COPD > 40" = "copd",
+                                                                                  "ACO > 40" = "aco",
+                                                                                  "Asthma 6-17" = "asthma6plus",
+                                                                                  "Asthma < 5" = "asthma6min"), selected = "asthma", multiple = FALSE)
+     
+      return(tagList(one, two, three))
+      
+    }
+    
+    
+  })
+  
   
 })
