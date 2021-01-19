@@ -62,29 +62,29 @@ injection,Anti IgE,Intravenous Solution
 injection,Anti IgE,Prefilled Syringe
 injection,Anti IgE,Injection
 injection,Anti IgE,Intramuscular Solution
-oral,xanthines,Buccal Tablet
-oral,xanthines,Delayed Release Oral Tablet
-oral,xanthines,Disintegrating Oral Tablet
-oral,xanthines,Chewable Tablet
-oral,xanthines,Delayed Release Oral Capsule
-oral,xanthines,Extended Release Oral Tablet
-oral,xanthines,Extended Release Suspension
-oral,xanthines,Oral Capsule
-oral,xanthines,Oral Gel
-oral,xanthines,Oral Granules
-oral,xanthines,Oral Lozenge
-oral,xanthines,Oral Ointment
-oral,xanthines,Oral Paste
-oral,xanthines,Oral Powder
-oral,xanthines,Oral Solution
-oral,xanthines,Oral Suspension
-oral,xanthines,Effervescent Oral Tablet
-oral,xanthines,Extended Release Oral Capsule
-oral,xanthines,Powder for Oral Suspension
-oral,xanthines,Sublingual Tablet
-oral,xanthines,Tablet for Oral Suspension
-oral,xanthines,Oral Tablet
-oral,xanthines,Pack
+oral,Xanthines,Buccal Tablet
+oral,Xanthines,Delayed Release Oral Tablet
+oral,Xanthines,Disintegrating Oral Tablet
+oral,Xanthines,Chewable Tablet
+oral,Xanthines,Delayed Release Oral Capsule
+oral,Xanthines,Extended Release Oral Tablet
+oral,Xanthines,Extended Release Suspension
+oral,Xanthines,Oral Capsule
+oral,Xanthines,Oral Gel
+oral,Xanthines,Oral Granules
+oral,Xanthines,Oral Lozenge
+oral,Xanthines,Oral Ointment
+oral,Xanthines,Oral Paste
+oral,Xanthines,Oral Powder
+oral,Xanthines,Oral Solution
+oral,Xanthines,Oral Suspension
+oral,Xanthines,Effervescent Oral Tablet
+oral,Xanthines,Extended Release Oral Capsule
+oral,Xanthines,Powder for Oral Suspension
+oral,Xanthines,Sublingual Tablet
+oral,Xanthines,Tablet for Oral Suspension
+oral,Xanthines,Oral Tablet
+oral,Xanthines,Pack
 oral,Systemic glucocorticosteroids,Buccal Tablet
 oral,Systemic glucocorticosteroids,Delayed Release Oral Tablet
 oral,Systemic glucocorticosteroids,Disintegrating Oral Tablet
@@ -185,6 +185,6 @@ oral,PDE4,Pack
 ,Systemic glucocorticosteroids,
 ,Anti IL5,
 ,Anti IgE,
-,xanthines,
+,Xanthines,
 ,LTRA,
 ,PDE4,

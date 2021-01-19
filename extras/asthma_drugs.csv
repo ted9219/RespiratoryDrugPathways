@@ -43,17 +43,19 @@ R03BA03,Flunisolide,ICS,flunisolide,1196514
 R03BA05,Fluticasone,ICS,fluticasone,1149380
 R03BA07,Mometasone,ICS,mometasone,905233
 R03BA08,Ciclesonide,ICS,ciclesonide,902938
-R03DA01,Diprophylline,xanthines,dyphylline,1140088
-R03DA02,Choline theophyllinate,xanthines,choline,1195334
-R03DA03,Proxyphylline,xanthines,proxyphylline,19029547
-R03DA04,Theophylline,xanthines,theophylline,1237049
-R03DA05,Aminophylline,xanthines,aminophylline,1105775
-R03DA06,Etamiphylline,xanthines,etamiphyllin,40798802
-R03DA07,Theobromine,xanthines,theobromine,19137056
-R03DA08,Bamifylline,xanthines,bamifylline,19018518
-R03DA09,Acefylline piperazine,xanthines,acefylline piperazine,40798596
-R03DA10,Bufylline,xanthines,ambuphylline,0
-R03DA11,Doxofylline,xanthines,doxofylline,43009019
+R03BA04,Betamethasone,ICS,betamethasone,920458
+R03BA06,Triamcinolone,ICS,triamcinolone,903963
+R03DA01,Diprophylline,Xanthines,dyphylline,1140088
+R03DA02,Choline theophyllinate,Xanthines,choline,1195334
+R03DA03,Proxyphylline,Xanthines,proxyphylline,19029547
+R03DA04,Theophylline,Xanthines,theophylline,1237049
+R03DA05,Aminophylline,Xanthines,aminophylline,1105775
+R03DA06,Etamiphylline,Xanthines,etamiphyllin,40798802
+R03DA07,Theobromine,Xanthines,theobromine,19137056
+R03DA08,Bamifylline,Xanthines,bamifylline,19018518
+R03DA09,Acefylline piperazine,Xanthines,acefylline piperazine,40798596
+R03DA10,Bufylline,Xanthines,ambuphylline,0
+R03DA11,Doxofylline,Xanthines,doxofylline,43009019
 R03DC01,Zafirlukast,LTRA,zafirlukast,1111706
 R03DC02,Pranlukast,LTRA,pranlukast hydrate,43009065
 R03DC03,Montelukast,LTRA,montelukast,1154161
