@@ -471,29 +471,6 @@ shinyServer(function(input, output, session) {
   })
   
   # Plots
-  observe({
-      data <- prevalenceProportion[prevalenceProportion$databaseId %in% input$databases, ]
-      minRange = min(data$calendarYear,na.rm=TRUE)
-      maxRange = max(data$calendarYear,na.rm=TRUE)
-      updateSliderInput(session, "plotRange", 
-                        min = minRange, 
-                        max = maxRange,
-                        value = c(minRange,maxRange) ,
-                        step = 1)
-  })
-  
-  filteredIncidenceProportions <- reactive({
-    data <- incidenceProportion[incidenceProportion$cohortId == cohortId() & 
-                                  incidenceProportion$databaseId %in% input$databases, ]
-    return(filteredProportions(data, input$ipStratification, input$plotRange, cohortId()))
-  })
-  
-  filteredPrevalenceProportions <- reactive({
-    data <- prevalenceProportion[prevalenceProportion$cohortId == cohortId() & 
-                                   prevalenceProportion$databaseId %in% input$databases, ]
-    return(filteredProportions(data, input$ppStratification, input$plotRange, cohortId()))
-  })
-  
   output$incidenceProportionPlot <- renderPlot({
     data <- filteredIncidenceProportions()
     if (is.null(data)) {
@@ -706,14 +683,6 @@ shinyServer(function(input, output, session) {
   })
   observeEvent(input$resultsInfo, {
     showInfoBox("Study Results", "html/results.html")
-  })
-  
-  observeEvent(input$incidenceProportionInfo, {
-    showInfoBox("Study Results", "html/incidenceProportion.html")
-  })
-  
-  observeEvent(input$prevalenceProportionInfo, {
-    showInfoBox("Study Results", "html/prevalenceProportion.html")
   })
   
   output$sunburstplots <- renderUI({
