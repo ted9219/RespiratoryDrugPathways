@@ -32,10 +32,10 @@ connection <- DatabaseConnector::connect(dbms = dbms,connectionDetails = connect
 debugSqlFile <- "resp_drug_study.dsql"
 cohortTable <- "resp_drug_study_cohorts"
 
-runCreateCohorts <- FALSE
-runCohortCharacterization <- FALSE
-runTreatmentPathways <- FALSE
-outputResults <- FALSE
+runCreateCohorts <- TRUE
+runCohortCharacterization <- TRUE
+runTreatmentPathways <- TRUE
+outputResults <- TRUE
 
 study_settings <- data.frame(readr::read_csv("inst/Settings/study_settings.csv", col_types = readr::cols()))
 study_settings <- study_settings[,c("param", "analysis1", "analysis2", "analysis3", "analysis4", "analysis5")]
