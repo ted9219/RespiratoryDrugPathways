@@ -29,8 +29,16 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
   # Group all non-fixed combinations in one group if TRUE
   if (otherCombinations) {
     file[findCombinations] <- "Other combinations"
+  } else {
+    # Otherwise: group infrequent treatments below minFreqCombination as otherCombinations
+    
+    minFreqCombination <- 25
+    summarizeCombinations <- summaryCombinations$combination[summaryCombinations$freq <= minFreqCombination]
+    
+    selectedCombinations <- apply(file, 2, function(x) x %in% summarizeCombinations)
+    file[selectedCombinations] <- "Other combinations"
   }
-  
+
   summaryCombinations <- summaryCombinations[freq >= minCellCount,]
   write.csv(summaryCombinations, file=paste(path,"_combinations.csv",sep=''), row.names = FALSE)
   
@@ -84,10 +92,10 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
   return(FALSE)
 }
 
-outputPercentageGroupTreated <- function(data, outcomeCohortIds, path, outputFolder, outputFile, otherCombinations) {
+outputPercentageGroupTreated <- function(data, outcomeCohortIds, path, outputFolder, outputFile) {
   if (is.null(data$INDEX_YEAR)) {
     # For file_noyear compute once
-    result <- computePercentageGroupTreated(data, outcomeCohortIds, outputFolder, otherCombinations)
+    result <- computePercentageGroupTreated(data, outcomeCohortIds, outputFolder)
     
   } else {
     # For file_withyear compute per year
@@ -96,7 +104,7 @@ outputPercentageGroupTreated <- function(data, outcomeCohortIds, path, outputFol
     results <- lapply(years, function(y) {
       subset_data <- data[INDEX_YEAR == as.character(y),]
       
-      subset_result <- cbind(y, computePercentageGroupTreated(subset_data, outcomeCohortIds, outputFolder, otherCombinations))
+      subset_result <- cbind(y, computePercentageGroupTreated(subset_data, outcomeCohortIds, outputFolder))
     }) 
     
     result <- rbindlist(results)
@@ -193,29 +201,11 @@ outputStepUpDown <- function(file_noyear, path, targetCohortId) {
   ParallelLogger::logInfo("outputStepUpDown done")
 } 
 
-computePercentageGroupTreated <- function(data, outcomeCohortIds, outputFolder, otherCombinations) {
+computePercentageGroupTreated <- function(data, outcomeCohortIds, outputFolder) {
   layers <- as.vector(colnames(data)[!grepl("INDEX_YEAR|freq", colnames(data))])
   cohorts <- read.csv(paste(outputFolder, "/cohort.csv",sep=''), stringsAsFactors = FALSE)
   outcomes <- cohorts$cohortName[cohorts$cohortId %in% unlist(strsplit(outcomeCohortIds, ","))]
-  
-  # Group infrequent treatments below minFreqCombination as otherCombinations if otherTreatments FALSE
-  if (otherCombinations == "FALSE") {
-    findCombinations <- apply(data, 2, function(x) grepl("+", x, fixed = TRUE))
-    
-    combinations <- as.matrix(data)[findCombinations == TRUE]
-    num_columns <-  sum(grepl("CONCEPT_NAME", colnames(data)))
-    freqCombinations <- matrix(rep(data$freq, times = num_columns), ncol = num_columns)[findCombinations == TRUE]
-    
-    summaryCombinations <- data.table(combination = combinations, freq = freqCombinations)
-    summaryCombinations <- summaryCombinations[,.(freq=sum(freq)), by=combination][order(-freq)]
-    
-    minFreqCombination <- 25
-    replaceCombinations <- summaryCombinations$combination[summaryCombinations$freq <= minFreqCombination]
-   
-    selectedCombinations <- apply(data, 1:2, function(x) x %in% replaceCombinations)
-    data[selectedCombinations] <- "Other combinations"
-  }
-  
+
   percentGroupLayer <- sapply(layers, function(l) {
     percentGroup <- sapply(outcomes, function(g) {
       sumGroup <- sum(data$freq[data[,..l] == g], na.rm = TRUE)
