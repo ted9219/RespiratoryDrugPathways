@@ -20,6 +20,7 @@ Imports:
     SqlRender,
     dplyr,
     stringr,
+    stringi,
     readr,
     networkD3,
     rjson,

@@ -383,7 +383,7 @@ transformCSVtoJSON <- function(outcomeCohortIds, outputFolder, path, index_year,
   # Apply linking
   # Change all outcomes to bitwise number
   updated_path <- sapply(data$path, function(p) {
-    stringr::str_replace_all(p, structure(as.character(linking$bitwiseNumbers), names = as.character(linking$outcomes)))
+    stringi::stri_replace_all_fixed(p, replacement = as.character(linking$bitwiseNumbers), pattern = as.character(linking$outcomes), vectorize = FALSE)
   })
   
   # Sum the bitwise numbers of combinations (indicated by +)
