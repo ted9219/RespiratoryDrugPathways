@@ -14,6 +14,41 @@ doStepDuration <- function(data, minStepDuration) {
   return(data)
 }
 
+doAcuteVSTherapy <- function(data, splitAcuteVsTherapy, outputFolder) {
+  
+  # load in labels cohorts
+  labels <- data.table(readr::read_csv(paste(outputFolder, "/cohort.csv",sep=''), col_types = list("c", "c", "c", "c")))
+  
+  for (c in splitAcuteVsTherapy) {
+    # label as acute
+    data[DRUG_CONCEPT_ID == c & DURATION_ERA < 30, "DRUG_CONCEPT_ID"] <- as.integer(paste0(c,1))
+    
+    # label as therapy
+    data[DRUG_CONCEPT_ID == c & DURATION_ERA >= 30, "DRUG_CONCEPT_ID"] <- as.integer(paste0(c,2))
+    
+    # add new labels
+    original <- labels[cohortId == as.integer(c),]
+    
+    new1 <- original
+    new1$cohortId <- as.integer(paste0(c,1))
+    new1$cohortName <- paste0(new1$cohortName, " (acute)")
+    
+    new2 <- original
+    new2$cohortId <- as.integer(paste0(c,2))
+    new2$cohortName <- paste0(new2$cohortName, " (therapy)")
+    
+    labels <- labels[cohortId != as.integer(c),]
+    labels <- rbind(labels, new1, new2)
+    
+  }
+  
+  # save new labels cohorts
+  write.csv(labels, file.path(outputFolder, "cohort.csv"), row.names = FALSE)
+ 
+  return(data) 
+}
+
+
 doEraCollapse <- function(data, eraCollapseSize) {
   # order data by person_id, drug_concept_id, drug_start_date, drug_end_date
   data <- data[order(PERSON_ID, DRUG_CONCEPT_ID,DRUG_START_DATE, DRUG_END_DATE),]
@@ -46,7 +81,6 @@ doCombinationWindow <- function(data, combinationWindow, minStepDuration) {
   while(sum(data$SELECTED_ROWS)!=0) {
     
     # which have gap previous shorter than combination window OR min(current duration era, previous duration era) -> add column switch
-    # data[SELECTED_ROWS == 1 & (-GAP_PREVIOUS < combinationWindow & shift(DRUG_START_DATE, type = "lag") != DRUG_START_DATE), switch:=1]
     data[SELECTED_ROWS == 1 & (-GAP_PREVIOUS < combinationWindow  & !(-GAP_PREVIOUS >= DURATION_ERA | -GAP_PREVIOUS >= shift(DURATION_ERA, type = "lag"))), switch:=1]
     
     # for rows selected not in column switch -> if data[r - 1, DRUG_END_DATE] <= data[r, DRUG_END_DATE] -> add column combination first received, first stopped

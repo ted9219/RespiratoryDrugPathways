@@ -118,6 +118,7 @@ execute <- function(connection = NULL,
                            analysisRefFileName = file.path(paste0(outputFolder, "/characterization"), "analysis_ref.csv"),
                            counts = cohortCounts,
                            minCellCount = minCellCount)
+    
     # Selection of standard results
     settings_characterization <- read.csv("inst/Settings/characterization_settings.csv", stringsAsFactors = FALSE)
     standard_characterization <- read.csv(paste0(outputFolder, "/characterization/covariate_value.csv"), stringsAsFactors = FALSE)
@@ -169,13 +170,13 @@ execute <- function(connection = NULL,
   
   # Treatment pathways are constructed
   if (runTreatmentPathways) {
-    ParallelLogger::logInfo("Constructing treatment pathways")
-    
     # For all different study settings
     settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
     
     for (s in settings) {
       studyName <- study_settings[study_settings$param == "studyName",s]
+      
+      ParallelLogger::logInfo(paste0("Constructing treatment pathways: ", studyName))
       
       # Select cohorts included
       targetCohortId <- study_settings[study_settings$param == "targetCohortId",s]
@@ -183,6 +184,7 @@ execute <- function(connection = NULL,
       
       # Analyis settings
       minEraDuration <-  as.integer(study_settings[study_settings$param == "minEraDuration",s]) # Minimum time an era should last to be included in analysis
+      splitAcuteVsTherapy <-  study_settings[study_settings$param == "splitAcuteVsTherapy",s] # Cohort Ids to split in acute (< 30 days) and therapy (>= 30 days)
       minStepDuration <-  as.integer(study_settings[study_settings$param == "minStepDuration",s]) # Minimum time a step (generated drug era) before or after a combination treatment should last to be included in analysis
       eraCollapseSize <-  as.integer(study_settings[study_settings$param == "eraCollapseSize",s]) # Window of time between two same evnt cohorts that are considered one era
       combinationWindow <-  as.integer(study_settings[study_settings$param == "combinationWindow",s]) # Window of time when two event cohorts need to overlap to be considered a combination
@@ -215,6 +217,7 @@ execute <- function(connection = NULL,
       writeLines(paste0("Original: ", nrow(data)))
       
       data <- doEraDuration(data, minEraDuration)
+      if (splitAcuteVsTherapy != "") {data <- doAcuteVSTherapy(data, splitAcuteVsTherapy, outputFolder)}
       data <- doEraCollapse(data, eraCollapseSize)
       data <- doCombinationWindow(data, combinationWindow, minStepDuration)
       
@@ -293,8 +296,8 @@ execute <- function(connection = NULL,
         file_withyear <- as.data.table(read.csv(paste(path,"_file_withyear.csv",sep=''), stringsAsFactors = FALSE))
         
         # Compute percentage of people treated with each outcome cohort separately and in the form of combination treatments
-        outputPercentageGroupTreated(data = file_noyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_noyear.csv",sep=''), otherCombinations = otherCombinations)
-        outputPercentageGroupTreated(data = file_withyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_withyear.csv",sep=''), otherCombinations = otherCombinations)
+        outputPercentageGroupTreated(data = file_noyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_noyear.csv",sep=''))
+        outputPercentageGroupTreated(data = file_withyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_withyear.csv",sep=''))
         
         # Compute step-up/down of asthma/COPD drugs
         outputStepUpDown(file_noyear = file_noyear, path = path, targetCohortId = targetCohortId)
