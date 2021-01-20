@@ -21,5 +21,7 @@ source("PlotsAndTables.R")
 # databases <- database[order(database$databaseId),]
 # analyses <- analyses[order(analyses$analysisId), ]
 
+addResourcePath("workingdirectory", stringr::str_replace(getwd(),"/shiny",""))
+
 writeLines("Data Loaded")
 

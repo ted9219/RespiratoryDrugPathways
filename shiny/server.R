@@ -28,8 +28,6 @@ getHoveroverStyle <- function(left_px, top_px) {
                   "px; width:400px;")
 }
 
-addResourcePath("workingdirectory", stringr::str_replace(getwd(),"/shiny",""))
-
 ## the shiny server update function
 shinyServer(function(input, output, session) {
   cohortId <- reactive({
