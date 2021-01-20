@@ -125,6 +125,13 @@ createCohorts <- function(connectionDetails,
   colnames(counts) <- SqlRender::snakeCaseToCamelCase(colnames(counts))
   write.csv(counts, file.path(outputFolder, "cohort_counts.csv"), row.names = FALSE)
   
+  # Check if all target cohorts have non-zero count
+  checkCohorts <- setdiff(cohortsToCreate$cohortId[cohortsToCreate$cohortType == "target"],counts$COHORT_DEFINITION_ID)
+  
+  if(length(checkCohorts) != 0) {
+    warning(paste0("Cohort definition ", paste0(checkCohorts, collapse = ","), " has zero count. "))
+  }
+  
   DatabaseConnector::disconnect(connection)
 }
 
