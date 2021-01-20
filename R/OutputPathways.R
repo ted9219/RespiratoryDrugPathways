@@ -363,7 +363,7 @@ transformCSVtoJSON <- function(outcomeCohortIds, outputFolder, path, index_year,
   data <- read.csv(paste(path,"_inputsunburst_", index_year, ".csv",sep=''))
   
   cohorts <- read.csv(paste(outputFolder, "/cohort.csv",sep=''), stringsAsFactors = FALSE)
-  outcomes <- c(cohorts$cohortName[cohorts$cohortId %in% unlist(strsplit(outcomeCohortIds, ","))], "Other combinations")
+  outcomes <- c(cohorts$cohortName[cohorts$cohortType == "outcome"], "Other combinations")
   
   # Add bitwise numbers to define combination treatments
   bitwiseNumbers <- sapply(1:length(outcomes), function(o) {2^(o-1)})
