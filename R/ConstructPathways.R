@@ -145,7 +145,10 @@ doCombinationWindow <- function(data, combinationWindow, minStepDuration) {
     gc()
   }
   
+  ParallelLogger::logInfo("Done with combinationWindow")
+  
   data[,GAP_PREVIOUS:=NULL]
+  data[,SELECTED_ROWS:=NULL]
   
   return(data)
 }
@@ -174,22 +177,14 @@ selectRowsCombinationWindow <- function(data) {
 doSequentialRepetition <- function(data) {
   # order data by person_id, drug_start_date, drug_end_date
   data <- data[order(PERSON_ID, DRUG_START_DATE, DRUG_END_DATE),]
-  data[,ID_PREVIOUS:=shift(DRUG_CONCEPT_ID, type = "lag"), by = PERSON_ID]
   
-  # find all rows for which previous treatment is same
-  rows <- which(data$DRUG_CONCEPT_ID == data$ID_PREVIOUS)
-  
-  # for all rows, modify the row preceding, loop backwards in case more than one collapse
-  for (r in rev(rows)) {
-    data[r - 1,"DRUG_END_DATE"] <- data[r,DRUG_END_DATE]
-    
-    # sum duration_era
-    data[r - 1,"DURATION_ERA"] <-  data[r - 1,DURATION_ERA] +  data[r,DURATION_ERA]
-  }
+  # group all rows per person for which previous treatment is same
+  data <- data[, group:=rleid(PERSON_ID,DRUG_CONCEPT_ID)]
   
   # remove all rows with same sequential treatments
-  data <- data[!rows,]
-  data[,ID_PREVIOUS:=NULL]
+  data <- data[,.(DRUG_START_DATE=min(DRUG_START_DATE), DRUG_END_DATE=max(DRUG_END_DATE), DURATION_ERA=sum(DURATION_ERA)), by = .(PERSON_ID,INDEX_YEAR,DRUG_CONCEPT_ID,group)]
+
+  data[,group:=NULL]
   writeLines(paste0("After collapseSameSequential: ", nrow(data)))
   
   return(data)
@@ -197,6 +192,9 @@ doSequentialRepetition <- function(data) {
 
 doFirstTreatment <- function(data) {
   data <- data[, head(.SD,1), by=.(PERSON_ID, DRUG_CONCEPT_ID)]
+  writeLines(paste0("After doFirstTreatment: ", nrow(data)))
+  
+  return(data)
 }
 
 addLabels <- function(data, outputFolder) {
