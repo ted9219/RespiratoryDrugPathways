@@ -26,17 +26,25 @@ dashboardPage(
       addInfo(menuItem("Databases", tabName = "databases"), "databaseInfo"),
       addInfo(menuItem("Characterization", tabName = "characterization"), "characterizationInfo"),
       addInfo(menuItem("Treatment pathways", tabName = "pathways"), "treatmentPathwaysInfo"),
-      # addInfo(menuItem("Analyses", tabName = "results"), "resultsInfo"),
       
       ## Option panel
       conditionalPanel(
-        condition = "input.tabs=='pathways' || input.tabs=='characterization' ",
-        radioButtons("viewer", label = "Viewer", choices = c("Compare databases", "Compare study populations", "Compare over time"), selected = "Compare databases")
+        condition = "input.tabs=='characterization'",
+        radioButtons("viewer1", label = "Viewer", choices = c("Compare databases", "Compare study populations"), selected = "Compare study populations")
+      ),
+      
+      conditionalPanel(
+        condition = "input.tabs=='characterization'",
+        htmlOutput("dynamic_input1")),
+      
+      conditionalPanel(
+        condition = "input.tabs=='pathways'",
+        radioButtons("viewer2", label = "Viewer", choices = c("Compare databases", "Compare study populations", "Compare over time"), selected = "Compare databases")
       ),
       
       conditionalPanel(
         condition = "input.tabs=='pathways'",
-      htmlOutput("dynamic_input"))
+        htmlOutput("dynamic_input2"))
       
     )
     
@@ -70,14 +78,10 @@ dashboardPage(
         h3("Rationale and background"),
         p("To be added."),
         h3("Study Limitations"),
-        p("First, for this study we will use real world data from electronic health care records. There might exist
-        differences between the databases with regard to availability of certain data.
-        ...
-        Finally, the databases are a subsample of the full population and results should be used with caution
-        when attempting to infer the results nation-wide."),
+        p("To be added."),
         h3("Development Status"),
         p(
-          " The results in this application are currently under review and should be treated as preliminary at this moment."
+          "The results in this application are currently under review and should be treated as preliminary at this moment."
         )
       )
       ,
@@ -86,7 +90,9 @@ dashboardPage(
         includeHTML("./html/databasesInfo.html")
       ),
       tabItem(tabName = "characterization",
-              box(
+              box(width = 12,
+                textOutput("tableCharacterizationTitle"),
+                dataTableOutput("tableCharacterization")
               )
       ),
       tabItem(tabName = "pathways",
@@ -95,49 +101,6 @@ dashboardPage(
                        title = "Treatment Pathways", width = NULL, status = "primary",
                        htmlOutput("sunburstplots"))),
               column(width = 3, tags$img(src = paste0("workingdirectory/plots/legend.png"), height = 400))
-      ),
-      tabItem(
-        tabName = "results",
-        
-        tabsetPanel(
-          id = "resultTabsetPanel",
-          
-          tabPanel(
-            "Tables",
-            br(),
-            textOutput("tableATitle"),
-            br(),
-            
-            conditionalPanel(condition = "input.analysis != 'Indications' && input.analysis != 'Renal Impairment'",
-            ),
-            conditionalPanel(condition = "input.analysis == 'Indications'",
-            ),
-            hr(),
-            textOutput("tableBTitle"),
-            br(),
-            dataTableOutput("TableB")
-          ),
-          
-          tabPanel(
-            "Figures",
-            br(),
-            conditionalPanel(condition = "input.analysis == 'Observation Period'",
-                             p("Figure 7: Observation Period per database"),
-                             br(),
-                             girafeOutput("observationPeriodHistogram", height = "100%")),
-            
-            
-            conditionalPanel(
-              condition = "input.analysis != 'Observation Period'",
-              
-              textOutput("FigureTitle"),
-              br(),
-              plotOutput("BoxplotBxp", height = 700),
-              plotlyOutput("BoxplotPlotly")
-            )
-            
-          )
-        )
       )
     )
   )
