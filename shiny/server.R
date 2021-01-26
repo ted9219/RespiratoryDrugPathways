@@ -91,22 +91,22 @@ shinyServer(function(input, output, session) {
   output$sunburstplots <- renderUI({
     
     if (input$viewer2 == "Compare databases") {
-      result <- lapply(input$dataset,
+      result <- lapply(input$dataset2,
                        function(d) {
-                         tagList(tags$h4(d), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", d, "_",input$population,"_" ,input$year,".html"), width=400, height=400, scrolling = "no",frameborder = "no"))
+                         tagList(tags$h4(names(which(included_databases == d))), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", d, "_",input$population2,"_" ,input$year2,".html"), width=400, height=400, scrolling = "no",frameborder = "no"))
                        })
       
     } else if  (input$viewer2 == "Compare study populations") {
-      result <- lapply(input$population,
+      result <- lapply(input$population2,
                        function(p) {
-                         tagList(tags$h4(p), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", input$dataset, "_",p,"_" ,input$year,".html"), width=400, height=400, scrolling = "no",frameborder = "no"))
+                         tagList(tags$h4(names(which(all_populations == p))), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", input$dataset2, "_",p,"_" ,input$year2,".html"), width=400, height=400, scrolling = "no",frameborder = "no"))
                        })
       
       
     } else if (input$viewer2 == "Compare over time") {
-      result <- lapply(input$year,
+      result <- lapply(input$year2,
                        function(y) {
-                         tagList(tags$h4(y), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", input$dataset, "_",input$population,"_" ,y,".html"), width=400, height=400, scrolling = "no",frameborder = "no"))
+                         tagList(tags$h4(names(which(all_years == y))), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", input$dataset2, "_",input$population2,"_" ,y,".html"), width=400, height=400, scrolling = "no",frameborder = "no"))
                        })
       
     }
@@ -117,15 +117,15 @@ shinyServer(function(input, output, session) {
   output$dynamic_input1 = renderUI({
     if (input$viewer1 == "Compare databases") {
       # Select multiple databases
-      one <- checkboxGroupInput("dataset", label = "Database", choices = included_databases, selected = "IPCI")
+      one <- checkboxGroupInput("dataset1", label = "Database", choices = included_databases, selected = "IPCI")
       
       # Select single population
-      two <- selectInput("population", label = "Study population", choices = all_populations, selected = "asthma", multiple = FALSE)
+      two <- selectInput("population1", label = "Study population", choices = all_populations, selected = "asthma", multiple = FALSE)
       return(tagList(one, two))
       
     } else if (input$viewer1 == "Compare study populations") {
       # Select single database
-      one <- selectInput("dataset", label = "Database", choices = included_databases, selected = "IPCI")
+      one <- selectInput("dataset1", label = "Database", choices = included_databases, selected = "IPCI")
       
       return(tagList(one))
       
@@ -135,58 +135,75 @@ shinyServer(function(input, output, session) {
   output$dynamic_input2 = renderUI({
     if (input$viewer2 == "Compare databases") {
       # Select multiple databases
-      one <- checkboxGroupInput("dataset", label = "Database", choices = included_databases, selected = "IPCI")
+      one <- checkboxGroupInput("dataset2", label = "Database", choices = included_databases, selected = "IPCI")
       
       # Select single population, year
-      two <- selectInput("population", label = "Study population", choices = all_populations, selected = "asthma", multiple = FALSE)
-      three <- selectInput("year", label = "Year", choices = all_years, selected = "all")
+      two <- selectInput("population2", label = "Study population", choices = all_populations, selected = "asthma", multiple = FALSE)
+      three <- selectInput("year2", label = "Year", choices = all_years, selected = "all")
       return(tagList(one, two, three))
       
     } else if (input$viewer2 == "Compare study populations") {
       # Select multiple populations
-      one <- checkboxGroupInput("population", label = "Study population", choices = all_populations, selected = "asthma")
-     
+      one <- checkboxGroupInput("population2", label = "Study population", choices = all_populations, selected = "asthma")
       
       # Select single dataset, year
-      two <- selectInput("dataset", label = "Database", choices = included_databases, selected = "IPCI")
+      two <- selectInput("dataset2", label = "Database", choices = included_databases, selected = "IPCI")
         
-      three <- selectInput("year", label = "Year", choices = all_years, selected = "all")
+      three <- selectInput("year2", label = "Year", choices = all_years, selected = "all")
       return(tagList(one, two, three))
       
     } else if (input$viewer2 == "Compare over time") {
       # Select multiple years
-      one <- checkboxGroupInput("year", label = "Year", choices = all_years, selected = "all")
+      one <- checkboxGroupInput("year2", label = "Year", choices = all_years, selected = "all")
       
       # Select single dataset, population
-      two <- selectInput("dataset", label = "Database", choices = included_databases, selected = "IPCI")
+      two <- selectInput("dataset2", label = "Database", choices = included_databases, selected = "IPCI")
       
-      three <- selectInput("population", label = "Study population", choices = all_populations, selected = "asthma", multiple = FALSE)
+      three <- selectInput("population2", label = "Study population", choices = all_populations, selected = "asthma", multiple = FALSE)
      
       return(tagList(one, two, three))
     }
   })
   
   output$tableCharacterizationTitle <- renderText({"Table with characterization of study population." })
+
   
   output$tableCharacterization <- renderDataTable({
+    
     if (input$viewer1 == "Compare databases") {
-      # Get the data
       
+      # Get the data
+      data <- data.frame()
+      
+      for (d in input$dataset1) {
+        data <- rbind(data, characterization[[d]])
+      }
+      
+      # Rename to study populations
+      data$cohort_id <- sapply(data$cohort_id, function(c) names(all_populations[c]))
+      data <- data[data$cohort_id == names(which(all_populations == input$population1)),]
+    
+      data$sd <- NULL
+      data$cohort_id <- NULL
+      data$covariate_id <- NULL
+      
+      # Multiply all rows by 100 to get percentages (except Age, Charlson comorbidity index score)
+      data$mean[!(data$covariate_name %in% c('Age', 'Charlson comorbidity index score'))] <- round(data$mean[!(data$covariate_name %in% c('Age', 'Charlson comorbidity index score'))]*100,digits=3)
       
       # Columns different databases (rows different characteristics)
-      table <- NULL
+      table <- dcast(data, covariate_name ~ database_id, value.var = "mean")
       
     } else if  (input$viewer1 == "Compare study populations") { 
       
       # Get the data
-      data <- characterization[[input$dataset]]
-
+      data <- characterization[[input$dataset1]]
+      
       data$sd <- NULL
       data$database_id <- NULL
       data$covariate_id <- NULL
       
       # Multiply all rows by 100 to get percentages (except Age, Charlson comorbidity index score)
-      data$mean[!(data$covariate_name %in% c('Age', 'Charlson comorbidity index score'))] <- data$mean[!(data$covariate_name %in% c('Age', 'Charlson comorbidity index score'))]*100 
+      data$mean[!(data$covariate_name %in% c('Age', 'Charlson comorbidity index score'))] <- round(data$mean[!(data$covariate_name %in% c('Age', 'Charlson comorbidity index score'))]*100,digits=3)
       
       # Rename to study populations
       data$cohort_id <- sapply(data$cohort_id, function(c) names(all_populations[c]))
@@ -194,8 +211,8 @@ shinyServer(function(input, output, session) {
       # Columns different study populations (rows different characteristics)
       table <- dcast(data, covariate_name ~ cohort_id, value.var = "mean")
       
-      }
-  
+    }
+    
     return(table)
   })
   
