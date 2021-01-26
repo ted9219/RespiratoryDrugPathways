@@ -69,11 +69,12 @@ execute <- function(connection = NULL,
     on.exit(DatabaseConnector::disconnect(connection))
   }
   
+  ParallelLogger::addDefaultFileLogger(file.path(outputFolder, "log.txt"))
+  ParallelLogger::logInfo(paste0("Running package version ", packageVersion("RespiratoryDrugPathways")))
+  
   # Target/outcome cohorts of interest are extracted from the database (defined using ATLAS or custom concept sets created in SQL inserted into cohort template) 
   if (runCreateCohorts) {
-    ParallelLogger::addDefaultFileLogger(file.path(outputFolder, "log.txt"))
-    
-    ParallelLogger::logInfo("Creating cohorts")
+    ParallelLogger::logInfo("runCreateCohorts TRUE")
     createCohorts(connectionDetails = connectionDetails,
                   cdmDatabaseSchema = cdmDatabaseSchema,
                   cohortDatabaseSchema = cohortDatabaseSchema,
@@ -84,7 +85,7 @@ execute <- function(connection = NULL,
   
   # Characterization of study/target population
   if (runCohortCharacterization) {
-    ParallelLogger::logInfo("Characterization")
+    ParallelLogger::logInfo("runCohortCharacterization TRUE")
     
     if (!file.exists(paste0(outputFolder, "/characterization")))
       dir.create(paste0(outputFolder, "/characterization"), recursive = TRUE)
@@ -170,6 +171,8 @@ execute <- function(connection = NULL,
   
   # Treatment pathways are constructed
   if (runTreatmentPathways) {
+    ParallelLogger::logInfo("runTreatmentPathways TRUE")
+    
     # For all different study settings
     settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
     
@@ -280,7 +283,7 @@ execute <- function(connection = NULL,
   
   # Output is generated
   if (outputResults) {
-    ParallelLogger::logInfo("Generating output")
+    ParallelLogger::logInfo("outputResults TRUE")
     
     # For all different study settings
     settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
