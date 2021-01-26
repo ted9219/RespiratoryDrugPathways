@@ -67,7 +67,12 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
       col <- col - 1
     }
     
-    file_withyear[is.na(D1_CONCEPT_NAME)] <- "Other combinations"
+    # If path becomes completely NA -> add to "Other combinations" group to distinguish from non-treated
+    file_noyear$D1_CONCEPT_NAME[is.na(file_noyear$D1_CONCEPT_NAME)] <- "Other combinations"
+    file_noyear <- file_noyear[,.(freq=sum(freq)), by=layers]
+    
+    file_withyear$D1_CONCEPT_NAME[is.na(file_withyear$D1_CONCEPT_NAME)] <- "Other combinations"
+    file_withyear <- file_withyear[,.(freq=sum(freq)), by=c(layers, "INDEX_YEAR")]
     
   }
   
