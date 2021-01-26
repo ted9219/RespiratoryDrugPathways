@@ -109,11 +109,6 @@ FROM (
 WHERE num_ingredient > 1
 GROUP BY med_group;
 
-
-/*
-Define drug strength
-
- */
-
-
+-- Keep all monotherapy concept sets and de combination concept sets that are part of a fixed combination of interest
+-- Save this as 'drug_classes.csv'
 
