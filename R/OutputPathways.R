@@ -31,7 +31,6 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
     file[findCombinations] <- "Other combinations"
   } else {
     # Otherwise: group infrequent treatments below minFreqCombination as otherCombinations
-    
     minFreqCombination <- 25
     summarizeCombinations <- summaryCombinations$combination[summaryCombinations$freq <= minFreqCombination]
     
@@ -67,6 +66,9 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
       
       col <- col - 1
     }
+    
+    file_withyear[is.na(D1_CONCEPT_NAME)] <- "Other combinations"
+    
   }
   
   writeLines(paste("Remove ", sum(file_noyear$freq < minCellCount), " paths with too low frequency (without year)"))
