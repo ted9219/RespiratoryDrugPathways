@@ -228,7 +228,7 @@ execute <- function(connection = NULL,
       time1 <- Sys.time()
       data <- doCombinationWindow(data, combinationWindow, minStepDuration)
       time2 <- Sys.time()
-      print(paste0("Time needed to execute combination window ", difftime(time2, time1, units = "mins")))
+      ParallelLogger::logInfo(paste0("Time needed to execute combination window ", difftime(time2, time1, units = "mins")))
       
       # Order the combinations
       ParallelLogger::logInfo("Order the combinations.")
@@ -277,7 +277,7 @@ execute <- function(connection = NULL,
       DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
       time4 <- Sys.time()
       
-      print(paste0("Move data to SQL and last processing ", difftime(time4, time3, units = "mins")))
+      ParallelLogger::logInfo(paste0("Move data to SQL and last processing ", difftime(time4, time3, units = "mins")))
     }
   }
   
