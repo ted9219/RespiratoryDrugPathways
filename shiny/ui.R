@@ -96,9 +96,9 @@ dashboardPage(
               )
       ),
       tabItem(tabName = "pathways",
-              column(width = 6, 
+              column(width = 9, 
                      box(
-                       title = "Treatment Pathways", width = NULL, status = "primary",
+                       title = "Treatment Pathways", width = 30, status = "primary",
                        htmlOutput("sunburstplots"))),
               column(width = 3, tags$img(src = paste0("workingdirectory/plots/legend.png"), height = 400))
       )

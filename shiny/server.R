@@ -88,32 +88,6 @@ shinyServer(function(input, output, session) {
     showInfoBox("Study Results", "html/results.html")
   })
   
-  output$sunburstplots <- renderUI({
-    
-    if (input$viewer2 == "Compare databases") {
-      result <- lapply(input$dataset2,
-                       function(d) {
-                         tagList(tags$h4(names(which(included_databases == d))), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", d, "_",input$population2,"_" ,input$year2,".html"), width=400, height=400, scrolling = "no",frameborder = "no"))
-                       })
-      
-    } else if  (input$viewer2 == "Compare study populations") {
-      result <- lapply(input$population2,
-                       function(p) {
-                         tagList(tags$h4(names(which(all_populations == p))), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", input$dataset2, "_",p,"_" ,input$year2,".html"), width=400, height=400, scrolling = "no",frameborder = "no"))
-                       })
-      
-      
-    } else if (input$viewer2 == "Compare over time") {
-      result <- lapply(input$year2,
-                       function(y) {
-                         tagList(tags$h4(names(which(all_years == y))), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", input$dataset2, "_",input$population2,"_" ,y,".html"), width=400, height=400, scrolling = "no",frameborder = "no"))
-                       })
-      
-    }
-   
-    return(result)
-  })
-  
   output$dynamic_input1 = renderUI({
     if (input$viewer1 == "Compare databases") {
       # Select multiple databases
@@ -214,6 +188,60 @@ shinyServer(function(input, output, session) {
     }
     
     return(table)
+  })
+  
+  
+  
+  output$sunburstplots <- renderUI({
+    n_cols <- 2
+    
+    if (input$viewer2 == "Compare databases") {
+      
+      result <- list()
+      
+      for(i in 1:ceiling(length(input$dataset2)/n_cols)) { 
+        cols_ <- list();
+        
+        for(j in (1+n_cols*(i-1)):min(i*n_cols, length(input$dataset2))) {
+          cols_ <- append(cols_,list(column(width = floor(8/n_cols), offset = 0, tagList(tags$h4(names(which(included_databases == input$dataset2[[j]]))), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", input$dataset2[[j]], "_",input$population2,"_" ,input$year2,".html"), width=400, height=400, scrolling = "no", frameborder = "no")))));
+        }
+        result <- append(result, list(fluidRow(cols_, style = "width:1200px" )));
+      }
+      do.call(tagList, result)
+
+      
+    } else if  (input$viewer2 == "Compare study populations") {
+      
+      result <- list()
+      
+      for(i in 1:ceiling(length(input$population2)/n_cols)) { 
+        cols_ <- list();
+        for(j in (1+n_cols*(i-1)):min(i*n_cols, length(input$population2))) {
+          cols_ <- append(cols_,list(column(width = floor(8/n_cols), offset = 0, tagList(tags$h4(names(which(all_populations == input$population2[[j]]))), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", input$dataset2, "_",input$population2[[j]],"_" ,input$year2,".html"), width=400, height=400, scrolling = "no", frameborder = "no")))));
+        }
+        result <- append(result, list(fluidRow(cols_, style = "width:1200px" )));
+      }
+      do.call(tagList, result)
+    
+      
+      
+    } else if (input$viewer2 == "Compare over time") {
+      
+      result <- list()
+      
+      for(i in 1:ceiling(length(input$year2)/n_cols)) { 
+        cols_ <- list();
+        for(j in (1+n_cols*(i-1)):min(i*n_cols, length(input$year2))) {
+          cols_ <- append(cols_,list(column(width = floor(8/n_cols), offset = 0, tagList(tags$h4(names(which(all_years == input$year2[[j]]))), tags$iframe(seamless="seamless", src= paste0("workingdirectory/plots/sunburst_", input$dataset2, "_",input$population2,"_" ,input$year2[[j]],".html"), width=400, height=400, scrolling = "no", frameborder = "no")))));
+        }
+        result <- append(result, list(fluidRow(cols_, style = "width:1200px" )));
+      }
+      do.call(tagList, result)
+    
+      
+    }
+    
+    return(result)
   })
   
 })
