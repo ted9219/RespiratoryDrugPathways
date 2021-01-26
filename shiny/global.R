@@ -30,11 +30,15 @@ all_populations <- list("Asthma > 18"= "asthma",
                         "Asthma < 5" = "asthma6min")
 
 included_databases <- list("IPCI" = "IPCI",
-                           "CPRD" = "CPRD")
+                           "CPRD" = "CPRD",
+                           "Estonia" = "Asthma", # results have to be rerun (not latest package)
+                           "CCAE" = "ccae", # results not complete yet
+                           "MDCD" = "mdcd") # characterization missing
                     
 characterization <- list()
+
 for (d in included_databases) {
-  characterization[[d]] <- read.csv(paste0(stringr::str_replace(getwd(),"/shiny",""), "/output/", included_databases[[d]], "/characterization/characterization.csv"))
+  try(characterization[[d]] <- read.csv(paste0(stringr::str_replace(getwd(),"/shiny",""), "/output/", d, "/characterization/characterization.csv")))
 }
 
 writeLines("Data Loaded")

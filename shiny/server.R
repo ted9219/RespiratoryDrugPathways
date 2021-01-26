@@ -161,6 +161,8 @@ shinyServer(function(input, output, session) {
       data$cohort_id <- NULL
       data$covariate_id <- NULL
       
+      data$database_id <- sapply(data$database_id, function(d) names(which(included_databases == d)))
+      
       # Multiply all rows by 100 to get percentages (except Age, Charlson comorbidity index score)
       data$mean[!(data$covariate_name %in% c('Age', 'Charlson comorbidity index score'))] <- round(data$mean[!(data$covariate_name %in% c('Age', 'Charlson comorbidity index score'))]*100,digits=3)
       
@@ -188,7 +190,7 @@ shinyServer(function(input, output, session) {
     }
     
     return(table)
-  })
+  }, options = list(pageLength = 20))
   
   
   
