@@ -174,7 +174,6 @@ execute <- function(connection = NULL,
     settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
     
     for (s in settings) {
-      time1 <- Sys.time()
       studyName <- study_settings[study_settings$param == "studyName",s]
       
       ParallelLogger::logInfo(paste0("Constructing treatment pathways: ", studyName))
@@ -215,9 +214,6 @@ execute <- function(connection = NULL,
       all_data <- DatabaseConnector::querySql(connection, sql)
       
       # Apply analysis settings
-      time2 <- Sys.time()
-      print(paste0("Start till apply analysis settings ", difftime(time2, time1, units = "mins")))
-      
       ParallelLogger::logInfo("Transform data, this may take a while for larger datasets.")
       data <- as.data.table(all_data)
       writeLines(paste0("Original: ", nrow(data)))
@@ -226,42 +222,31 @@ execute <- function(connection = NULL,
       if (splitAcuteVsTherapy != "") {data <- doAcuteVSTherapy(data, splitAcuteVsTherapy, outputFolder)}
       data <- doEraCollapse(data, eraCollapseSize)
       
-      time3 <- Sys.time()
-      print(paste0("Apply analysis settings till combination window ", difftime(time3, time2, units = "mins")))
+      time1 <- Sys.time()
       data <- doCombinationWindow(data, combinationWindow, minStepDuration)
+      time2 <- Sys.time()
+      print(paste0("Time needed to execute combination window ", difftime(time2, time1, units = "mins")))
       
       # Order the combinations
-      time4 <- Sys.time()
-      print(paste0("Combination window till order the observations ", difftime(time4, time3, units = "mins")))
       ParallelLogger::logInfo("Order the combinations.")
       
       combi <- grep("+", data$DRUG_CONCEPT_ID, fixed=TRUE)
       concept_ids <- strsplit(data$DRUG_CONCEPT_ID[combi], split="+", fixed=TRUE)
       data$DRUG_CONCEPT_ID[combi] <- sapply(concept_ids, function(x) paste(sort(x), collapse = "+"))
       
-      write.csv(data, "data_test.csv", row.names = FALSE)
-      
-      time5 <- Sys.time()
-      print(paste0("Order the observation till sequential repetition ", difftime(time5, time4, units = "mins")))
       if (sequentialRepetition) {data <- doSequentialRepetition(data)}
       if (firstTreatment) {data <- doFirstTreatment(data)}
       
       # Add drug_seq
-      time6 <- Sys.time()
-      print(paste0("Sequential repetition till add drug sequence number ", difftime(time6, time5, units = "mins")))
       ParallelLogger::logInfo("Adding drug sequence number.")
       data <- data[order(PERSON_ID, DRUG_START_DATE, DRUG_END_DATE),]
       data[, DRUG_SEQ:=seq_len(.N), by= .(PERSON_ID)]
       
       # Add concept_name
-      time7 <- Sys.time()
-      print(paste0("Add drug sequence number till add concept names ", difftime(time7, time6, units = "mins")))
       ParallelLogger::logInfo("Adding concept names.")
       data <- addLabels(data, outputFolder)
       
       # Order the combinations
-      time8 <- Sys.time()
-      print(paste0("Add concept names till order the combinations ", difftime(time8, time7, units = "mins")))
       ParallelLogger::logInfo("Ordering the combinations.")
       
       combi <- grep("+", data$DRUG_CONCEPT_NAME, fixed=TRUE)
@@ -269,9 +254,8 @@ execute <- function(connection = NULL,
       data$CONCEPT_NAME[combi] <- sapply(concept_names, function(x) paste(sort(x), collapse = "+"))
       
       # Move table back to SQL
-      time9 <- Sys.time()
-      print(paste0("Order the combinations till move to SQL ", difftime(time9, time8, units = "mins")))
       ParallelLogger::logInfo("Move data back to sQL for final processing.")
+      time3 <- Sys.time()
       DatabaseConnector::insertTable(connection = connection,
                                      tableName = paste0(cohortDatabaseSchema,".", databaseName, "_", studyName, "_drug_seq_processed"),
                                      data = data,
@@ -288,9 +272,9 @@ execute <- function(connection = NULL,
                                     studyName=studyName,
                                     databaseName=databaseName)
       DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
+      time4 <- Sys.time()
       
-      time10 <- Sys.time()
-      print(paste0("Move to SQL till end for these settings ", difftime(time10, time9, units = "mins")))
+      print(paste0("Move data to SQL and last processing ", difftime(time4, time3, units = "mins")))
     }
   }
   
