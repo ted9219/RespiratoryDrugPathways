@@ -8,12 +8,14 @@ cdmDatabaseSchemaList <- 'todo'
 cohortSchema <- 'todo'
 oracleTempSchema <- NULL
 databaseList <- 'todo' # name of the data source
-fftempdir <- paste0(getwd(),"/temp")
 
 dbms <- 'todo'
 server <- 'todo'
 port <- 'todo'
 outputFolder <- paste0(getwd(),"/output")
+
+# Optional: specify where the temporary files will be created:
+# options(andromedatempdir = "")
 
 # Connect to the server
 connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = dbms,
