@@ -330,9 +330,6 @@ execute <- function(connection = NULL,
         # Treatment pathways sunburst plot 
         outputSunburstPlot(data = file_noyear, databaseName = databaseName, outcomeCohortIds = outcomeCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
         outputSunburstPlot(data = file_withyear, databaseName = databaseName, outcomeCohortIds = outcomeCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
-        
-        # Launch shiny application
-        # shiny::runApp('shiny')
       }
       
     }
