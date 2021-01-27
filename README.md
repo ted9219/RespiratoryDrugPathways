@@ -16,7 +16,8 @@ If you like to execute this study against your own OMOP CDM follow these instruc
 2. Build the package (packages required are listed in DESCRIPTION file).
 3. In extras -> CodeToRun.R: specify connection details. 
 4. To execute the study run code in CodeToRun.R. 
-5. Run the Shiny App for an interactive visualisation of the results (in progress).
+5. The results are located in the 'output' and 'plots' folders.
+6. Run the Shiny App for an interactive visualisation of the results (in progress).
 
 ````
   shiny::runApp('shiny')
