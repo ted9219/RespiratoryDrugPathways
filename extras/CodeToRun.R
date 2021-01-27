@@ -55,6 +55,7 @@ for (sourceId in 1:length(cdmDatabaseSchemaList)) {
 
   outputFolderDB <- paste0(outputFolder, "/", databaseName)
 
+  time0 <- Sys.time()
   execute(
     connection = connection,
     connectionDetails = connectionDetails,
@@ -71,6 +72,9 @@ for (sourceId in 1:length(cdmDatabaseSchemaList)) {
     outputResults = outputResults,
     study_settings = study_settings
   )
+  time5 <- Sys.time()
+  ParallelLogger::logInfo(paste0("Time needed to execute study for this database ", difftime(time5, time0, units = "mins")))
+  
   
 }
 
