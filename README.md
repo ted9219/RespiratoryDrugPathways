@@ -18,5 +18,3 @@ If you like to execute this study against your own OMOP CDM follow these instruc
 4. To execute the study run code in CodeToRun.R. 
 5. The results are located in the 'output' and 'plots' folders.
 6. Run the Shiny App for an interactive visualisation of the results (in progress).
-
-
