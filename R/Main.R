@@ -131,7 +131,7 @@ execute <- function(connection = NULL,
     
     custom_characterization <- data.frame()
     
-    for (t in targetCohortIds) {
+    for (t in cohortCounts$cohortId) {
       for (c in 1:nrow(custom)) {
         
         # Get concept sets
