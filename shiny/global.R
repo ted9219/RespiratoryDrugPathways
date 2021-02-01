@@ -7,6 +7,7 @@ library(tidyr)
 library(scales)
 library(ggiraph)
 library(reshape2)
+library(data.table)
 
 # Set working directory
 setwd(stringr::str_replace(getwd(),"/shiny",""))
@@ -31,14 +32,24 @@ all_populations <- list("Asthma > 18"= "asthma",
 
 included_databases <- list("IPCI" = "IPCI",
                            "CPRD" = "CPRD",
-                           "Estonia" = "Asthma", # results have to be rerun (not latest package)
-                           "CCAE" = "ccae", # results not complete yet
-                           "MDCD" = "mdcd") # characterization missing
+                           "CCAE" = "ccae",
+                           "MDCD" = "mdcd",
+                           "MDCR" = "mdcr",
+                           "AUSOM" = "AUSOM")
                     
 characterization <- list()
+stepupdown <- list()
 
 for (d in included_databases) {
   try(characterization[[d]] <- read.csv(paste0(stringr::str_replace(getwd(),"/shiny",""), "/output/", d, "/characterization/characterization.csv")))
+  
+  stepupdown_d <- list()
+  
+  for (p in all_populations) {
+    try(stepupdown_d[[p]] <- read.csv(paste0(stringr::str_replace(getwd(),"/shiny",""), "/output/", d, "/", p, "/",d , "_", p, "_augmentswitch.csv"))) 
+    
+    try(stepupdown[[d]] <- stepupdown_d)
+  }
 }
 
 writeLines("Data Loaded")

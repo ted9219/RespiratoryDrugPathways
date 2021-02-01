@@ -84,8 +84,8 @@ shinyServer(function(input, output, session) {
   observeEvent(input$treatmentPathwaysInfo, {
     showInfoBox("Treatment pathways", "html/treatmentPathways.html")
   })
-  observeEvent(input$resultsInfo, {
-    showInfoBox("Study Results", "html/results.html")
+  observeEvent(input$stepupdownInfo, {
+    showInfoBox("Step up/down", "html/stepupdown.html")
   })
   
   output$dynamic_input1 = renderUI({
@@ -244,6 +244,32 @@ shinyServer(function(input, output, session) {
     }
     
     return(result)
+  })
+  
+  
+  output$stepupdownpie <- renderUI({
+    
+    # Get the data
+    data <- data.frame()
+    
+    for (d in input$dataset) {
+      data <- rbind(data, cbind(stepupdown[[d]][[input$population]], d))
+    }
+    
+    data <- as.data.table(data)
+    data <- data[layer == input$level,]
+    
+    data$group <- data$category
+    data$group[data$group == "step_up_broad"] <- "step_up"
+    data$group[data$group == "step_down_broad"] <- "step_down"
+    data$group[data$group == "switching_broad"] <- "switching"
+    
+    output <- data[,sum(perc), by = .(group, d)]
+    colnames(output) <- c("group", "dataset", "perc")
+    
+    
+    lapply(input$dataset, function(d) renderPlot({pie(output$perc[output$dataset == d], labels = output$group[output$dataset == d], main = paste0("Layer ", input$level, " to ",as.integer(input$level)+1, " for ", names(which(all_populations == input$population)), " ", names(which(included_databases == d))))}))
+    
   })
   
 })

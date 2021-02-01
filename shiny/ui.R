@@ -26,6 +26,7 @@ dashboardPage(
       addInfo(menuItem("Databases", tabName = "databases"), "databaseInfo"),
       addInfo(menuItem("Characterization", tabName = "characterization"), "characterizationInfo"),
       addInfo(menuItem("Treatment pathways", tabName = "pathways"), "treatmentPathwaysInfo"),
+      addInfo(menuItem("Step up/down", tabName = "stepupdown"), "stepupdownInfo"),
       
       ## Option panel
       conditionalPanel(
@@ -44,7 +45,22 @@ dashboardPage(
       
       conditionalPanel(
         condition = "input.tabs=='pathways'",
-        htmlOutput("dynamic_input2"))
+        htmlOutput("dynamic_input2")),
+      
+      conditionalPanel(
+        condition = "input.tabs=='stepupdown'",
+        checkboxGroupInput("dataset", label = "Database", choices = included_databases, selected = "IPCI")
+      ),
+      
+      conditionalPanel(
+        condition = "input.tabs=='stepupdown'",
+        radioButtons("population", label = "Study population", choices = all_populations, selected = "asthma")
+      ),
+      
+      conditionalPanel(
+        condition = "input.tabs=='stepupdown'",
+        radioButtons("level", label = "After treatment step", choices = c(1,2,3), selected = 1)
+      )
       
     )
     
@@ -94,13 +110,18 @@ dashboardPage(
                 textOutput("tableCharacterizationTitle"),
                 dataTableOutput("tableCharacterization")
               )
-      ),
+      ), #stepupdownpie
       tabItem(tabName = "pathways",
               column(width = 9, 
                      box(
                        title = "Treatment Pathways", width = 30, status = "primary",
                        htmlOutput("sunburstplots"))),
               column(width = 3, tags$img(src = paste0("workingdirectory/plots/legend.png"), height = 400))
+      ),
+      tabItem(tabName = "stepupdown",
+              box(width = 9,
+                  uiOutput("stepupdownpie")
+              )
       )
     )
   )
