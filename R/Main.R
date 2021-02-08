@@ -125,6 +125,9 @@ execute <- function(connection = NULL,
     standard_characterization <- read.csv(paste0(outputFolder, "/characterization/covariate_value.csv"), stringsAsFactors = FALSE)
     standard_characterization <- merge(settings_characterization[,c("covariate_id", "covariate_name")], standard_characterization, by = "covariate_id")
     
+    # Add cohort counts
+    standard_characterization <- rbind(standard_characterization, cbind(covariate_id = "Custom", covariate_name = "Number of persons", cohort_id = cohortCounts$cohortId, mean = cohortCounts$cohortEntries, sd = NA, database_id = databaseId))
+    
     # Add custom characterization
     ParallelLogger::logInfo("Adding custom cohorts in characterization")
     custom <- settings_characterization[settings_characterization$covariate_id == "Custom", ]
@@ -331,7 +334,6 @@ execute <- function(connection = NULL,
         outputSunburstPlot(data = file_noyear, databaseName = databaseName, outcomeCohortIds = outcomeCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
         outputSunburstPlot(data = file_withyear, databaseName = databaseName, outcomeCohortIds = outcomeCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
       }
-      
     }
   }
   
