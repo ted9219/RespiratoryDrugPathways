@@ -14,7 +14,7 @@ removed_ICS <- as.numeric(unlist(removed_ICS))
 removed_SAMA <- read.csv("extras/removed_SAMA.txt", sep="")
 removed_SAMA <- as.numeric(unlist(removed_SAMA))
 
-removed_SG <- read.csv("extras//removed_Systemic Glucocorticosteroids.txt", sep="")
+removed_SG <- read.csv("extras//removed_Systemic glucocorticoids.txt", sep="")
 removed_SG <- as.numeric(unlist(removed_SG))
 
 # load in current concept sets for monotherapy
@@ -26,7 +26,7 @@ concept_set_SAMAmono <- custom_definitions[custom_definitions$name == "SAMA","co
 concept_set_SAMAmono <- substr(concept_set_SAMAmono, 2, nchar(concept_set_SAMAmono)-1)
 concept_set_SAMAmono <- as.numeric(unlist(strsplit(concept_set_SAMAmono, ",")))
 
-concept_set_SGmono <- custom_definitions[custom_definitions$name == "Systemic glucocorticosteroids","conceptSet"]
+concept_set_SGmono <- custom_definitions[custom_definitions$name == "Systemic glucocorticoids","conceptSet"]
 concept_set_SGmono <- substr(concept_set_SGmono, 2, nchar(concept_set_SGmono)-1)
 concept_set_SGmono <- as.numeric(unlist(strsplit(concept_set_SGmono, ",")))
 

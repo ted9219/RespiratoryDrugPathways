@@ -34,13 +34,13 @@ inhalation,ICS,Inhalation Suspension
 inhalation,ICS,Metered Dose Inhaler
 inhalation,ICS,Dry Powder Inhaler
 inhalation,ICS,Gas for Inhalation
-injection,Systemic glucocorticosteroids,Injectable Solution
-injection,Systemic glucocorticosteroids,Injectable Suspension
-injection,Systemic glucocorticosteroids,Auto-Injector
-injection,Systemic glucocorticosteroids,Intravenous Solution
-injection,Systemic glucocorticosteroids,Prefilled Syringe
-injection,Systemic glucocorticosteroids,Injection
-injection,Systemic glucocorticosteroids,Intramuscular Solution
+injection,Systemic glucocorticoids,Injectable Solution
+injection,Systemic glucocorticoids,Injectable Suspension
+injection,Systemic glucocorticoids,Auto-Injector
+injection,Systemic glucocorticoids,Intravenous Solution
+injection,Systemic glucocorticoids,Prefilled Syringe
+injection,Systemic glucocorticoids,Injection
+injection,Systemic glucocorticoids,Intramuscular Solution
 injection,Systemic B2 agonist,Injectable Solution
 injection,Systemic B2 agonist,Injectable Suspension
 injection,Systemic B2 agonist,Auto-Injector
@@ -85,29 +85,29 @@ oral,Xanthines,Sublingual Tablet
 oral,Xanthines,Tablet for Oral Suspension
 oral,Xanthines,Oral Tablet
 oral,Xanthines,Pack
-oral,Systemic glucocorticosteroids,Buccal Tablet
-oral,Systemic glucocorticosteroids,Delayed Release Oral Tablet
-oral,Systemic glucocorticosteroids,Disintegrating Oral Tablet
-oral,Systemic glucocorticosteroids,Chewable Tablet
-oral,Systemic glucocorticosteroids,Delayed Release Oral Capsule
-oral,Systemic glucocorticosteroids,Extended Release Oral Tablet
-oral,Systemic glucocorticosteroids,Extended Release Suspension
-oral,Systemic glucocorticosteroids,Oral Capsule
-oral,Systemic glucocorticosteroids,Oral Gel
-oral,Systemic glucocorticosteroids,Oral Granules
-oral,Systemic glucocorticosteroids,Oral Lozenge
-oral,Systemic glucocorticosteroids,Oral Ointment
-oral,Systemic glucocorticosteroids,Oral Paste
-oral,Systemic glucocorticosteroids,Oral Powder
-oral,Systemic glucocorticosteroids,Oral Solution
-oral,Systemic glucocorticosteroids,Oral Suspension
-oral,Systemic glucocorticosteroids,Effervescent Oral Tablet
-oral,Systemic glucocorticosteroids,Extended Release Oral Capsule
-oral,Systemic glucocorticosteroids,Powder for Oral Suspension
-oral,Systemic glucocorticosteroids,Sublingual Tablet
-oral,Systemic glucocorticosteroids,Tablet for Oral Suspension
-oral,Systemic glucocorticosteroids,Oral Tablet
-oral,Systemic glucocorticosteroids,Pack
+oral,Systemic glucocorticoids,Buccal Tablet
+oral,Systemic glucocorticoids,Delayed Release Oral Tablet
+oral,Systemic glucocorticoids,Disintegrating Oral Tablet
+oral,Systemic glucocorticoids,Chewable Tablet
+oral,Systemic glucocorticoids,Delayed Release Oral Capsule
+oral,Systemic glucocorticoids,Extended Release Oral Tablet
+oral,Systemic glucocorticoids,Extended Release Suspension
+oral,Systemic glucocorticoids,Oral Capsule
+oral,Systemic glucocorticoids,Oral Gel
+oral,Systemic glucocorticoids,Oral Granules
+oral,Systemic glucocorticoids,Oral Lozenge
+oral,Systemic glucocorticoids,Oral Ointment
+oral,Systemic glucocorticoids,Oral Paste
+oral,Systemic glucocorticoids,Oral Powder
+oral,Systemic glucocorticoids,Oral Solution
+oral,Systemic glucocorticoids,Oral Suspension
+oral,Systemic glucocorticoids,Effervescent Oral Tablet
+oral,Systemic glucocorticoids,Extended Release Oral Capsule
+oral,Systemic glucocorticoids,Powder for Oral Suspension
+oral,Systemic glucocorticoids,Sublingual Tablet
+oral,Systemic glucocorticoids,Tablet for Oral Suspension
+oral,Systemic glucocorticoids,Oral Tablet
+oral,Systemic glucocorticoids,Pack
 oral,Systemic B2 agonist,Buccal Tablet
 oral,Systemic B2 agonist,Delayed Release Oral Tablet
 oral,Systemic B2 agonist,Disintegrating Oral Tablet
@@ -182,9 +182,14 @@ oral,PDE4,Pack
 ,LAMA,
 ,LABA,
 ,ICS,
-,Systemic glucocorticosteroids,
+,Systemic glucocorticoids,
 ,Anti IL5,
 ,Anti IgE,
 ,Xanthines,
 ,LTRA,
 ,PDE4,
+inhalation,SAMA,Inhalation Spray
+inhalation,SABA,Inhalation Spray
+inhalation,LAMA,Inhalation Spray
+inhalation,LABA,Inhalation Spray
+inhalation,ICS,Inhalation Spray

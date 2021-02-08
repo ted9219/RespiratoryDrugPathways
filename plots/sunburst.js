@@ -154,8 +154,10 @@ var colors = {
   "SABA": "#1F618D", 
     "SABA&SAMA": "#43AA8B",
   "SAMA": "#76448A  ", 
- "Systemic glucocorticosteroids (acute)": "#FBD780", 
-  "Systemic glucocorticosteroids (therapy)": "#F3AE08", 
+ "Systemic glucocorticoids (acute)": "#FBD780", 
+  "Systemic glucocorticoids (therapy)": "#F3AE08", 
+   "Systemic glucocorticosteroids (acute)": "#FBD780", // remove this old label
+  "Systemic glucocorticosteroids (therapy)": "#F3AE08", // remove this old label
        "Xanthines": "#1D493C",
        "Anti IgE": "#FB7476",
    "Anti IL5": "#FFA07A", 

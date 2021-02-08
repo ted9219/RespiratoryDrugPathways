@@ -14,7 +14,7 @@ cohortId,cohortName,cohortDefinition,cohortType
 17,Xanthines,Custom,outcome
 18,SABA,Custom,outcome
 19,ICS,Custom,outcome
-20,Systemic glucocorticosteroids,Custom,outcome
+20,Systemic glucocorticoids,Custom,outcome
 21,PDE4,Custom,outcome
 22,LABA&ICS,Custom,outcome
 23,LABA&LAMA,Custom,outcome
