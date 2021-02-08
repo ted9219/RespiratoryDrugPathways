@@ -152,7 +152,7 @@ outputStepUpDown <- function(file_noyear, path, targetCohortId) {
   
   def_groups <- as.vector(unique(def_updown$targetCohortIds))
   
-  # Define set of rules # TODO: ACO?
+  # Define set of rules
   done <- FALSE
   counter <- 1
   
