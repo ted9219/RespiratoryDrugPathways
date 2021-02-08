@@ -158,3 +158,6 @@ FROM
     GROUP BY index_year
   ) t1;
 
+
+IF OBJECT_ID('@resultsSchema.@databaseName_@studyName_targetcohort', 'U') IS NOT NULL
+DROP TABLE @resultsSchema.@databaseName_@studyName_targetcohort;
