@@ -211,8 +211,8 @@ outputStepUpDown <- function(file_noyear, path, targetCohortId) {
 computePercentageGroupTreated <- function(data, outcomeCohortIds, outputFolder) {
   layers <- as.vector(colnames(data)[!grepl("INDEX_YEAR|freq", colnames(data))])
   cohorts <- read.csv(paste(outputFolder, "/cohort.csv",sep=''), stringsAsFactors = FALSE)
-  outcomes <- cohorts$cohortName[cohorts$cohortId %in% unlist(strsplit(outcomeCohortIds, ","))]
-
+  outcomes <- c(cohorts$cohortName[cohorts$cohortId %in% unlist(strsplit(outcomeCohortIds, ","))], "Other combinations")
+  
   percentGroupLayer <- sapply(layers, function(l) {
     percentGroup <- sapply(outcomes, function(g) {
       sumGroup <- sum(data$freq[data[,..l] == g], na.rm = TRUE)
@@ -228,7 +228,7 @@ computePercentageGroupTreated <- function(data, outcomeCohortIds, outputFolder) 
   rownames(result) <- NULL
   
   # Add rows for total, fixed combinations, all combinations
-  result <- rbind(result, c("Total",colSums(result[layers])), c("Fixed combinations",colSums(result[grepl("\\&", result$outcomes), layers])), c("All combinations",colSums(result[grepl("Other combinations|\\+|\\&", result$outcomes), layers])))
+  result <- rbind(result, c("Total",colSums(result[layers])), c("Fixed combinations",colSums(result[grepl("\\&", result$outcomes), layers])), c("All combinations",colSums(result[grepl("Other combinations|\\+|\\&", result$outcomes), layers])), c("Monotherapy",colSums(result[!grepl("Other combinations|\\+|\\&", result$outcomes), layers])))
 }
 
 transformDuration <- function(connection, cohortDatabaseSchema, dbms, studyName, databaseName, path, maxPathLength, minCellCount, removePaths, otherCombinations) {
@@ -293,7 +293,7 @@ transformDuration <- function(connection, cohortDatabaseSchema, dbms, studyName,
 outputSunburstPlot <- function(data, databaseName, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, createInput, createPlot) {
   if (is.null(data$INDEX_YEAR)) {
     # For file_noyear compute once
-    result <- createSunburstPlot(data, databaseName, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year = 'all', createInput, createPlot)
+     createSunburstPlot(data, databaseName, outcomeCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year = 'all', createInput, createPlot)
     
   } else {
     # For file_withyear compute per year
