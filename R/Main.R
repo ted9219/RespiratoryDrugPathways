@@ -192,8 +192,8 @@ execute <- function(connection = NULL,
       minEraDuration <-  as.integer(study_settings[study_settings$param == "minEraDuration",s]) # Minimum time an era should last to be included in analysis
       splitAcuteVsTherapy <-  study_settings[study_settings$param == "splitAcuteVsTherapy",s] # Cohort Ids to split in acute (< 30 days) and therapy (>= 30 days)
       minStepDuration <-  as.integer(study_settings[study_settings$param == "minStepDuration",s]) # Minimum time a step (generated drug era) before or after a combination treatment should last to be included in analysis
-      eraCollapseSize <-  as.integer(study_settings[study_settings$param == "eraCollapseSize",s]) # Window of time between two same evnt cohorts that are considered one era
-      combinationWindow <-  as.integer(study_settings[study_settings$param == "combinationWindow",s]) # Window of time when two event cohorts need to overlap to be considered a combination
+      eraCollapseSize <-  as.integer(study_settings[study_settings$param == "eraCollapseSize",s]) # Window of time between two same outcome cohorts that are considered one era
+      combinationWindow <-  as.integer(study_settings[study_settings$param == "combinationWindow",s]) # Window of time when two outcome cohorts need to overlap to be considered a combination
       sequentialRepetition <-  study_settings[study_settings$param == "sequentialRepetition",s] # Select to only remove sequential occurences of each outcome cohort
       firstTreatment <-  study_settings[study_settings$param == "firstTreatment",s] # Select to only include first occurrence of each outcome cohort
       
@@ -299,7 +299,7 @@ execute <- function(connection = NULL,
       outcomeCohortIds <- study_settings[study_settings$param == "outcomeCohortIds",s]
       
       # Result settings
-      maxPathLength <-  as.integer(study_settings[study_settings$param == "maxPathLength",s]) # Maximum number of steps in a given pathway to be included in the sunburst plot
+      maxPathLength <-  as.integer(study_settings[study_settings$param == "maxPathLength",s]) # Maximum number of steps in a given pathway to be included in the sunburst plot (current maximum is 5)
       minCellCount <-  as.integer(study_settings[study_settings$param == "minCellCount",s]) # Minimum number of subjects in the target cohort for a given eent in order to be counted in the pathway
       removePaths  <-  study_settings[study_settings$param == "removePaths",s] # Select to completely remove paths below minCellCount otherwise adjusted by removing last treatment till above minCellCount
       addNoPaths  <-  study_settings[study_settings$param == "addNoPaths",s] # Select to add subjects without path to sunburst plot

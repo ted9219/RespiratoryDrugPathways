@@ -11,21 +11,15 @@ d2_concept_id VARCHAR (40),
 d3_concept_id VARCHAR (40),
 d4_concept_id VARCHAR (40),
 d5_concept_id VARCHAR (40),
-d6_concept_id VARCHAR (40),
-d7_concept_id VARCHAR (40),
-d8_concept_id VARCHAR (40),
 d1_concept_name VARCHAR (400),
 d2_concept_name VARCHAR (400),
 d3_concept_name VARCHAR (400),
 d4_concept_name VARCHAR (400),
 d5_concept_name VARCHAR (400),
-d6_concept_name VARCHAR (400),
-d7_concept_name VARCHAR (400),
-d8_concept_name VARCHAR (400),
 num_persons INT
 );
 
-INSERT INTO @resultsSchema.@databaseName_@studyName_drug_seq_summary (index_year, d1_concept_id, d2_concept_id, d3_concept_id, d4_concept_id, d5_concept_id, d6_concept_id, d7_concept_id, d8_concept_id, d1_concept_name, d2_concept_name, d3_concept_name, d4_concept_name, d5_concept_name, d6_concept_name, d7_concept_name, d8_concept_name, num_persons)
+INSERT INTO @resultsSchema.@databaseName_@studyName_drug_seq_summary (index_year, d1_concept_id, d2_concept_id, d3_concept_id, d4_concept_id, d5_concept_id, d1_concept_name, d2_concept_name, d3_concept_name, d4_concept_name, d5_concept_name, num_persons)
 SELECT
   d1.index_year,
   d1.drug_concept_id           AS d1_concept_id,
@@ -33,17 +27,11 @@ SELECT
   d3.drug_concept_id           AS d3_concept_id,
   d4.drug_concept_id           AS d4_concept_id,
   d5.drug_concept_id           AS d5_concept_id,
-  d6.drug_concept_id           AS d6_concept_id,
-  d7.drug_concept_id           AS d7_concept_id,
-  d8.drug_concept_id           AS d8_concept_id,
   d1.concept_name              AS d1_concept_name,
   d2.concept_name              AS d2_concept_name,
   d3.concept_name              AS d3_concept_name,
   d4.concept_name              AS d4_concept_name,
   d5.concept_name              AS d5_concept_name,
-  d6.concept_name              AS d6_concept_name,
-  d7.concept_name              AS d7_concept_name,
-  d8.concept_name              AS d8_concept_name,
   count(DISTINCT d1.person_id) AS num_persons
 FROM
   (SELECT *
@@ -69,21 +57,6 @@ FROM
    FROM @resultsSchema.@databaseName_@studyName_drug_seq_processed
    WHERE drug_seq = 5) d5
     ON d1.person_id = d5.person_id
-  LEFT JOIN
-  (SELECT *
-   FROM @resultsSchema.@databaseName_@studyName_drug_seq_processed
-   WHERE drug_seq = 6) d6
-    ON d1.person_id = d6.person_id
-  LEFT JOIN
-  (SELECT *
-   FROM @resultsSchema.@databaseName_@studyName_drug_seq_processed
-   WHERE drug_seq = 7) d7
-    ON d1.person_id = d7.person_id
-  LEFT JOIN
-  (SELECT *
-   FROM @resultsSchema.@databaseName_@studyName_drug_seq_processed
-   WHERE drug_seq = 8) d8
-    ON d1.person_id = d8.person_id
 GROUP BY
   d1.index_year,
   d1.drug_concept_id,
@@ -91,17 +64,11 @@ GROUP BY
   d3.drug_concept_id,
   d4.drug_concept_id,
   d5.drug_concept_id,
-  d6.drug_concept_id,
-  d7.drug_concept_id,
-  d8.drug_concept_id,
   d1.concept_name,
   d2.concept_name,
   d3.concept_name,
   d4.concept_name,
-  d5.concept_name,
-  d6.concept_name,
-  d7.concept_name,
-  d8.concept_name;
+  d5.concept_name;
 
 
 -- Count total persons for attrition table
