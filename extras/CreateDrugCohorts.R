@@ -1,44 +1,47 @@
 
-
 # 1. use CreateCustomConceptSet.sql first to create drug_classes.csv
-
-pathToCsv <- "inst/settings/drug_classes.csv"
-
-custom_definitions <- readr::read_csv(pathToCsv, col_types = readr::cols())
+custom_definitions <- readr::read_csv("inst/settings/drug_classes.csv", col_types = readr::cols())
 
 # 2. remove some dose forms NULL from 
-# load in concepts to remove (selected by manual inspection of all concepts with missing dose forms)
-removed_ICS <- read.csv("extras/removed_ICS.txt", sep="")
-removed_ICS <- as.numeric(unlist(removed_ICS))
+# load in concepts to remove (selected by manual inspection of all concepts with missing dose forms AND searching for terms such as "rectal" / "topical" / "otic" / "nasal" / "medicated pad" / "tape")
+removed_concepts <- read.csv("extras/removed_concepts.csv", sep=",")
 
-removed_SAMA <- read.csv("extras/removed_SAMA.txt", sep="")
-removed_SAMA <- as.numeric(unlist(removed_SAMA))
-
-removed_SG <- read.csv("extras//removed_Systemic glucocorticoids.txt", sep="")
-removed_SG <- as.numeric(unlist(removed_SG))
-
-# load in current concept sets for monotherapy
-concept_set_ICSmono <- custom_definitions[custom_definitions$name == "ICS","conceptSet"]
-concept_set_ICSmono <- substr(concept_set_ICSmono, 2, nchar(concept_set_ICSmono)-1)
-concept_set_ICSmono <- as.numeric(unlist(strsplit(concept_set_ICSmono, ",")))
-
-concept_set_SAMAmono <- custom_definitions[custom_definitions$name == "SAMA","conceptSet"]
-concept_set_SAMAmono <- substr(concept_set_SAMAmono, 2, nchar(concept_set_SAMAmono)-1)
-concept_set_SAMAmono <- as.numeric(unlist(strsplit(concept_set_SAMAmono, ",")))
-
-concept_set_SGmono <- custom_definitions[custom_definitions$name == "Systemic glucocorticoids","conceptSet"]
-concept_set_SGmono <- substr(concept_set_SGmono, 2, nchar(concept_set_SGmono)-1)
-concept_set_SGmono <- as.numeric(unlist(strsplit(concept_set_SGmono, ",")))
-
-# remove the concepts selected
-concept_set_ICSmono <- setdiff(concept_set_ICSmono, removed_ICS)
-concept_set_SAMAmono <- setdiff(concept_set_SAMAmono, removed_SAMA)
-concept_set_SGmono <- setdiff(concept_set_SGmono, removed_SG)
-
-# replace these new concept sets (copy to drug_classes.csv manually)
-concept_set_ICSmono <- paste0("{", paste0(concept_set_ICSmono, collapse = ","), "}")
-concept_set_SAMAmono <- paste0("{", paste0(concept_set_SAMAmono, collapse = ","), "}")
-concept_set_SGmono <- paste0("{", paste0(concept_set_SGmono, collapse = ","), "}")
+for (m in unique(removed_concepts$med_group)) { # 
+  print(paste0("Remove selected concepts for ", m))
+  
+  # concepts to remove
+  concept_set_m_remove <- as.numeric(removed_concepts$concept_id[removed_concepts$med_group == m])
+  
+  # current concept set for monotherapy
+  concept_set_m <- custom_definitions[custom_definitions$name == m,"conceptSet"]
+  concept_set_m <- substr(concept_set_m, 2, nchar(concept_set_m)-1)
+  concept_set_m <- as.numeric(unlist(strsplit(concept_set_m, ",")))
+  
+  concept_set_m <- setdiff(concept_set_m, concept_set_m_remove)
+  
+  count_m <- length(concept_set_m)
+  concept_set_m <- paste0("{", paste0(concept_set_m, collapse = ","), "}")
+  
+  custom_definitions$count[custom_definitions$name == m] <- count_m
+  custom_definitions$conceptSet[custom_definitions$name == m] <- concept_set_m
+  
+  # if also present as combination therapy:
+  if (paste0(m, " combi") %in% custom_definitions$name) {
+    
+    concept_set_m_combi <- custom_definitions[custom_definitions$name == paste0(m, " combi"),"conceptSet"]
+    concept_set_m_combi <- substr(concept_set_m_combi, 2, nchar(concept_set_m_combi)-1)
+    concept_set_m_combi <- as.numeric(unlist(strsplit(concept_set_m_combi, ",")))
+    
+    concept_set_m_combi <- setdiff(concept_set_m_combi, concept_set_m_remove)
+    
+    count_m_combi <- length(concept_set_m_combi)
+    concept_set_m_combi <- paste0("{", paste0(concept_set_m_combi, collapse = ","), "}")
+    
+    custom_definitions$count[custom_definitions$name == paste0(m, " combi")] <- count_m_combi
+    custom_definitions$conceptSet[custom_definitions$name == paste0(m, " combi")] <- concept_set_m_combi
+  }
+  
+}
 
 # 3. create fixed combinations
 # load in current concept sets for combinations
@@ -68,13 +71,33 @@ LABA_ICS <- setdiff(intersect(concept_set_LABA,concept_set_ICS), LABA_LAMA_ICS)
 LABA_LAMA <- setdiff(intersect(concept_set_LABA,concept_set_LAMA), LABA_LAMA_ICS)
 SABA_SAMA <- intersect(concept_set_SABA,concept_set_SAMA)
 
-# remove the concepts selected
-LABA_LAMA_ICS <- setdiff(LABA_LAMA_ICS, removed_ICS)
-LABA_ICS <- setdiff(LABA_ICS, removed_ICS)
-SABA_SAMA <- setdiff(SABA_SAMA, removed_SAMA)
+# count concepts
+count_LABA_LAMA_ICS <- length(LABA_LAMA_ICS)
+count_LABA_ICS <- length(LABA_ICS)
+count_LABA_LAMA <- length(LABA_LAMA)
+count_SABA_SAMA <- length(SABA_SAMA)
 
-# add these new concept sets (copy to drug_classes.csv manually)
+# transform concept sets to string
 LABA_LAMA_ICS <- paste0("{", paste0(LABA_LAMA_ICS, collapse = ","), "}")
 LABA_ICS <- paste0("{", paste0(LABA_ICS, collapse = ","), "}")
 LABA_LAMA <- paste0("{", paste0(LABA_LAMA, collapse = ","), "}")
 SABA_SAMA <- paste0("{", paste0(SABA_SAMA, collapse = ","), "}")
+
+# add these new concept sets
+custom_definitions$count[custom_definitions$name == "LABA&LAMA&ICS"] <- count_LABA_LAMA_ICS
+custom_definitions$conceptSet[custom_definitions$name == "LABA&LAMA&ICS"] <- LABA_LAMA_ICS
+
+custom_definitions$count[custom_definitions$name == "LABA&ICS"] <- count_LABA_ICS
+custom_definitions$conceptSet[custom_definitions$name == "LABA&ICS"] <- LABA_ICS
+
+custom_definitions$count[custom_definitions$name == "LABA&LAMA"] <- count_LABA_LAMA
+custom_definitions$conceptSet[custom_definitions$name == "LABA&LAMA"] <- LABA_LAMA
+
+custom_definitions$count[custom_definitions$name == "SABA&SAMA"] <- count_SABA_SAMA
+custom_definitions$conceptSet[custom_definitions$name == "SABA&SAMA"] <- SABA_SAMA
+
+
+# overwrite old file
+write.csv(custom_definitions, "inst/settings/drug_classes.csv", row.names = FALSE )
+
+
