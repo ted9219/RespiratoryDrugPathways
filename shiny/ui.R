@@ -59,9 +59,14 @@ ui <- dashboardPage(
      ),
     
       conditionalPanel(
-        condition = "input.tabs=='stepupdown' || input.tabs=='summaryclasses'",
+        condition = "input.tabs=='stepupdown'",
         checkboxGroupInput("dataset", label = "Database", choices = included_databases, selected = "IPCI")
       ),
+    
+    conditionalPanel(
+      condition = "input.tabs=='summaryclasses'",
+      selectInput("dataset3", label = "Database", choices = included_databases, selected = "IPCI")
+    ),
       
       conditionalPanel(
         condition = "input.tabs=='stepupdown' || input.tabs=='summaryclasses'",

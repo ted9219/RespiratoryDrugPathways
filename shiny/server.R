@@ -308,9 +308,9 @@ server <- function(input, output, session) {
     
     # Get the data
     if (input$year3 == "all") {
-      data <- summary_drugclasses[[input$dataset]][[input$population]]
+      data <- summary_drugclasses[[input$dataset3]][[input$population]]
     } else {
-      data <- summary_drugclasses_year[[input$dataset]][[input$population]]
+      data <- summary_drugclasses_year[[input$dataset3]][[input$population]]
       
       data <- data[data$y == input$year3,]
       data$y <- NULL
@@ -329,7 +329,7 @@ server <- function(input, output, session) {
   })
   
   output$figureSummaryClassesYears <- renderPlot({
-    data <- summary_drugclasses_year[[input$dataset]][[input$population]]
+    data <- summary_drugclasses_year[[input$dataset3]][[input$population]]
     
     col_name <- paste0("D", input$layer3, "_CONCEPT_NAME")
     
@@ -349,9 +349,9 @@ server <- function(input, output, session) {
   output$figureSummaryClassesLayers <- renderPlot({
     
     if (input$year3 == "all") {
-      data <- summary_drugclasses[[input$dataset]][[input$population]]
+      data <- summary_drugclasses[[input$dataset3]][[input$population]]
     } else {
-      data <- summary_drugclasses_year[[input$dataset]][[input$population]]
+      data <- summary_drugclasses_year[[input$dataset3]][[input$population]]
       
       data <- data[data$y == input$year3,]
       data$y <- NULL
