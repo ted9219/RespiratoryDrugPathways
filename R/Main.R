@@ -191,12 +191,13 @@ execute <- function(connection = NULL,
       # Analysis settings
       minEraDuration <-  as.integer(study_settings[study_settings$param == "minEraDuration",s]) # Minimum time an era should last to be included in analysis
       splitAcuteVsTherapy <-  study_settings[study_settings$param == "splitAcuteVsTherapy",s] # Cohort Ids to split in acute (< 30 days) and therapy (>= 30 days)
-      minStepDuration <-  as.integer(study_settings[study_settings$param == "minStepDuration",s]) # Minimum time a step (generated drug era) before or after a combination treatment should last to be included in analysis
       eraCollapseSize <-  as.integer(study_settings[study_settings$param == "eraCollapseSize",s]) # Window of time between two same outcome cohorts that are considered one era
+      minStepDuration <-  as.integer(study_settings[study_settings$param == "minStepDuration",s]) # Minimum time a step (generated drug era) before or after a combination treatment should last to be included in analysis
       combinationWindow <-  as.integer(study_settings[study_settings$param == "combinationWindow",s]) # Window of time when two outcome cohorts need to overlap to be considered a combination
-      sequentialRepetition <-  study_settings[study_settings$param == "sequentialRepetition",s] # Select to only remove sequential occurences of each outcome cohort
       firstTreatment <-  study_settings[study_settings$param == "firstTreatment",s] # Select to only include first occurrence of each outcome cohort
-      
+      sequentialRepetition <-  study_settings[study_settings$param == "sequentialRepetition",s] # Select to only remove sequential occurences of each outcome cohort
+      includeTreatmentsPriorToIndex <- study_settings[study_settings$param == "includeTreatmentsPriorToIndex",s] # Number of days prior of index that treatments should be included
+        
       # Load cohorts and pre-processing in SQL
       sql <- loadRenderTranslateSql(sql = "CreateTreatmentSequence.sql",
                                     dbms = connectionDetails$dbms,
@@ -206,6 +207,7 @@ execute <- function(connection = NULL,
                                     databaseName=databaseName,
                                     targetCohortId=targetCohortId,
                                     outcomeCohortIds=outcomeCohortIds,
+                                    includeTreatmentsPriorToIndex=includeTreatmentsPriorToIndex,
                                     cohortTable=cohortTable)
       DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
       
