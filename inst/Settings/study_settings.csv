@@ -1,17 +1,17 @@
-param,analysis0,analysis1,analysis2,analysis3,analysis4,analysis5,analysis6,analysis7,analysis8,analysis9,analysis10, analysis11
-studyName,comparisonATLAS,asthma,copd,aco,asthma6plus,asthma6min,asthma_SA,copd_SA,aco_SA,asthma_inhaler, copd_inhaler, aco_inhaler
-targetCohortId,1,1,2,3,4,5,1,2,3,1,2,3
-outcomeCohortIds,"10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25","10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25","10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25","10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25","10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25","10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25","10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25", "10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25", "10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25", "12,13,15,18,19,22,23,24,25","12,13,15,18,19,22,23,24,25","12,13,15,18,19,22,23,24,25"
-minEraDuration,0,5,5,5,5,5,1,1,1,5,5,5
-splitAcuteVsTherapy,"","20","20","20","20","20","20","20","20","20","20","20"
-minStepDuration,30,30,30,30,30,30,30,30,30,30,30,30
-eraCollapseSize,0,30,30,30,30,30,30,30,30,30,30,30
-combinationWindow,30,30,30,30,30,30,30,30,30,30,30,30
-sequentialRepetition,FALSE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE
-firstTreatment,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE
-includeTreatmentsPriorToIndex,0,0,0,0,0,0,0,0,0,0,0,0
-maxPathLength,5,5,5,5,5,5,5,5,5,5,5,5
-minCellCount,0,5,5,5,5,5,5,5,5,5,5,5
-removePaths,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE
-addNoPaths,FALSE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE
-otherCombinations,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE
+param,analysis0,analysis1,analysis2,analysis3,analysis4,analysis5,analysis6,analysis7,analysis8,analysis9,analysis10, analysis11, analysis12, analysis13, analysis14
+studyName,comparisonATLAS,asthma,copd,aco,asthma6plus,asthma6min,asthma_durationera,copd_durationera,aco_durationera, asthma_inhaler, copd_inhaler, aco_inhaler, asthma_treatmentsprior, copd_treatmentsprior, aco_treatmentsprior 
+targetCohortId,1,1,2,3,4,5,1,2,3,1,2,3, 1,2,3
+outcomeCohortIds,"10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25","10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25","10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25","10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25","10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25","10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25","10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25", "10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25", "10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25", "12,13,15,18,19,22,23,24,25","12,13,15,18,19,22,23,24,25","12,13,15,18,19,22,23,24,25", "10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25", "10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25", "10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25"
+minEraDuration,0,5,5,5,5,5,1,1,1,5,5,5, 5,5,5
+splitAcuteVsTherapy,"","20","20","20","20","20","20","20","20","20","20","20","20","20","20"
+minStepDuration,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30
+eraCollapseSize,0,30,30,30,30,30,30,30,30,30,30,30,30,30,30
+combinationWindow,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30
+sequentialRepetition,FALSE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE
+firstTreatment,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE
+includeTreatmentsPriorToIndex,0,0,0,0,0,0,0,0,0,0,0,0,30,30,30
+maxPathLength,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5
+minCellCount,0,5,5,5,5,5,5,5,5,5,5,5,5,5,5
+removePaths,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE
+addNoPaths,FALSE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE
+otherCombinations,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE

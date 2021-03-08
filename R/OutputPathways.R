@@ -208,10 +208,92 @@ outputStepUpDown <- function(file_noyear, path, targetCohortId) {
   ParallelLogger::logInfo("outputStepUpDown done")
 } 
 
+
+generalStepUpDownAsthma <- function(file) {
+  
+  # Input = file with columns 'from' / 'to
+  # file <- read.csv("inst/Settings/augment_switch.csv", stringsAsFactors = FALSE)
+  
+  # Either use csv file with predefined rules
+  # OR: the following "generalized" rules
+  
+  # Defined levels
+  class_level <- list("SABA" = 1,
+                      "SAMA" = 1,
+                      "LABA" = 2,
+                      "LAMA" = 2,
+                      "Xanthines" = 2,
+                      "ICS" = 3,
+                      "LTRA" = 3,
+                      "Systemic glucocorticoids (therapy)" = 4,
+                      "Systemic glucocorticoids (acute)" = 4,
+                      "Anti IL5" = 4,
+                      "Anti Ig5" = 4)
+  
+  # Add columns with # from and # to
+  file$from_num <- stringr::str_count(file$from, fixed("+")) + 1
+  file$to_num <- stringr::str_count(file$to, fixed("+")) + 1
+  
+  # Add "level" score
+  file$from_level <- sapply(file$from, function(r) sum(unlist(sapply(unlist(strsplit(r, split="+", fixed=TRUE)), function(r_s) class_level[[r_s]]))))
+  file$to_level <- sapply(file$to, function(r) sum(unlist(sapply(unlist(strsplit(r, split="+", fixed=TRUE)), function(r_s) class_level[[r_s]]))))
+
+  file$group <- NA
+  
+  ### Same number
+  selection <- file$from_num == file$to_num
+  print(paste0("Same number: ", sum(selection)))
+  
+  file$group[selection] <- "switching"
+  file$group[selection & file$from_num == 1 & file$from_level > file$to_level] <- "step_down_broad"
+  file$group[selection & file$from_num == 1 & file$from_level < file$to_level] <- "step_up_broad"
+  
+  # Consider level 1/2 as one for from_num 2
+  file$from_level_2 <- file$from_level + stringr::str_count(file$from, fixed("LA")) + stringr::str_count(file$from, fixed("Xa"))
+  file$to_level_2 <- file$to_level + stringr::str_count(file$to, fixed("LA")) + stringr::str_count(file$to, fixed("Xa"))
+  
+  file$group[selection & file$from_num == 2 & file$from_level_2 > file$to_level_2] <- "step_down_broad"
+  file$group[selection & file$from_num == 2 & file$from_level_2 < file$to_level_2] <- "step_up_broad"
+  
+  file$group[selection & file$from_num == 2 & file$to_num == 2 & stringr::str_detect(file$from, fixed("Systemic glucocorticoids (therapy)")) & !stringr::str_detect(file$to, fixed("Systemic glucocorticoids (therapy)"))] <- "step_down_broad"
+  file$group[selection & file$from_num == 2 & file$to_num == 2 & !stringr::str_detect(file$from, fixed("Systemic glucocorticoids (therapy)")) & stringr::str_detect(file$to, fixed("Systemic glucocorticoids (therapy)"))] <- "step_up_broad"
+  
+  ### Higher number
+  selection <- file$from_num < file$to_num
+  print(paste0("Higher number: ", sum(selection)))
+  
+  file$group[selection] <- "step_up_broad"
+  file$group[selection & file$from_num == 1 & file$to_num %in% c(2,3) & stringr::str_detect(file$from, fixed("Systemic glucocorticoids (therapy)")) & !stringr::str_detect(file$to, fixed("Systemic glucocorticoids (therapy)"))] <- "step_down_broad"
+  
+  ### Lower number
+  selection <- file$from_num > file$to_num
+  print(paste0("Lower number: ", sum(selection)))
+  
+  file$group[selection] <- "step_down_broad"
+  file$group[selection & file$from_num %in% c(2,3) & file$to_num == 1 & !stringr::str_detect(file$from, fixed("Systemic glucocorticoids (therapy)")) & stringr::str_detect(file$to, fixed("Systemic glucocorticoids (therapy)"))] <- "step_up_broad"
+  
+  # Start exacerbation (from NO acute, to YES acute)
+  selection <- !stringr::str_detect(file$from, fixed("Systemic glucocorticoids (acute)")) & stringr::str_detect(file$to, fixed("Systemic glucocorticoids (acute)"))
+  print(paste0("Start exacerbation: ", sum(selection)))
+  file$group[selection] <- "acute_exacerbation"
+  
+  # End exacerbation (from YES acute, to NO acute)
+  selection <- stringr::str_detect(file$from, fixed("Systemic glucocorticoids (acute)")) & !stringr::str_detect(file$to, fixed("Systemic glucocorticoids (acute)"))
+  print(paste0("End exacerbation: ", sum(selection)))
+  file$group[selection] <- "end_of_acute_exacerbation"
+  
+  # write.csv(file,"generalized_test.csv")
+  
+  return(file)
+}
+
+
 computePercentageGroupTreated <- function(data, outcomeCohortIds, outputFolder) {
   layers <- as.vector(colnames(data)[!grepl("INDEX_YEAR|freq", colnames(data))])
   cohorts <- read.csv(paste(outputFolder, "/cohort.csv",sep=''), stringsAsFactors = FALSE)
   outcomes <- c(cohorts$cohortName[cohorts$cohortType == "outcome"], "Other combinations")
+  
+  # TODO: check if all combinations -> other combinations
   
   percentGroupLayer <- sapply(layers, function(l) {
     percentGroup <- sapply(outcomes, function(g) {
@@ -222,16 +304,18 @@ computePercentageGroupTreated <- function(data, outcomeCohortIds, outputFolder) 
     })
   })
   
+  # TODO: add total over all layers
+  
   # Add outcome names
   result <- data.frame(outcomes, percentGroupLayer, stringsAsFactors = FALSE)
   colnames(result) <- c("outcomes", layers)
   rownames(result) <- NULL
   
   # Add rows for total, fixed combinations, all combinations
-  result <- rbind(result, c("Total",colSums(result[layers])), c("Fixed combinations",colSums(result[grepl("\\&", result$outcomes), layers])), c("All combinations",colSums(result[grepl("Other combinations|\\+|\\&", result$outcomes), layers])), c("Monotherapy",colSums(result[!grepl("Other combinations|\\+|\\&", result$outcomes), layers])))
+  result <- rbind(result, c("Total treated",colSums(result[layers])), c("Fixed combinations",colSums(result[grepl("\\&", result$outcomes), layers])), c("All combinations",colSums(result[grepl("Other combinations|\\+|\\&", result$outcomes), layers])), c("Monotherapy",colSums(result[!grepl("Other combinations|\\+|\\&", result$outcomes), layers])))
 }
 
-transformDuration <- function(connection, cohortDatabaseSchema, dbms, studyName, databaseName, path, maxPathLength, minCellCount, removePaths, otherCombinations) {
+transformDuration <- function(connection, cohortDatabaseSchema, dbms, studyName, databaseName, path, maxPathLength, minCellCount, removePaths) {
   
   file <- data.table(extractFile(connection, tableName = "drug_seq_processed", resultsSchema = cohortDatabaseSchema, studyName = studyName,databaseName = databaseName, dbms = connectionDetails$dbms))
   
@@ -243,44 +327,37 @@ transformDuration <- function(connection, cohortDatabaseSchema, dbms, studyName,
   # Apply maxPathLength
   file <- file[DRUG_SEQ <= maxPathLength,]
   
-  # Group all non-fixed combinations in one group if TRUE
-  if (otherCombinations) {
-    # Summarize all non-fixed combinations occuring
-    findCombinations <- apply(file, 2, function(x) grepl("+", x, fixed = TRUE))
-    file[findCombinations] <- "Other combinations"
-  } else {
-    # Otherwise: group infrequent treatments below minFreqCombination as otherCombinations
-    
-    minFreqCombination <- 25
-    freqCombinations <- file[grepl("+", CONCEPT_NAME, fixed = TRUE),.N, by = "CONCEPT_NAME"]
-    summarizeCombinations <- freqCombinations$CONCEPT_NAME[freqCombinations$N <= minFreqCombination]
-    
-    selectedCombinations <- apply(file, 2, function(x) x %in% summarizeCombinations)
-    file[selectedCombinations] <- "Other combinations"
-  }
+  # Group all non-fixed combinations in one group
+  findCombinations <- apply(file, 2, function(x) grepl("+", x, fixed = TRUE))
+  file[findCombinations] <- "Other combinations"
   
-  # Add column for total, fixed combinations, all combinations
+  # Add column for total treated, fixed combinations, all combinations
   file$total <- 1
   file$fixed_combinations[grepl("\\&", file$CONCEPT_NAME)] <- 1
   file$all_combinations[grepl("Other combinations|\\+|\\&", file$CONCEPT_NAME)] <- 1
+  file$monotherapy[!grepl("Other combinations|\\+|\\&", file$CONCEPT_NAME)] <- 1
   
   result <- file[,.(AVG_DURATION=round(mean(DURATION_ERA),3), COUNT = .N), by = c("CONCEPT_NAME", "DRUG_SEQ")][order(CONCEPT_NAME, DRUG_SEQ)]
   
-  result_total_seq <- file[,.(DRUG_SEQ = "Total", AVG_DURATION= round(mean(DURATION_ERA),3), COUNT = .N), by = c("CONCEPT_NAME", "total")]
+  result_total_seq <- file[,.(DRUG_SEQ = "Overall", AVG_DURATION= round(mean(DURATION_ERA),2), COUNT = .N), by = c("CONCEPT_NAME", "total")]
   result_total_seq$total <- NULL
   
-  result_total_concept <- file[,.(CONCEPT_NAME = "Total", AVG_DURATION= round(mean(DURATION_ERA),3), COUNT = .N), by = c("DRUG_SEQ", "total")]
+  result_total_concept <- file[,.(CONCEPT_NAME = "Total treated", AVG_DURATION= round(mean(DURATION_ERA),2), COUNT = .N), by = c("DRUG_SEQ", "total")]
   result_total_concept$total <- NULL
   
-  result_fixed_combinations <- file[,.(CONCEPT_NAME = "Fixed combinations", AVG_DURATION= round(mean(DURATION_ERA),3), COUNT = .N), by = c("DRUG_SEQ", "fixed_combinations")]
+  result_fixed_combinations <- file[,.(CONCEPT_NAME = "Fixed combinations", AVG_DURATION= round(mean(DURATION_ERA),2), COUNT = .N), by = c("DRUG_SEQ", "fixed_combinations")]
   result_fixed_combinations <- result_fixed_combinations[!is.na(fixed_combinations),]
   result_fixed_combinations$fixed_combinations <- NULL
   
-  result_all_combinations <- file[,.(CONCEPT_NAME = "All combinations", AVG_DURATION=round(mean(DURATION_ERA),3), COUNT = .N), by = c("DRUG_SEQ", "all_combinations")]
+  result_all_combinations <- file[,.(CONCEPT_NAME = "All combinations", AVG_DURATION=round(mean(DURATION_ERA),2), COUNT = .N), by = c("DRUG_SEQ", "all_combinations")]
   result_all_combinations <- result_all_combinations[!is.na(all_combinations),]
   result_all_combinations$all_combinations <- NULL
   
-  results <- rbind(result, result_total_seq, result_total_concept, result_fixed_combinations, result_all_combinations)
+  result_monotherapy <- file[,.(CONCEPT_NAME = "Monotherapy", AVG_DURATION=round(mean(DURATION_ERA),2), COUNT = .N), by = c("DRUG_SEQ", "monotherapy")]
+  result_monotherapy <- result_monotherapy[!is.na(monotherapy),]
+  result_monotherapy$monotherapy <- NULL
+  
+  results <- rbind(result, result_total_seq, result_total_concept, result_fixed_combinations, result_all_combinations, result_monotherapy)
   
   # Remove durations computed using less than minCellCount observations
   results[COUNT < minCellCount,c("AVG_DURATION", "COUNT")] <- NA

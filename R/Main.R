@@ -327,7 +327,7 @@ execute <- function(connection = NULL,
         outputStepUpDown(file_noyear = file_noyear, path = path, targetCohortId = targetCohortId)
         
         # Duration of era's
-        transformDuration(connection = connection, cohortDatabaseSchema = cohortDatabaseSchema, dbms = dbms, studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, otherCombinations = otherCombinations)
+        transformDuration(connection = connection, cohortDatabaseSchema = cohortDatabaseSchema, dbms = dbms, studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount)
         
         # Treatment pathways sankey diagram
         createSankeyDiagram(data = file_noyear, databaseName = databaseName, studyName = studyName)
