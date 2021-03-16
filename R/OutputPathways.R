@@ -38,11 +38,13 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
   return(list(file_noyear, file_withyear))
 }
 
-saveTreatmentSequence <- function(file_noyear, file_withyear, groupCombinations, minCellCount, minCellMethod) {
+saveTreatmentSequence <- function(file_noyear, file_withyear, path, groupCombinations, minCellCount, minCellMethod) {
   
   # Group non-fixed combinations in one group according to groupCobinations
   file_noyear <- groupInfrequentCombinations(file_noyear, groupCombinations)
   file_withyear <- groupInfrequentCombinations(file_withyear, groupCombinations)
+  
+  layers <- as.vector(colnames(data)[!grepl("INDEX_YEAR|freq", colnames(data))])
   
   # Apply minCellCount by adjusting to other most similar path (removing last treatment in path) or else remove complete path
   if (minCellMethod == "Adjust") {
@@ -98,7 +100,7 @@ saveTreatmentSequence <- function(file_noyear, file_withyear, groupCombinations,
 }
 
 
-outputPercentageGroupTreated <- function(data, eventCohortIds, path, outputFolder, outputFile) {
+outputPercentageGroupTreated <- function(data, eventCohortIds, groupCombinations, path, outputFolder, outputFile) {
   if (is.null(data$INDEX_YEAR)) {
     # For file_noyear compute once
     result <- computePercentageGroupTreated(data, eventCohortIds, groupCombinations, outputFolder)
@@ -376,7 +378,9 @@ transformDuration <- function(connection, cohortDatabaseSchema, outputFolder, db
   file <- file[DRUG_SEQ <= maxPathLength,]
   
   # Group non-fixed combinations in one group according to groupCobinations
-  file <- groupInfrequentCombinations(file, groupCombinations)
+  # TODO: change to function
+  findCombinations <- apply(file, 2, function(x) grepl("+", x, fixed = TRUE))
+  file[findCombinations] <- "Other"
   
   result <- file[,.(AVG_DURATION=round(mean(DURATION_ERA),3), COUNT = .N), by = c("CONCEPT_NAME", "DRUG_SEQ")][order(CONCEPT_NAME, DRUG_SEQ)]
   
@@ -476,7 +480,6 @@ inputSunburstPlot <- function(data, path, groupCombinations, addNoPaths, index_y
   # Group non-fixed combinations in one group according to groupCobinations
   data <- groupInfrequentCombinations(data, groupCombinations)
   
-  # Remove unnessary columns
   layers <- as.vector(colnames(data)[!grepl("INDEX_YEAR|freq", colnames(data))])
   
   transformed_file <- apply(data[,..layers],1, paste, collapse = "-")

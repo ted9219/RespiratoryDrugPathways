@@ -330,7 +330,7 @@ execute <- function(connection = NULL,
         
         
         # Save (censored) results file_noyear and file_year
-        saveTreatmentSequence(file_noyear = file_noyear, file_withyear = file_withyear, groupCombinations = groupCombinations, minCellCount = minCellCount, minCellMethod = minCellMethod)
+        saveTreatmentSequence(file_noyear = file_noyear, file_withyear = file_withyear, path= path, groupCombinations = groupCombinations, minCellCount = minCellCount, minCellMethod = minCellMethod)
         
         file_noyear <- as.data.table(read.csv(paste(path,"_file_noyear.csv",sep=''), stringsAsFactors = FALSE))
         file_withyear <- as.data.table(read.csv(paste(path,"_file_withyear.csv",sep=''), stringsAsFactors = FALSE))

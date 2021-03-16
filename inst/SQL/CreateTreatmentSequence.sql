@@ -50,7 +50,7 @@ SELECT
 FROM
   (SELECT *
    FROM @resultsSchema.@cohortTable C
-         WHERE C.cohort_definition_id IN (@outcomeCohortIds)) de
+         WHERE C.cohort_definition_id IN (@eventCohortIds)) de
   INNER JOIN @resultsSchema.@databaseName_@studyName_targetcohort c1
 ON de.subject_id = c1.person_id
 WHERE c1.index_date - @includeTreatmentsPriorToIndex <= de.cohort_start_date AND de.cohort_start_date < c1.cohort_end_date; -- exclude events outside target cohort period
