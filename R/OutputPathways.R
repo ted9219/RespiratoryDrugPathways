@@ -44,7 +44,7 @@ saveTreatmentSequence <- function(file_noyear, file_withyear, path, groupCombina
   file_noyear <- groupInfrequentCombinations(file_noyear, groupCombinations)
   file_withyear <- groupInfrequentCombinations(file_withyear, groupCombinations)
   
-  layers <- as.vector(colnames(data)[!grepl("INDEX_YEAR|freq", colnames(data))])
+  layers <- as.vector(colnames(file_noyear)[!grepl("INDEX_YEAR|freq", colnames(file_noyear))])
   
   # Apply minCellCount by adjusting to other most similar path (removing last treatment in path) or else remove complete path
   if (minCellMethod == "Adjust") {
@@ -317,13 +317,8 @@ stepUpDown <- function(file, path, targetCohortId, input) {
       all_results <- rbind(all_results, subfile)
     }
     
-   
-    
-    
   }
-  
-  
-  
+
   write.csv(all_results, paste(path,"_augmentswitch_generalized.csv",sep=''), row.names = FALSE)
 }
 
@@ -359,10 +354,11 @@ computePercentageGroupTreated <- function(data, eventCohortIds, groupCombination
   # Add rows for total, fixed combinations, all combinations
   result <- rbind(result, c("Fixed combinations",colSums(result[grepl("\\&", result$outcomes), layers]), NA), c("All combinations",colSums(result[grepl("Other|\\+|\\&", result$outcomes), layers]), NA), c("Monotherapy",colSums(result[!grepl("Other|\\+|\\&", result$outcomes), layers]), NA))
   
-  result$ALL_LAYERS[result$outcomes == "Fixed combinations"] <- sum(sapply(1:nrow(data), function(r) ifelse(result[grepl("\\&", result$outcomes), layers], data[r,freq], 0))) * 100.0 / paths_all
-  result$ALL_LAYERS[result$outcomes == "All combinations"] <- sum(sapply(1:nrow(data), function(r) ifelse(result[grepl("Other|\\+|\\&", result$outcomes), layers], data[r,freq], 0))) * 100.0 / paths_all
-  result$ALL_LAYERS[result$outcomes == "Monotherapy"] <- sum(sapply(1:nrow(data), function(r) ifelse(result[!grepl("Other|\\+|\\&", result$outcomes), layers], data[r,freq], 0))) * 100.0 / paths_all
+  result$ALL_LAYERS[result$outcomes == "Fixed combinations"] <- sum(sapply(1:nrow(data), function(r) ifelse(grepl("\\&", data[r,]), data[r,freq], 0))) * 100.0 / paths_all
+  result$ALL_LAYERS[result$outcomes == "All combinations"] <- sum(sapply(1:nrow(data), function(r) ifelse(grepl("Other|\\+|\\&", data[r,]), data[r,freq], 0))) * 100.0 / paths_all
+  result$ALL_LAYERS[result$outcomes == "Monotherapy"] <- sum(sapply(1:nrow(data), function(r) ifelse(grepl("Other|\\+|\\&", data[r,]), data[r,freq], 0))) * 100.0 / paths_all
   
+  return(result)
 }
 
 transformDuration <- function(connection, cohortDatabaseSchema, outputFolder, dbms, studyName, databaseName, path, maxPathLength, groupCombinations, minCellCount, removePaths) {
