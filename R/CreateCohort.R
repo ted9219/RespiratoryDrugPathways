@@ -88,7 +88,7 @@ createCohorts <- function(connectionDetails,
     } else if (cohortsToCreate$cohortDefinition[i] == "Custom") {
       
       # Load in concept sets (later: change to -> generate sql to form concept sets)
-      concept_set <- custom_definitions[custom_definitions$name == cohortsToCreate$cohortName[i],"conceptSet"]
+      concept_set <- custom_definitions[custom_definitions$cohortName == cohortsToCreate$cohortName[i],"conceptSet"]
       concept_set <- paste0("(", substr(concept_set, 2, nchar(concept_set)-1), ")")
       
       if (is.null(concept_set))

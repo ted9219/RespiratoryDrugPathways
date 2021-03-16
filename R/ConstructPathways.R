@@ -14,12 +14,12 @@ doStepDuration <- function(data, minStepDuration) {
   return(data)
 }
 
-doAcuteVSTherapy <- function(data, splitAcuteVsTherapy, outputFolder) {
+doSplitEventCohorts <- function(data, splitEventCohorts, outputFolder) {
   
   # load in labels cohorts
   labels <- data.table(readr::read_csv(paste(outputFolder, "/cohort.csv",sep=''), col_types = list("c", "c", "c", "c")))
   
-  for (c in splitAcuteVsTherapy) {
+  for (c in splitEventCohorts) {
     # label as acute
     data[DRUG_CONCEPT_ID == c & DURATION_ERA < 30, "DRUG_CONCEPT_ID"] <- as.integer(paste0(c,1))
     
@@ -174,24 +174,36 @@ selectRowsCombinationWindow <- function(data) {
   return(data)
 }
 
-doSequentialRepetition <- function(data) {
-  # order data by person_id, drug_start_date, drug_end_date
-  data <- data[order(PERSON_ID, DRUG_START_DATE, DRUG_END_DATE),]
+doFilterTreatments <- function(data, filterTreatments) {
   
-  # group all rows per person for which previous treatment is same
-  data <- data[, group:=rleid(PERSON_ID,DRUG_CONCEPT_ID)]
+  if (filterTreatments == "First") {
+    data <- data[, head(.SD,1), by=.(PERSON_ID, DRUG_CONCEPT_ID)]
+    
+  } else if (filterTreatments == "Changes") {
+    
+    # order data by person_id, drug_start_date, drug_end_date
+    data <- data[order(PERSON_ID, DRUG_START_DATE, DRUG_END_DATE),]
+    
+    # group all rows per person for which previous treatment is same
+    data <- data[, group:=rleid(PERSON_ID,DRUG_CONCEPT_ID)]
+    
+    # remove all rows with same sequential treatments
+    data <- data[,.(DRUG_START_DATE=min(DRUG_START_DATE), DRUG_END_DATE=max(DRUG_END_DATE), DURATION_ERA=sum(DURATION_ERA)), by = .(PERSON_ID,INDEX_YEAR,DRUG_CONCEPT_ID,group)]
+    
+    data[,group:=NULL]
+    
+  } else if (filterTreatments == "All") {
   
-  # remove all rows with same sequential treatments
-  data <- data[,.(DRUG_START_DATE=min(DRUG_START_DATE), DRUG_END_DATE=max(DRUG_END_DATE), DURATION_ERA=sum(DURATION_ERA)), by = .(PERSON_ID,INDEX_YEAR,DRUG_CONCEPT_ID,group)]
-
-  data[,group:=NULL]
-  writeLines(paste0("After collapseSameSequential: ", nrow(data)))
+    # do nothing
+  }
+  
+  writeLines(paste0("After filterTreatments: ", nrow(data)))
   
   return(data)
 }
 
 doFirstTreatment <- function(data) {
-  data <- data[, head(.SD,1), by=.(PERSON_ID, DRUG_CONCEPT_ID)]
+ 
   writeLines(paste0("After doFirstTreatment: ", nrow(data)))
   
   return(data)

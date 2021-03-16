@@ -186,17 +186,16 @@ execute <- function(connection = NULL,
       
       # Select cohorts included
       targetCohortId <- study_settings[study_settings$param == "targetCohortId",s]
-      outcomeCohortIds <- study_settings[study_settings$param == "outcomeCohortIds",s]
+      eventCohortIds <- study_settings[study_settings$param == "eventCohortIds",s]
       
       # Analysis settings
-      minEraDuration <-  as.integer(study_settings[study_settings$param == "minEraDuration",s]) # Minimum time an era should last to be included in analysis
-      splitAcuteVsTherapy <-  study_settings[study_settings$param == "splitAcuteVsTherapy",s] # Cohort Ids to split in acute (< 30 days) and therapy (>= 30 days)
-      eraCollapseSize <-  as.integer(study_settings[study_settings$param == "eraCollapseSize",s]) # Window of time between two same outcome cohorts that are considered one era
-      minStepDuration <-  as.integer(study_settings[study_settings$param == "minStepDuration",s]) # Minimum time a step (generated drug era) before or after a combination treatment should last to be included in analysis
-      combinationWindow <-  as.integer(study_settings[study_settings$param == "combinationWindow",s]) # Window of time when two outcome cohorts need to overlap to be considered a combination
-      firstTreatment <-  study_settings[study_settings$param == "firstTreatment",s] # Select to only include first occurrence of each outcome cohort
-      sequentialRepetition <-  study_settings[study_settings$param == "sequentialRepetition",s] # Select to only remove sequential occurences of each outcome cohort
-      includeTreatmentsPriorToIndex <- study_settings[study_settings$param == "includeTreatmentsPriorToIndex",s] # Number of days prior of index that treatments should be included
+      includeTreatmentsPriorToIndex <- study_settings[study_settings$param == "includeTreatmentsPriorToIndex",s] # Number of days prior to the index date of the target cohort that event cohorts are allowed to start
+      minEraDuration <-  as.integer(study_settings[study_settings$param == "minEraDuration",s]) # Minimum time an event era should last to be included in analysis
+      splitEventCohorts <-  study_settings[study_settings$param == "splitEventCohorts",s] # Specify event cohort to split in acute (< 30 days) and therapy (>= 30 days)
+      eraCollapseSize <-  as.integer(study_settings[study_settings$param == "eraCollapseSize",s]) # Window of time between which two eras of the same event cohort are collapsed into one era
+      combinationWindow <-  as.integer(study_settings[study_settings$param == "combinationWindow",s]) # Window of time two event cohorts need to overlap to be considered a combination treatment
+      minStepDuration <-  as.integer(study_settings[study_settings$param == "minStepDuration",s]) # Minimum time an event era before or after a generated combination treatment should last to be included in analysis
+      filterTreatments <-  study_settings[study_settings$param == "filterTreatments",s] # Select first occurrence of / changes between / all event cohorts
         
       # Load cohorts and pre-processing in SQL
       sql <- loadRenderTranslateSql(sql = "CreateTreatmentSequence.sql",
@@ -206,7 +205,7 @@ execute <- function(connection = NULL,
                                     studyName=studyName,
                                     databaseName=databaseName,
                                     targetCohortId=targetCohortId,
-                                    outcomeCohortIds=outcomeCohortIds,
+                                    eventCohortIds=eventCohortIds,
                                     includeTreatmentsPriorToIndex=includeTreatmentsPriorToIndex,
                                     cohortTable=cohortTable)
       DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
@@ -226,7 +225,7 @@ execute <- function(connection = NULL,
       writeLines(paste0("Original: ", nrow(data)))
       
       data <- doEraDuration(data, minEraDuration)
-      if (splitAcuteVsTherapy != "") {data <- doAcuteVSTherapy(data, splitAcuteVsTherapy, outputFolder)}
+      if (splitEventCohorts != "") {data <- doSplitEventCohorts(data, splitEventCohorts, outputFolder)}
       data <- doEraCollapse(data, eraCollapseSize)
       
       time1 <- Sys.time()
@@ -240,8 +239,7 @@ execute <- function(connection = NULL,
       concept_ids <- strsplit(data$DRUG_CONCEPT_ID[combi], split="+", fixed=TRUE)
       data$DRUG_CONCEPT_ID[combi] <- sapply(concept_ids, function(x) paste(sort(x), collapse = "+"))
       
-      if (sequentialRepetition) {data <- doSequentialRepetition(data)}
-      if (firstTreatment) {data <- doFirstTreatment(data)}
+      data <- doFilterTreatments(data, filterTreatments)
       
       # Add drug_seq
       ParallelLogger::logInfo("Adding drug sequence number.")
@@ -298,14 +296,14 @@ execute <- function(connection = NULL,
       
       # Select cohorts included
       targetCohortId <- study_settings[study_settings$param == "targetCohortId",s]
-      outcomeCohortIds <- study_settings[study_settings$param == "outcomeCohortIds",s]
+      eventCohortIds <- study_settings[study_settings$param == "eventCohortIds",s]
       
       # Result settings
-      maxPathLength <-  as.integer(study_settings[study_settings$param == "maxPathLength",s]) # Maximum number of steps in a given pathway to be included in the sunburst plot (current maximum is 5)
-      minCellCount <-  as.integer(study_settings[study_settings$param == "minCellCount",s]) # Minimum number of subjects in the target cohort for a given eent in order to be counted in the pathway
-      removePaths  <-  study_settings[study_settings$param == "removePaths",s] # Select to completely remove paths below minCellCount otherwise adjusted by removing last treatment till above minCellCount
-      addNoPaths  <-  study_settings[study_settings$param == "addNoPaths",s] # Select to add subjects without path to sunburst plot
-      otherCombinations  <-  study_settings[study_settings$param == "otherCombinations",s] # Select to group all non-fixed combinations in one category 'other combinations'
+      maxPathLength <-  as.integer(study_settings[study_settings$param == "maxPathLength",s]) # Maximum number of steps included in treatment pathway (max 5)
+      minCellCount <-  as.integer(study_settings[study_settings$param == "minCellCount",s]) # Minimum number of persons with a specific treatment pathway for the pathway to be included in analysis
+      minCellMethod  <-  study_settings[study_settings$param == "minCellMethod",s] # Select to completely remove / sequentially adjust (by removing last step as often as necessary) treatment pathways below minCellCount
+      groupCombinations  <-  study_settings[study_settings$param == "groupCombinations",s] # Select to group all non-fixed combinations in one category 'other’ in the sunburst plot
+      addNoPaths  <-  study_settings[study_settings$param == "addNoPaths",s] # Select to include untreated persons without treatment pathway in the sunburst plot
       
       path = paste0(outputFolder, "/",studyName, "/", databaseName, "_", studyName)
       
@@ -313,29 +311,33 @@ execute <- function(connection = NULL,
       extractAndWriteToFile(connection, tableName = "summary_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, path = path, dbms = connectionDetails$dbms)
       
       # Transform results for output
-      empty_data <- transformTreatmentSequence(studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount, removePaths = removePaths, otherCombinations = otherCombinations)
+      transformed_data <- transformTreatmentSequence(studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount)
       
-      if (!empty_data) {
-        file_noyear <- as.data.table(read.csv(paste(path,"_file_noyear.csv",sep=''), stringsAsFactors = FALSE))
-        file_withyear <- as.data.table(read.csv(paste(path,"_file_withyear.csv",sep=''), stringsAsFactors = FALSE))
+      if (!is.null(transformed_data)) {
+        file_noyear <- as.data.table(transformed_data[[1]])
+        file_withyear <- as.data.table(transformed_data[[2]])
         
         # Compute percentage of people treated with each outcome cohort separately and in the form of combination treatments
-        outputPercentageGroupTreated(data = file_noyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_noyear.csv",sep=''))
-        outputPercentageGroupTreated(data = file_withyear, outcomeCohortIds = outcomeCohortIds, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_withyear.csv",sep=''))
+        outputPercentageGroupTreated(data = file_noyear, eventCohortIds = eventCohortIds, groupCombinations = TRUE, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_noyear.csv",sep=''))
+        outputPercentageGroupTreated(data = file_withyear, eventCohortIds = eventCohortIds, groupCombinations = TRUE, outputFolder = outputFolder, outputFile = paste(path,"_percentage_groups_treated_withyear.csv",sep=''))
         
         # Compute step-up/down of asthma/COPD drugs
         outputStepUpDown(file_noyear = file_noyear, path = path, targetCohortId = targetCohortId)
         
         # Duration of era's
-        transformDuration(connection = connection, cohortDatabaseSchema = cohortDatabaseSchema, dbms = dbms, studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount)
+        transformDuration(connection = connection, outputFolder = outputFolder, cohortDatabaseSchema = cohortDatabaseSchema, dbms = dbms, studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, groupCombinations = TRUE, minCellCount = minCellCount)
         
         # Treatment pathways sankey diagram
         createSankeyDiagram(data = file_noyear, databaseName = databaseName, studyName = studyName)
         
         # Treatment pathways sunburst plot 
-        outputSunburstPlot(data = file_noyear, databaseName = databaseName, outcomeCohortIds = outcomeCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
-        outputSunburstPlot(data = file_withyear, databaseName = databaseName, outcomeCohortIds = outcomeCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
-      }
+        outputSunburstPlot(data = file_noyear, databaseName = databaseName, eventCohortIds = eventCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, groupCombinations=groupCombinations, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
+        outputSunburstPlot(data = file_withyear, databaseName = databaseName, eventCohortIds = eventCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, groupCombinations=groupCombinations, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
+      
+        # Save (censored) results file_noyear and file_year
+        saveTreatmentSequence(file_noyear = file_noyear, file_withyear = file_withyear, groupCombinations = groupCombinations, minCellCount = minCellCount, minCellMethod = minCellMethod)
+        
+        }
     }
   }
   
