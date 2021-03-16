@@ -141,7 +141,6 @@ outputStepUpDown <- function(file_noyear, path, targetCohortId) {
   file_noyear$freq <- as.numeric(file_noyear$freq)
   
   stepUpDown(file_noyear, path, targetCohortId, input = "manual rules")
-  # stepUpDown(file_noyear, path, targetCohortId, input = "generalized rules")
   
   ParallelLogger::logInfo("outputStepUpDown done")
 } 
@@ -358,7 +357,10 @@ computePercentageGroupTreated <- function(data, eventCohortIds, groupCombination
   # Add rows for total, fixed combinations, all combinations
   result <- rbind(result, c("Fixed combinations",colSums(result[grepl("\\&", result$outcomes), layers]), NA), c("All combinations",colSums(result[grepl("Other|\\+|\\&", result$outcomes), layers]), NA), c("Monotherapy",colSums(result[!grepl("Other|\\+|\\&", result$outcomes), layers]), NA))
   
-  # TODO: add fixed combinations, all combinations, monotherapy
+  result$ALL_LAYERS[result$outcomes == "Fixed combinations"] <- sum(sapply(1:nrow(data), function(r) ifelse(result[grepl("\\&", result$outcomes), layers], data[r,freq], 0))) * 100.0 / paths_all
+  result$ALL_LAYERS[result$outcomes == "All combinations"] <- sum(sapply(1:nrow(data), function(r) ifelse(result[grepl("Other|\\+|\\&", result$outcomes), layers], data[r,freq], 0))) * 100.0 / paths_all
+  result$ALL_LAYERS[result$outcomes == "Monotherapy"] <- sum(sapply(1:nrow(data), function(r) ifelse(result[!grepl("Other|\\+|\\&", result$outcomes), layers], data[r,freq], 0))) * 100.0 / paths_all
+  
 }
 
 transformDuration <- function(connection, cohortDatabaseSchema, outputFolder, dbms, studyName, databaseName, path, maxPathLength, groupCombinations, minCellCount, removePaths) {

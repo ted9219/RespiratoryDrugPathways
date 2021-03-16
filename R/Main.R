@@ -326,6 +326,14 @@ execute <- function(connection = NULL,
         
         # Duration of era's
         transformDuration(connection = connection, outputFolder = outputFolder, cohortDatabaseSchema = cohortDatabaseSchema, dbms = dbms, studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, groupCombinations = TRUE, minCellCount = minCellCount)
+      
+        
+        
+        # Save (censored) results file_noyear and file_year
+        saveTreatmentSequence(file_noyear = file_noyear, file_withyear = file_withyear, groupCombinations = groupCombinations, minCellCount = minCellCount, minCellMethod = minCellMethod)
+        
+        file_noyear <- as.data.table(read.csv(paste(path,"_file_noyear.csv",sep=''), stringsAsFactors = FALSE))
+        file_withyear <- as.data.table(read.csv(paste(path,"_file_withyear.csv",sep=''), stringsAsFactors = FALSE))
         
         # Treatment pathways sankey diagram
         createSankeyDiagram(data = file_noyear, databaseName = databaseName, studyName = studyName)
@@ -334,9 +342,7 @@ execute <- function(connection = NULL,
         outputSunburstPlot(data = file_noyear, databaseName = databaseName, eventCohortIds = eventCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, groupCombinations=groupCombinations, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
         outputSunburstPlot(data = file_withyear, databaseName = databaseName, eventCohortIds = eventCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, groupCombinations=groupCombinations, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
       
-        # Save (censored) results file_noyear and file_year
-        saveTreatmentSequence(file_noyear = file_noyear, file_withyear = file_withyear, groupCombinations = groupCombinations, minCellCount = minCellCount, minCellMethod = minCellMethod)
-        
+
         }
     }
   }
