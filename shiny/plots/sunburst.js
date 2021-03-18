@@ -163,7 +163,7 @@ var colors = {
    "Anti IL5": "#FFA07A", 
    "Systemic B2 agonist": "#F3722C", 
    "PDE4": "#819AB1", 
-    "Other combinations": "#465D72",
+    "Other": "#465D72",
              "End": "ffffff"
 }
 
