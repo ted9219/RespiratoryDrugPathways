@@ -143,6 +143,7 @@ outputStepUpDown <- function(file_noyear, path, targetCohortId) {
   file_noyear$freq <- as.numeric(file_noyear$freq)
   
   stepUpDown(file_noyear, path, targetCohortId, input = "manual rules")
+  stepUpDown(file_noyear, path, targetCohortId, input = "generalized rules")
   
   ParallelLogger::logInfo("outputStepUpDown done")
 } 
@@ -212,11 +213,13 @@ stepUpDown <- function(file, path, targetCohortId, input) {
         
         all_results <- rbind(all_results, result)
       }
+      
+      write.csv(all_results, paste(path,"_augmentswitch_manual.csv",sep=''), row.names = FALSE) 
     }
     
   } else if (input == "generalized rules") {
     
-    if (targetCohortId %in% c(1,4,5, 3)) { # Asthma, ACO
+    if (targetCohortId %in% c(1,4,5,3)) { # Asthma, ACO
       class_level <- list("SABA" = 1,
                           "SAMA" = 1,
                           "Systemic B2" = 1,
@@ -254,9 +257,11 @@ stepUpDown <- function(file, path, targetCohortId, input) {
       subfile <- file[, ..cols]
       colnames(subfile) <- c("from", "to", "freq")
       
+      subfile[is.na(subfile)] <- "End"
+      
       # Add columns with # from and # to
-      subfile$from_num <- stringr::str_count(subfile$from, fixed("+")) + 1
-      subfile$to_num <- stringr::str_count(subfile$to, fixed("+")) + 1
+      subfile$from_num <- stringr::str_count(subfile$from, stringr::fixed("+")) + 1
+      subfile$to_num <- stringr::str_count(subfile$to, stringr::fixed("+")) + 1
       
       # Add "level" score
       subfile$from_level <- sapply(subfile$from, function(r) sum(unlist(sapply(unlist(strsplit(r, split="+", fixed=TRUE)), function(r_s) class_level[[r_s]]))))
@@ -273,53 +278,68 @@ stepUpDown <- function(file, path, targetCohortId, input) {
       subfile$group[selection & subfile$from_num == 1 & subfile$from_level < subfile$to_level] <- "step_up_broad"
       
       # Consider level 1/2 as one for from_num 2
-      subfile$from_level_2 <- subfile$from_level + stringr::str_count(subfile$from, fixed("LA")) + stringr::str_count(subfile$from, fixed("Xa"))
-      subfile$to_level_2 <- subfile$to_level + stringr::str_count(subfile$to, fixed("LA")) + stringr::str_count(subfile$to, fixed("Xa"))
+      subfile$from_level_2 <- subfile$from_level + stringr::str_count(subfile$from, stringr::fixed("LA")) + stringr::str_count(subfile$from, stringr::fixed("Xa"))
+      subfile$to_level_2 <- subfile$to_level + stringr::str_count(subfile$to, stringr::fixed("LA")) + stringr::str_count(subfile$to, stringr::fixed("Xa"))
       
       subfile$group[selection & subfile$from_num == 2 & subfile$from_level_2 > subfile$to_level_2] <- "step_down_broad"
       subfile$group[selection & subfile$from_num == 2 & subfile$from_level_2 < subfile$to_level_2] <- "step_up_broad"
       
-      subfile$group[selection & subfile$from_num == 2 & subfile$to_num == 2 & stringr::str_detect(subfile$from, fixed("Systemic glucocorticoids (therapy)")) & !stringr::str_detect(subfile$to, fixed("Systemic glucocorticoids (therapy)"))] <- "step_down_broad"
-      subfile$group[selection & subfile$from_num == 2 & subfile$to_num == 2 & !stringr::str_detect(subfile$from, fixed("Systemic glucocorticoids (therapy)")) & stringr::str_detect(subfile$to, fixed("Systemic glucocorticoids (therapy)"))] <- "step_up_broad"
+      subfile$group[selection & subfile$from_num == 2 & subfile$to_num == 2 & stringr::str_detect(subfile$from, stringr::fixed("Systemic glucocorticoids (therapy)")) & !stringr::str_detect(subfile$to, stringr::fixed("Systemic glucocorticoids (therapy)"))] <- "step_down_broad"
+      subfile$group[selection & subfile$from_num == 2 & subfile$to_num == 2 & !stringr::str_detect(subfile$from, stringr::fixed("Systemic glucocorticoids (therapy)")) & stringr::str_detect(subfile$to, stringr::fixed("Systemic glucocorticoids (therapy)"))] <- "step_up_broad"
       
       ### Higher number
       selection <- subfile$from_num < subfile$to_num
       print(paste0("Higher number: ", sum(selection)))
       
       subfile$group[selection] <- "step_up_broad"
-      subfile$group[selection & subfile$from_num == 1 & subfile$to_num %in% c(2,3) & stringr::str_detect(subfile$from, fixed("Systemic glucocorticoids (therapy)")) & !stringr::str_detect(subfile$to, fixed("Systemic glucocorticoids (therapy)"))] <- "step_down_broad"
+      subfile$group[selection & subfile$from_num == 1 & subfile$to_num %in% c(2,3) & stringr::str_detect(subfile$from, stringr::fixed("Systemic glucocorticoids (therapy)")) & !stringr::str_detect(subfile$to, stringr::fixed("Systemic glucocorticoids (therapy)"))] <- "step_down_broad"
       
       ### Lower number
       selection <- subfile$from_num > subfile$to_num
       print(paste0("Lower number: ", sum(selection)))
       
       subfile$group[selection] <- "step_down_broad"
-      subfile$group[selection & subfile$from_num %in% c(2,3) & subfile$to_num == 1 & !stringr::str_detect(subfile$from, fixed("Systemic glucocorticoids (therapy)")) & stringr::str_detect(subfile$to, fixed("Systemic glucocorticoids (therapy)"))] <- "step_up_broad"
+      subfile$group[selection & subfile$from_num %in% c(2,3) & subfile$to_num == 1 & !stringr::str_detect(subfile$from, stringr::fixed("Systemic glucocorticoids (therapy)")) & stringr::str_detect(subfile$to, stringr::fixed("Systemic glucocorticoids (therapy)"))] <- "step_up_broad"
       
       # Start exacerbation (from NO acute, to YES acute)
-      selection <- !stringr::str_detect(subfile$from, fixed("Systemic glucocorticoids (acute)")) & stringr::str_detect(subfile$to, fixed("Systemic glucocorticoids (acute)"))
+      selection <- !stringr::str_detect(subfile$from, stringr::fixed("Systemic glucocorticoids (acute)")) & stringr::str_detect(subfile$to, stringr::fixed("Systemic glucocorticoids (acute)"))
       print(paste0("Start exacerbation: ", sum(selection)))
       subfile$group[selection] <- "acute_exacerbation"
       
       # End exacerbation (from YES acute, to NO acute)
-      selection <- stringr::str_detect(subfile$from, fixed("Systemic glucocorticoids (acute)")) & !stringr::str_detect(subfile$to, fixed("Systemic glucocorticoids (acute)"))
+      selection <- stringr::str_detect(subfile$from, stringr::fixed("Systemic glucocorticoids (acute)")) & !stringr::str_detect(subfile$to, stringr::fixed("Systemic glucocorticoids (acute)"))
       print(paste0("End exacerbation: ", sum(selection)))
       subfile$group[selection] <- "end_of_acute_exacerbation"
       
       if (targetCohortId %in% c(1,4,5)) { # Asthma
           # Non conform (to monotherapy LABA/LAMA)
-          selection <- subfile$to == "LABA" |  subfile$to == "LAMA" 
+          selection <- subfile$to == "LABA" |  subfile$to == "LAMA" | subfile$to == "LABA+LAMA"
   
           print(paste0("Non conform: ", sum(selection)))
           subfile$group[selection] <- "non_conform"
       }
       
+      
+      # Remove paths of inviduals who already stopped treatment
+      subfile <- subfile[subfile$from != "End",]
+      
+      # Define stop treatment
+      subfile$group[subfile$to == "End"] <- 'stopped'
+      
+      # Fill NA's with 'undefined'
+      subfile$group[is.na(subfile$group)] <- 'undefined'
+      
+      # Compute augment/switch
+      total <- sum(subfile$freq)
+      subfile <- subfile[,.(count = sum(freq), perc = round(sum(freq)*100/total,4)), by = "group"]
+      subfile$layer <- l
+      
+    
       all_results <- rbind(all_results, subfile)
     }
-    
+   
+    write.csv(all_results, paste(path,"_augmentswitch_generalized.csv",sep=''), row.names = FALSE) 
   }
-
-  write.csv(all_results, paste(path,"_augmentswitch_generalized.csv",sep=''), row.names = FALSE)
 }
 
 computePercentageGroupTreated <- function(data, eventCohortIds, groupCombinations, outputFolder) {
@@ -451,7 +471,7 @@ createSunburstPlot <- function(data, databaseName, eventCohortIds, studyName, ou
     transformCSVtoJSON(eventCohortIds, outputFolder, path, index_year, maxPathLength)
     
     # Load template HTML file
-    html <- paste(readLines("plots/sunburst.html"), collapse="\n")
+    html <- paste(readLines("shiny/plots/sunburst.html"), collapse="\n")
     
     # Replace @insert_data
     input_plot <- readLines(paste(path,"_inputsunburst_", index_year, ".txt",sep=''))
@@ -462,7 +482,7 @@ createSunburstPlot <- function(data, databaseName, eventCohortIds, studyName, ou
     
     # Save HTML file as sunburst_@studyName
     write.table(html, 
-                file=paste0("plots/sunburst_", databaseName, "_", studyName,"_", index_year,".html"), 
+                file=paste0("shiny/plots/sunburst_", databaseName, "_", studyName,"_", index_year,".html"), 
                 quote = FALSE,
                 col.names = FALSE,
                 row.names = FALSE)

@@ -12,7 +12,7 @@ databaseList <- 'todo' # name of the data source
 dbms <- 'todo'
 server <- 'todo'
 port <- 'todo'
-outputFolder <- paste0(getwd(),"/output")
+outputFolder <- paste0(getwd(),"/shiny/output")
 
 # Optional: specify where the temporary files will be created:
 # options(andromedatempdir = "")

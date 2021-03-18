@@ -12,5 +12,5 @@ filterTreatments,First,Changes,Changes,Changes,Changes,Changes,Changes,Changes,C
 maxPathLength,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5
 minCellCount,0,5,5,5,5,5,5,5,5,5,5,5,5,5,5
 minCellMethod,Remove,Adjust,Adjust,Adjust,Adjust,Adjust,Adjust,Adjust,Adjust,Adjust,Adjust,Adjust,Adjust,Adjust,Adjust
-groupCombinations,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE
+groupCombinations,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10
 addNoPaths,FALSE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE

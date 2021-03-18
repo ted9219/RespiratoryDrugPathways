@@ -328,7 +328,7 @@ execute <- function(connection = NULL,
         transformDuration(connection = connection, outputFolder = outputFolder, cohortDatabaseSchema = cohortDatabaseSchema, dbms = dbms, studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, groupCombinations = TRUE, minCellCount = minCellCount)
         
         # Save (censored) results file_noyear and file_year
-        saveTreatmentSequence(file_noyear = file_noyear, file_withyear = file_withyear, path= path, groupCombinations = groupCombinations, minCellCount = minCellCount, minCellMethod = minCellMethod)
+        saveTreatmentSequence(file_noyear = file_noyear, file_withyear = file_withyear, path = path, groupCombinations = FALSE, minCellCount = minCellCount, minCellMethod = minCellMethod)
         
         file_noyear <- as.data.table(read.csv(paste(path,"_file_noyear.csv",sep=''), stringsAsFactors = FALSE))
         file_withyear <- as.data.table(read.csv(paste(path,"_file_withyear.csv",sep=''), stringsAsFactors = FALSE))
