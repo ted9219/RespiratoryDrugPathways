@@ -716,7 +716,7 @@ groupInfrequentCombinations <- function(data, groupCombinations)  {
   summaryCombinations <- summaryCombinations[,.(freq=sum(freq)), by=combination][order(-freq)]
   
   # Group all non-fixed combinations in one group if TRUE
-  if (groupCombinations) {
+  if (groupCombinations == "TRUE") {
     data[findCombinations] <- "Other"
   } else {
     # Otherwise: group infrequent treatments below groupCombinations as "other"
