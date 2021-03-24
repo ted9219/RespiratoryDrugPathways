@@ -1,4 +1,16 @@
 
+#' Title
+#'
+#' @param studyName 
+#' @param databaseName 
+#' @param path 
+#' @param maxPathLength 
+#' @param minCellCount 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLength, minCellCount) {
   
   file <- data.table(extractFile(connection, tableName = "drug_seq_summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, dbms = connectionDetails$dbms))
@@ -38,6 +50,19 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
   return(list(file_noyear, file_withyear))
 }
 
+#' Title
+#'
+#' @param file_noyear 
+#' @param file_withyear 
+#' @param path 
+#' @param groupCombinations 
+#' @param minCellCount 
+#' @param minCellMethod 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 saveTreatmentSequence <- function(file_noyear, file_withyear, path, groupCombinations, minCellCount, minCellMethod) {
   
   # Group non-fixed combinations in one group according to groupCobinations
@@ -100,6 +125,19 @@ saveTreatmentSequence <- function(file_noyear, file_withyear, path, groupCombina
 }
 
 
+#' Title
+#'
+#' @param data 
+#' @param eventCohortIds 
+#' @param groupCombinations 
+#' @param path 
+#' @param outputFolder 
+#' @param outputFile 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 outputPercentageGroupTreated <- function(data, eventCohortIds, groupCombinations, path, outputFolder, outputFile) {
   if (is.null(data$INDEX_YEAR)) {
     # For file_noyear compute once
@@ -123,6 +161,16 @@ outputPercentageGroupTreated <- function(data, eventCohortIds, groupCombinations
   ParallelLogger::logInfo("outputPercentageGroupTreated done")
 }
 
+#' Title
+#'
+#' @param file_noyear 
+#' @param path 
+#' @param targetCohortId 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 outputStepUpDown <- function(file_noyear, path, targetCohortId) { 
   
   # Replace & signs by + (so that definitions match both)
@@ -149,6 +197,17 @@ outputStepUpDown <- function(file_noyear, path, targetCohortId) {
 } 
 
 
+#' Title
+#'
+#' @param file 
+#' @param path 
+#' @param targetCohortId 
+#' @param input 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 stepUpDown <- function(file, path, targetCohortId, input) {
   
   if (input == "manual rules") {
@@ -201,14 +260,14 @@ stepUpDown <- function(file, path, targetCohortId, input) {
         result <- result[!is.na(result$from),]
         
         # Define stop treatment
-        result$category[is.na(result$to)] <- 'stopped'
+        result$group[is.na(result$to)] <- 'stopped'
         
         # Fill NA's with 'undefined'
-        result$category[is.na(result$category)] <- 'undefined'
+        result$group[is.na(result$group)] <- 'undefined'
         
         # Compute augment/switch
         total <- sum(result$freq)
-        result <- result[,.(count = sum(freq), perc = round(sum(freq)*100/total,4)), by = "category"]
+        result <- result[,.(count = sum(freq), perc = round(sum(freq)*100/total,4)), by = "group"]
         result$layer <- l
         
         all_results <- rbind(all_results, result)
@@ -342,6 +401,17 @@ stepUpDown <- function(file, path, targetCohortId, input) {
   }
 }
 
+#' Title
+#'
+#' @param data 
+#' @param eventCohortIds 
+#' @param groupCombinations 
+#' @param outputFolder 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 computePercentageGroupTreated <- function(data, eventCohortIds, groupCombinations, outputFolder) {
   layers <- as.vector(colnames(data)[!grepl("INDEX_YEAR|freq", colnames(data))])
   cohorts <- read.csv(paste(outputFolder, "/cohort.csv",sep=''), stringsAsFactors = FALSE)
@@ -381,6 +451,24 @@ computePercentageGroupTreated <- function(data, eventCohortIds, groupCombination
   return(result)
 }
 
+#' Title
+#'
+#' @param connection 
+#' @param cohortDatabaseSchema 
+#' @param outputFolder 
+#' @param dbms 
+#' @param studyName 
+#' @param databaseName 
+#' @param path 
+#' @param maxPathLength 
+#' @param groupCombinations 
+#' @param minCellCount 
+#' @param removePaths 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 transformDuration <- function(connection, cohortDatabaseSchema, outputFolder, dbms, studyName, databaseName, path, maxPathLength, groupCombinations, minCellCount, removePaths) {
   
   file <- data.table(extractFile(connection, tableName = "drug_seq_processed", resultsSchema = cohortDatabaseSchema, studyName = studyName,databaseName = databaseName, dbms = connectionDetails$dbms))
@@ -442,6 +530,24 @@ transformDuration <- function(connection, cohortDatabaseSchema, outputFolder, db
   ParallelLogger::logInfo("transformDuration done")
 }
 
+#' Title
+#'
+#' @param data 
+#' @param databaseName 
+#' @param eventCohortIds 
+#' @param studyName 
+#' @param outputFolder 
+#' @param path 
+#' @param groupCombinations 
+#' @param addNoPaths 
+#' @param maxPathLength 
+#' @param createInput 
+#' @param createPlot 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 outputSunburstPlot <- function(data, databaseName, eventCohortIds, studyName, outputFolder, path, groupCombinations, addNoPaths, maxPathLength, createInput, createPlot) {
   if (is.null(data$INDEX_YEAR)) {
     # For file_noyear compute once
@@ -460,6 +566,25 @@ outputSunburstPlot <- function(data, databaseName, eventCohortIds, studyName, ou
   ParallelLogger::logInfo("outputSunburstPlot done")
 }
 
+#' Title
+#'
+#' @param data 
+#' @param databaseName 
+#' @param eventCohortIds 
+#' @param studyName 
+#' @param outputFolder 
+#' @param path 
+#' @param groupCombinations 
+#' @param addNoPaths 
+#' @param maxPathLength 
+#' @param index_year 
+#' @param createInput 
+#' @param createPlot 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 createSunburstPlot <- function(data, databaseName, eventCohortIds, studyName, outputFolder, path, groupCombinations, addNoPaths, maxPathLength, index_year, createInput, createPlot){
   
   if (createInput) {
@@ -482,7 +607,7 @@ createSunburstPlot <- function(data, databaseName, eventCohortIds, studyName, ou
     
     # Save HTML file as sunburst_@studyName
     write.table(html, 
-                file=paste0("shiny/plots/sunburst_", databaseName, "_", studyName,"_", index_year,".html"), 
+                file=paste0(outputFolder, "/plots/sunburst_", databaseName, "_", studyName,"_", index_year,".html"), 
                 quote = FALSE,
                 col.names = FALSE,
                 row.names = FALSE)
@@ -491,6 +616,18 @@ createSunburstPlot <- function(data, databaseName, eventCohortIds, studyName, ou
 }
 
 
+#' Title
+#'
+#' @param data 
+#' @param path 
+#' @param groupCombinations 
+#' @param addNoPaths 
+#' @param index_year 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 inputSunburstPlot <- function(data, path, groupCombinations, addNoPaths, index_year) {
   
   # Group non-fixed combinations in one group according to groupCobinations
@@ -522,6 +659,18 @@ inputSunburstPlot <- function(data, path, groupCombinations, addNoPaths, index_y
   write.table(transformed_file, file=paste(path,"_inputsunburst_", index_year, ".csv",sep=''), sep = ",", row.names = FALSE)
 }
 
+#' Title
+#'
+#' @param eventCohortIds 
+#' @param outputFolder 
+#' @param path 
+#' @param index_year 
+#' @param maxPathLength 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 transformCSVtoJSON <- function(eventCohortIds, outputFolder, path, index_year, maxPathLength) {
   data <- read.csv(paste(path,"_inputsunburst_", index_year, ".csv",sep=''))
   
@@ -569,6 +718,15 @@ transformCSVtoJSON <- function(eventCohortIds, outputFolder, path, index_year, m
   close(file)
 }
 
+#' Title
+#'
+#' @param csv 
+#' @param maxPathLength 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 buildHierarchy <- function(csv, maxPathLength) {
   
   if (maxPathLength > 5) {
@@ -654,6 +812,16 @@ buildHierarchy <- function(csv, maxPathLength) {
   return(json)
 }
 
+#' Title
+#'
+#' @param data 
+#' @param databaseName 
+#' @param studyName 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 createSankeyDiagram <- function(data, databaseName, studyName) {
   
   # Group all non-fixed combinations in one group
@@ -703,6 +871,15 @@ createSankeyDiagram <- function(data, databaseName, studyName) {
 }
 
 
+#' Title
+#'
+#' @param data 
+#' @param groupCombinations 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 groupInfrequentCombinations <- function(data, groupCombinations)  {
   
   # Find all non-fixed combinations occurring
