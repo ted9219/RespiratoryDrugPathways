@@ -27,10 +27,18 @@ getHoveroverStyle <- function(left_px, top_px) {
                   "px; width:400px;")
 }
 
+round_df <- function(x, digits) {
+  # round all numeric variables
+  # x: data frame 
+  # digits: number of digits to round
+  numeric_columns <- sapply(x, mode) == 'numeric'
+  x[numeric_columns] <-  round(x[numeric_columns], digits)
+  x
+}
+
 ## the shiny server update function
 server <- function(input, output, session) {
   
-
   cohortId <- reactive({
     return(cohort$cohortId[cohort$cohortName == input$ingredient])
   })
@@ -83,10 +91,13 @@ server <- function(input, output, session) {
     showInfoBox("Characterization", "html/characterization.html")
   })
   observeEvent(input$treatmentPathwaysInfo, {
-    showInfoBox("Treatment pathways", "html/treatmentpathways.html")
+    showInfoBox("Sunburst plots", "html/treatmentpathways.html")
+  })
+  observeEvent(input$sankeyDiagramInfo, {
+    showInfoBox("Sankey Diagram", "html/sankeydiagram.html")
   })
   observeEvent(input$summaryPathwaysInfo, {
-    showInfoBox("Summary pathways", "html/treatmentpathways.html")
+    showInfoBox("Treated patients", "html/treatedpatients.html")
   })
   observeEvent(input$durationInfo, {
     showInfoBox("Duration", "html/duration.html")
@@ -257,7 +268,25 @@ server <- function(input, output, session) {
     return(result)
   })
   
-  output$tableSummaryPathwayTitle <- renderText({paste0("Percentage of patients with each treatment group in treatment pathway and as '", tolower(names(which(layers == input$layer3))), "' in '", tolower(names(which(all_years == input$year3))), "'.") })
+  
+  output$sankeydiagram <- renderUI({
+    
+    inhalation <- ""
+    if (input$inhalation2 == "Yes") {
+      inhalation <- "_inhaler"
+    } 
+    
+    info <- summary_counts[[input$dataset34]][[paste0(input$population345, inhalation)]]
+    title_plot <- paste0(names(which(included_databases == input$dataset34)), " (N = ", info$number_target[info$year == "all"], " , Treated % = ", info$perc[info$year == "all"], ")")
+    plot_location <- paste0("workingdirectory/plots/sankeydiagram_", input$dataset34, "_",input$population345, inhalation, "_all.html")
+    
+    plot <- tagList(tags$h4(title_plot), tags$iframe(seamless="seamless", src=plot_location, width=800, height=400, scrolling = "no", frameborder = "no"))
+    
+    return(plot)
+  })
+  
+  
+  output$tableSummaryPathwayTitle <- renderText({paste0("Percentage of treated patients with each treatment group in pathway and as '", tolower(names(which(layers == input$layer3))), "' in '", tolower(names(which(all_years == input$year3))), "'.") })
   
   output$tableSummaryPathway <- renderDataTable({
     
@@ -273,18 +302,21 @@ server <- function(input, output, session) {
     
     # Select and rename column
     col_name <- paste0("D", input$layer3, "_CONCEPT_NAME")
-    table <- data[,c("outcomes", col_name)]
-    colnames(table) <- c("Group", names(which(layers == input$layer3)))
+    table <- data[,c("outcomes",  "ALL_LAYERS", col_name)]
+    colnames(table) <- c("Group", "Group in Pathway", names(which(layers == input$layer3)))
+    
+    # Round numbers
+    table <- round_df(table, 1)  
     
     # Sort
     table  <- table[order(match(table$Group,orderClasses)),]
     row.names(table) <- NULL
     
     return(table)
-  }, options = list(pageLength = 20))
+  }, options = list(pageLength = 21))
   
   output$figureSummaryPathwayTitleYears <- renderText({
-    paste0("Figure with percentage of patients with each teatment group as '", tolower(names(which(layers == input$layer3))), "' over the different years.")
+    paste0("Figure with percentage of treated patients with each treatment group as '", tolower(names(which(layers == input$layer3))), "' over the different years.")
   })
   
   output$figureSummaryPathwayYears <- renderPlot({
@@ -305,7 +337,7 @@ server <- function(input, output, session) {
   })
   
   output$figureSummaryPathwayTitleLayers <- renderText({
-    paste0("Figure with percentages of patients with each treatment group in '", tolower(names(which(all_years == input$year3))) , "' over the different treatment layers.")
+    paste0("Figure with percentages of treated patients with each treatment group in '", tolower(names(which(all_years == input$year3))) , "' over the different treatment layers.")
   })
   
   output$figureSummaryPathwayLayers <- renderPlot({
@@ -363,7 +395,7 @@ server <- function(input, output, session) {
     row.names(data) <- NULL
     
     return(data)
-  }, options = list(pageLength = 18))
+  }, options = list(pageLength = 21))
   
   output$heatmapDuration <- renderPlot({
     
@@ -387,10 +419,15 @@ server <- function(input, output, session) {
     # Sort
     data_matrix <- data_matrix[order(-match(row.names(data_matrix),orderClasses)),]
     
-    # TODO: create own categories + add legend?
-    
-    heatmap(data_matrix, Rowv = NA, Colv = NA, scale = "none", margins = c(10, 5), cexRow = 1, cexCol = 1)
-    
+    # Create own categories
+    data_matrix_group <- sapply(1:ncol(data_matrix), function(c) {cut(data_matrix[,c], breaks = c(0,1,30,90,120,180,1000), labels=FALSE, right = FALSE)})
+    colnames(data_matrix_group) <- colnames(data_matrix)
+    rownames(data_matrix_group) <- rownames(data_matrix)
+  
+    # colors <- c("#FFFFFF", rev(heat.colors(5)))
+    colors <- c("#FFFFFF", "#FFFF00", "#FFAA00","#FF0000","#a11212", "#631616")
+    heatmap(data_matrix_group, Rowv = NA, Colv = NA, scale = "none", margins = c(10, 5), cexRow = 1, cexCol = 1, col=colors) 
+    legend(x="topright", legend=c("NA", "0-30", "30-90", "90-120", "120-180", "180+"), fill=colors, title="Duration group")
   })
   
   output$stepupdownpie <- renderUI({
@@ -405,7 +442,6 @@ server <- function(input, output, session) {
     data <- as.data.table(data)
     data <- data[layer == input$transition5,]
     
-    data$group <- data$category
     data$group[data$group == "step_up_broad"] <- "step_up"
     data$group[data$group == "step_down_broad"] <- "step_down"
     data$group[data$group == "switching_broad"] <- "switching"

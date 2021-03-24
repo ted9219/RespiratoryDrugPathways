@@ -25,8 +25,9 @@ ui <- dashboardPage(
       addInfo(menuItem("About", tabName = "about"), "aboutInfo"),
       addInfo(menuItem("Databases", tabName = "databases"), "databaseInfo"),
       addInfo(menuItem("Characterization", tabName = "characterization"), "characterizationInfo"),
-      addInfo(menuItem("Treatment pathways", tabName = "pathways"), "treatmentPathwaysInfo"),
-      addInfo(menuItem("Summary pathways", tabName = "summarypathway"), "summaryPathwaysInfo"),
+      addInfo(menuItem("Sunburst plots", tabName = "pathways"), "treatmentPathwaysInfo"),
+      addInfo(menuItem("Sankey diagram", tabName = "sankeydiagram"), "sankeyDiagramInfo"),
+      addInfo(menuItem("Treated patients", tabName = "summarypathway"), "summaryPathwaysInfo"),
       addInfo(menuItem("Duration eras", tabName = "duration"), "durationInfo"),
       addInfo(menuItem("Step up/down", tabName = "stepupdown"), "stepupdownInfo"),
      
@@ -48,20 +49,20 @@ ui <- dashboardPage(
      conditionalPanel(
       condition = "input.tabs=='pathways'",
       htmlOutput("dynamic_input2")),
-
-     conditionalPanel(
-       condition = "input.tabs=='pathways'",
-       selectInput("inhalation2", label = "Show only inhalation", choices = c("Yes", "No"), selected = "No")
-     ),
-
+  
     conditionalPanel(
-      condition = "input.tabs=='summarypathway' || input.tabs=='duration'",
+      condition = "input.tabs=='sankeydiagram' || input.tabs=='summarypathway' || input.tabs=='duration'",
       selectInput("dataset34", label = "Database", choices = included_databases, selected = "IPCI")
     ),
     
     conditionalPanel(
-      condition = "input.tabs=='summarypathway' || input.tabs=='duration' || input.tabs=='stepupdown'",
+      condition = "input.tabs=='sankeydiagram' ||input.tabs=='summarypathway' || input.tabs=='duration' || input.tabs=='stepupdown'",
       selectInput("population345", label = "Study population", choices = all_populations, selected = "asthma")
+    ),
+    
+    conditionalPanel(
+      condition = "input.tabs=='pathways' || input.tabs=='sankeydiagram'",
+      selectInput("inhalation2", label = "Show only inhalation", choices = c("Yes", "No"), selected = "No")
     ),
     
     conditionalPanel(
@@ -80,8 +81,6 @@ ui <- dashboardPage(
         condition = "input.tabs=='stepupdown'",
         radioButtons("transition5", label = "Transition after treatment layer", choices = layers[1:3], selected = 1)
       )
-    
-   
     )
     
   ),
@@ -140,6 +139,12 @@ ui <- dashboardPage(
                        htmlOutput("sunburstplots"))),
               column(width = 3, tags$img(src = paste0("workingdirectory/plots/legend.png"), height = 400))
       ),
+      tabItem(tabName = "sankeydiagram",
+              column(width = 12, 
+                     box(
+                       title = "Treatment Pathways", width = 30, status = "primary",
+                       htmlOutput("sankeydiagram")))
+      ),
       
       tabItem(tabName = "summarypathway",
               box(width = 6,
@@ -180,10 +185,6 @@ ui <- dashboardPage(
                 )
               ),
               
-              # box(width = 12,
-              #    textOutput("tableDurationTitle"),
-              #    dataTableOutput("tableDuration")
-              # )
       tabItem(tabName = "stepupdown",
               box(width = 12,
                   uiOutput("stepupdownpie")
@@ -192,7 +193,3 @@ ui <- dashboardPage(
     )
   )
 )
-
-
-
-

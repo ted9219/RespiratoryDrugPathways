@@ -12,10 +12,7 @@ library(shinymanager)
 library(magrittr)
 library(ggplot2)
 
-# rsconnect::deployApp(paste0(getwd(), "/shiny"))
-
 # Set working directory
-# setwd(stringr::str_replace(getwd(),"/shiny",""))
 local <- paste0(getwd(), "/")
 addResourcePath("workingdirectory", getwd())
 
@@ -57,7 +54,6 @@ labels_stepupdown <- list("stopped" = "Stopped",
                           "switching" = "Switching",
                           "acute_exacerbation" = "Acute exacerbation",
                           "end_of_acute_exacerbation" = "End of acute exacerbation")
-
 # Set colors
 colors <- list("stopped" = "#EBDEF0", # purple
                "step_up" = "#FADBD8", # red
@@ -99,6 +95,7 @@ for (d in included_databases) {
   
   for (p in c(all_populations, paste0(all_populations, "_inhaler"))) {
     # Load step up/down file for available study populations
+    try(stepupdown_d[[p]] <- read.csv(paste0(local, "output/", d, "/", p, "/",d , "_", p, "_augmentswitch_generalized.csv")))
     try(stepupdown_d[[p]] <- read.csv(paste0(local, "output/", d, "/", p, "/",d , "_", p, "_augmentswitch.csv"))) 
     
     # Load summary counts

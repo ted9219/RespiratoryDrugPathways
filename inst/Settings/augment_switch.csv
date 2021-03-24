@@ -1,4 +1,4 @@
-targetCohortIds,from,to,category
+targetCohortIds,from,to,group
 "1,4,5",SABA,SABA+SAMA,step_up
 "1,4,5",SABA,SABA+ICS,step_up
 "1,4,5",SABA,ICS,step_up
