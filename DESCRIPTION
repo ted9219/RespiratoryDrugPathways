@@ -24,7 +24,8 @@ Imports:
     readr,
     networkD3,
     rjson,
-    shiny
+    shiny,
+    reshape2
 License: Apache License 2.0
 Encoding: UTF-8
 LazyData: true
