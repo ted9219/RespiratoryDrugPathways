@@ -46,7 +46,8 @@
 #' @param study_settings         
 #' @export
 
-execute <- function(connection = NULL,
+execute <- function(OMOP_CDM = TRUE,
+                    connection = NULL,
                     connectionDetails,
                     cdmDatabaseSchema,
                     cohortDatabaseSchema = cdmDatabaseSchema,
@@ -55,6 +56,7 @@ execute <- function(connection = NULL,
                     outputFolder,
                     databaseId = "Unknown",
                     databaseName = "Unknown",
+                    cohortLocation = "inst/Settings/input_cohorts.csv",
                     runCreateCohorts = TRUE,
                     runCohortCharacterization = FALSE,
                     runTreatmentPathways = FALSE,
@@ -64,27 +66,28 @@ execute <- function(connection = NULL,
   if (!file.exists(outputFolder))
     dir.create(outputFolder, recursive = TRUE)
   
-  if (is.null(connection)) {
-    connection <- DatabaseConnector::connect(connectionDetails)
-    on.exit(DatabaseConnector::disconnect(connection))
-  }
-  
+  ParallelLogger::clearLoggers()
   ParallelLogger::addDefaultFileLogger(file.path(outputFolder, "log.txt"))
   ParallelLogger::logInfo(paste0("Running package version ", packageVersion("RespiratoryDrugPathways")))
   
   # Target/outcome cohorts of interest are extracted from the database (defined using ATLAS or custom concept sets created in SQL inserted into cohort template) 
   if (runCreateCohorts) {
-    ParallelLogger::logInfo("runCreateCohorts TRUE")
-    createCohorts(connectionDetails = connectionDetails,
-                  cdmDatabaseSchema = cdmDatabaseSchema,
-                  cohortDatabaseSchema = cohortDatabaseSchema,
-                  cohortTable = cohortTable,
-                  oracleTempSchema = oracleTempSchema,
-                  outputFolder = outputFolder)
+    if (OMOP_CDM) {
+      ParallelLogger::logInfo("runCreateCohorts OMOP-CDM TRUE")
+      createCohorts(connectionDetails = connectionDetails,
+                    cdmDatabaseSchema = cdmDatabaseSchema,
+                    cohortDatabaseSchema = cohortDatabaseSchema,
+                    cohortTable = cohortTable,
+                    oracleTempSchema = oracleTempSchema,
+                    outputFolder = outputFolder)
+    } else {
+      ParallelLogger::logInfo("runCreateCohorts Other TRUE")
+      importCohorts(cohortLocation = cohortLocation, outputFolder = outputFolder)
+    }
   }
   
   # Characterization of study/target population
-  if (runCohortCharacterization) {
+  if (runCohortCharacterization & OMOP_CDM) {
     ParallelLogger::logInfo("runCohortCharacterization TRUE")
     
     if (!file.exists(paste0(outputFolder, "/characterization")))
@@ -197,31 +200,59 @@ execute <- function(connection = NULL,
       minStepDuration <-  as.integer(study_settings[study_settings$param == "minStepDuration",s]) # Minimum time an event era before or after a generated combination treatment should last to be included in analysis
       filterTreatments <-  study_settings[study_settings$param == "filterTreatments",s] # Select first occurrence of / changes between / all event cohorts
         
-      # Load cohorts and pre-processing in SQL
-      sql <- loadRenderTranslateSql(sql = "CreateTreatmentSequence.sql",
-                                    dbms = connectionDetails$dbms,
-                                    oracleTempSchema = oracleTempSchema,
-                                    resultsSchema=cohortDatabaseSchema,
-                                    studyName=studyName,
-                                    databaseName=databaseName,
-                                    targetCohortId=targetCohortId,
-                                    eventCohortIds=eventCohortIds,
-                                    includeTreatmentsPriorToIndex=includeTreatmentsPriorToIndex,
-                                    cohortTable=cohortTable)
-      DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
+      # Load cohorts
+      if (OMOP_CDM) {
+        sql <- loadRenderTranslateSql(sql = "CreateTreatmentSequence.sql",
+                                      dbms = connectionDetails$dbms,
+                                      oracleTempSchema = oracleTempSchema,
+                                      resultsSchema=cohortDatabaseSchema,
+                                      studyName=studyName,
+                                      databaseName=databaseName,
+                                      targetCohortId=targetCohortId,
+                                      eventCohortIds=eventCohortIds,
+                                      includeTreatmentsPriorToIndex=includeTreatmentsPriorToIndex,
+                                      cohortTable=cohortTable)
+        DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
+        
+        sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.@databaseName_@studyName_@tableName",
+                                      dbms = connectionDetails$dbms,
+                                      oracleTempSchema = oracleTempSchema,
+                                      resultsSchema=cohortDatabaseSchema,
+                                      studyName=studyName,
+                                      databaseName=databaseName,
+                                      tableName="drug_seq")
+        data <- as.data.table(DatabaseConnector::querySql(connection, sql))
+        
+      } else {
+        
+        # Load cohorts in from file
+        # Required columns: cohort_id, person_id, start_date, end_date
+        all_data <- data.table(read.csv("~/Desktop/test2.csv", sep=";"))
       
-      sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.@databaseName_@studyName_@tableName",
-                                    dbms = connectionDetails$dbms,
-                                    oracleTempSchema = oracleTempSchema,
-                                    resultsSchema=cohortDatabaseSchema,
-                                    studyName=studyName,
-                                    databaseName=databaseName,
-                                    tableName="drug_seq")
-      all_data <- DatabaseConnector::querySql(connection, sql)
+        # Select target cohort
+        select_people <- all_data$person_id[all_data$cohort_id == targetCohortId]
+        data <- all_data[all_data$person_id %in% select_people, ]
+
+        # Add index year column based on start date target cohort
+        targetCohort <- data[data$cohort_id %in% targetCohortId,,]
+        targetCohort$index_year <- stringr::str_match(targetCohort$start_date, "20\\d{2}")
+        
+        eventCohorts <- data[data$cohort_id %in% eventCohortIds,,]
+        data <- merge(x = eventCohorts, y = targetCohort, by = c("person_id"))
+
+        # Only keep event cohorts after target cohort start date
+        # TODO: check if date type required
+        data <- data[data$start_date.y - includeTreatmentsPriorToIndex <= start_date.x & data$start_date.x < data$end_date.y,]
+        
+        # TODO: remove unnecessary columns and change column names
       
+        # Calculate duration
+        data[,DURATION_ERA:=difftime(DRUG_END_DATE , DRUG_START_DATE, units = "days")]
+      
+      }
+     
       # Apply analysis settings
       ParallelLogger::logInfo("Construct combinations, this may take a while for larger datasets.")
-      data <- as.data.table(all_data)
       writeLines(paste0("Original: ", nrow(data)))
       
       data <- doEraDuration(data, minEraDuration)
@@ -256,25 +287,36 @@ execute <- function(connection = NULL,
       concept_names <- strsplit(data$CONCEPT_NAME[combi], split="+", fixed=TRUE)
       data$CONCEPT_NAME[combi] <- sapply(concept_names, function(x) paste(sort(x), collapse = "+"))
       
+      # Group
+      # TODO: check/adjust
+      data <- reshape2::dcast(data = data, person_id + index_year ~ drug_seq, value.var = "outcome_cohort_name")
+      data <- data.table(data)
+      
+      layers <- as.vector(colnames(data)[!grepl("CONCEPT_ID|INDEX_YEAR|NUM_PERSONS", colnames(data))])
+      data <- data[, .(freq=sum(unique(person_id))), .BY = layers]
+      
+      # TODO: calculate number of persons in target cohort / with pathways, in total / per year
+      counts <- rollup(data, sum(freq), by = c("1", "index_year"))
+      
       # Move table back to SQL
-      ParallelLogger::logInfo("Move data back to SQL and final processing, this may take longer for larger datasets.")
-      time3 <- Sys.time()
-      DatabaseConnector::insertTable(connection = connection,
-                                     tableName = paste0(cohortDatabaseSchema,".", databaseName, "_", studyName, "_drug_seq_processed"),
-                                     data = data,
-                                     dropTableIfExists = TRUE,
-                                     createTable = TRUE,
-                                     tempTable = FALSE)
+      # ParallelLogger::logInfo("Move data back to SQL and final processing, this may take longer for larger datasets.")
+      # time3 <- Sys.time()
+      # DatabaseConnector::insertTable(connection = connection,
+      #                               tableName = paste0(cohortDatabaseSchema,".", databaseName, "_", studyName, "_drug_seq_processed"),
+      #                               data = data,
+      #                               dropTableIfExists = TRUE,
+      #                               createTable = TRUE,
+      #                               tempTable = FALSE)
       
       # Post-processing in SQL
-      sql <- loadRenderTranslateSql(sql = "SummarizeTreatmentSequence.sql",
-                                    dbms = connectionDetails$dbms,
-                                    oracleTempSchema = oracleTempSchema,
-                                    resultsSchema=cohortDatabaseSchema,
-                                    cdmDatabaseSchema = cdmDatabaseSchema,
-                                    studyName=studyName,
-                                    databaseName=databaseName)
-      DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
+      # sql <- loadRenderTranslateSql(sql = "SummarizeTreatmentSequence.sql",
+      #                              dbms = connectionDetails$dbms,
+      #                              oracleTempSchema = oracleTempSchema,
+      #                              resultsSchema=cohortDatabaseSchema,
+      #                              cdmDatabaseSchema = cdmDatabaseSchema,
+      #                              studyName=studyName,
+      #                              databaseName=databaseName)
+      # DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
       time4 <- Sys.time()
       
       ParallelLogger::logInfo(paste0("Time needed to move data back to SQL and final processing ", difftime(time4, time3, units = "mins")))
