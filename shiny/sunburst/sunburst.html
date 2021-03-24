@@ -4,7 +4,7 @@
 	<title>Visualization: Sunburst</title>
 	<link rel="stylesheet" type="text/css"
       href="https://fonts.googleapis.com/css?family=Open+Sans:400,600">
-		<link href="chart.css" rel="stylesheet">
+		<link href="../../../sunburst/chart.css" rel="stylesheet">
 </head>
 
 <body>
@@ -23,9 +23,9 @@
     <div id="legend" style="visibility:hidden;"></div>
 	</div>  
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.3/require.min.js"></script>
-	<script src="config.js"></script>
+	<script src="../../../sunburst/config.js"></script>
 	<script>
-		requirejs(['sunburst'], function(Sunburst) {
+		requirejs(['../../../sunburst/sunburst'], function(Sunburst) {
 			var plot = new Sunburst();
 			var target = document.querySelector('#plot');
 

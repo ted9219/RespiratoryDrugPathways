@@ -1,8 +1,8 @@
 requirejs.config({
 	packages: [
 		{
-			name: "plots",
-			location: "../plots",
+			name: "sunburst",
+			location: "../sunburst",
 			main: "main"
 		}	
   ],
