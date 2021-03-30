@@ -68,12 +68,12 @@ execute <- function(OMOP_CDM = TRUE,
   
   ParallelLogger::clearLoggers()
   ParallelLogger::addDefaultFileLogger(file.path(outputFolder, "log.txt"))
-  ParallelLogger::logInfo(paste0("Running package version ", packageVersion("RespiratoryDrugPathways")))
+  ParallelLogger::logInfo(print(paste0("Running package version ", packageVersion("RespiratoryDrugPathways"))))
   
   # Target/outcome cohorts of interest are extracted from the database (defined using ATLAS or custom concept sets created in SQL inserted into cohort template) 
   if (runCreateCohorts) {
     if (OMOP_CDM) {
-      ParallelLogger::logInfo("runCreateCohorts OMOP-CDM TRUE")
+      ParallelLogger::logInfo(print("runCreateCohorts OMOP-CDM TRUE"))
       createCohorts(connectionDetails = connectionDetails,
                     cdmDatabaseSchema = cdmDatabaseSchema,
                     cohortDatabaseSchema = cohortDatabaseSchema,
@@ -88,7 +88,7 @@ execute <- function(OMOP_CDM = TRUE,
   
   # Characterization of study/target population
   if (runCohortCharacterization & OMOP_CDM) {
-    ParallelLogger::logInfo("runCohortCharacterization TRUE")
+    ParallelLogger::logInfo(print("runCohortCharacterization TRUE"))
     
     if (!file.exists(paste0(outputFolder, "/characterization")))
       dir.create(paste0(outputFolder, "/characterization"), recursive = TRUE)
@@ -177,7 +177,7 @@ execute <- function(OMOP_CDM = TRUE,
   
   # Treatment pathways are constructed
   if (runTreatmentPathways) {
-    ParallelLogger::logInfo("runTreatmentPathways TRUE")
+    ParallelLogger::logInfo(print("runTreatmentPathways TRUE"))
     
     # For all different study settings
     settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
@@ -185,72 +185,79 @@ execute <- function(OMOP_CDM = TRUE,
     for (s in settings) {
       studyName <- study_settings[study_settings$param == "studyName",s]
       
-      ParallelLogger::logInfo(paste0("Constructing treatment pathways: ", studyName))
+      if (!file.exists(paste0(getwd(),"/temp/", databaseName, "/", studyName)))
+        dir.create(paste0(getwd(),"/temp/",  databaseName, "/", studyName), recursive = TRUE)
+      
+      if (!file.exists(paste0(outputFolder, "/", studyName)))
+        dir.create(paste0(outputFolder, "/",studyName), recursive = TRUE)
+      
+      ParallelLogger::logInfo(print(paste0("Constructing treatment pathways: ", studyName)))
       
       # Select cohorts included
       targetCohortId <- study_settings[study_settings$param == "targetCohortId",s]
       eventCohortIds <- study_settings[study_settings$param == "eventCohortIds",s]
       
       # Analysis settings
-      includeTreatmentsPriorToIndex <- study_settings[study_settings$param == "includeTreatmentsPriorToIndex",s] # Number of days prior to the index date of the target cohort that event cohorts are allowed to start
+      includeTreatmentsPriorToIndex <- as.integer(study_settings[study_settings$param == "includeTreatmentsPriorToIndex",s]) # Number of days prior to the index date of the target cohort that event cohorts are allowed to start
       minEraDuration <-  as.integer(study_settings[study_settings$param == "minEraDuration",s]) # Minimum time an event era should last to be included in analysis
       splitEventCohorts <-  study_settings[study_settings$param == "splitEventCohorts",s] # Specify event cohort to split in acute (< 30 days) and therapy (>= 30 days)
       eraCollapseSize <-  as.integer(study_settings[study_settings$param == "eraCollapseSize",s]) # Window of time between which two eras of the same event cohort are collapsed into one era
       combinationWindow <-  as.integer(study_settings[study_settings$param == "combinationWindow",s]) # Window of time two event cohorts need to overlap to be considered a combination treatment
       minStepDuration <-  as.integer(study_settings[study_settings$param == "minStepDuration",s]) # Minimum time an event era before or after a generated combination treatment should last to be included in analysis
       filterTreatments <-  study_settings[study_settings$param == "filterTreatments",s] # Select first occurrence of / changes between / all event cohorts
-        
+      
       # Load cohorts
       if (OMOP_CDM) {
-        sql <- loadRenderTranslateSql(sql = "CreateTreatmentSequence.sql",
+        # Get cohorts from database and save as csv
+        sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.@cohortTable",
                                       dbms = connectionDetails$dbms,
                                       oracleTempSchema = oracleTempSchema,
                                       resultsSchema=cohortDatabaseSchema,
                                       studyName=studyName,
                                       databaseName=databaseName,
-                                      targetCohortId=targetCohortId,
-                                      eventCohortIds=eventCohortIds,
-                                      includeTreatmentsPriorToIndex=includeTreatmentsPriorToIndex,
                                       cohortTable=cohortTable)
-        DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
+        all_data <- as.data.table(DatabaseConnector::querySql(connection, sql))
+        colnames(all_data) <- c("cohort_id", "person_id", "start_date", "end_date")   
         
-        sql <- loadRenderTranslateSql(sql = "SELECT * FROM @resultsSchema.@databaseName_@studyName_@tableName",
-                                      dbms = connectionDetails$dbms,
-                                      oracleTempSchema = oracleTempSchema,
-                                      resultsSchema=cohortDatabaseSchema,
-                                      studyName=studyName,
-                                      databaseName=databaseName,
-                                      tableName="drug_seq")
-        data <- as.data.table(DatabaseConnector::querySql(connection, sql))
-        
+        # write.csv(all_data, paste0(getwd(),"/temp/",  databaseName, "/", databaseName, "_extracted_cohorts.csv"), row.names = FALSE) 
       } else {
         
         # Load cohorts in from file
         # Required columns: cohort_id, person_id, start_date, end_date
-        all_data <- data.table(read.csv("~/Desktop/test2.csv", sep=";"))
-      
-        # Select target cohort
-        select_people <- all_data$person_id[all_data$cohort_id == targetCohortId]
-        data <- all_data[all_data$person_id %in% select_people, ]
-
-        # Add index year column based on start date target cohort
-        targetCohort <- data[data$cohort_id %in% targetCohortId,,]
-        targetCohort$index_year <- stringr::str_match(targetCohort$start_date, "20\\d{2}")
-        
-        eventCohorts <- data[data$cohort_id %in% eventCohortIds,,]
-        data <- merge(x = eventCohorts, y = targetCohort, by = c("person_id"))
-
-        # Only keep event cohorts after target cohort start date
-        # TODO: check if date type required
-        data <- data[data$start_date.y - includeTreatmentsPriorToIndex <= start_date.x & data$start_date.x < data$end_date.y,]
-        
-        # TODO: remove unnecessary columns and change column names
-      
-        # Calculate duration
-        data[,DURATION_ERA:=difftime(DRUG_END_DATE , DRUG_START_DATE, units = "days")]
-      
+        all_data <- data.table(read.csv(paste0(getwd(),"/temp/",  databaseName, "/extracted_cohorts.csv"), sep=","))
       }
-     
+      
+      # Select target cohort
+      select_people <- all_data$person_id[all_data$cohort_id == targetCohortId]
+      data <- all_data[all_data$person_id %in% select_people, ]
+      
+      # Add index year column based on start date target cohort
+      targetCohort <- data[data$cohort_id %in% targetCohortId,,]
+      targetCohort$index_year <- stringr::str_match(targetCohort$start_date, "20\\d{2}")
+      
+      # Number of persons in target cohort (in total + per year)
+      counts_targetcohort <- rollup(targetCohort, .N, by = c("index_year"))
+      counts_targetcohort$index_year <- paste0("Number of persons in target cohort ", counts_targetcohort$index_year)
+      
+      # Select event cohorts for target cohort and merge with start/end date and index year
+      eventCohorts <- data[data$cohort_id %in% unlist(strsplit(eventCohortIds, split = ",")),,]
+      data <- merge(x = eventCohorts, y = targetCohort, by = c("person_id"), all.x = TRUE)
+      
+      # Only keep event cohorts after target cohort start date
+      data <- data[data$start_date.y - as.difftime(includeTreatmentsPriorToIndex, unit="days") <= start_date.x & data$start_date.x < data$end_date.y,]
+      
+      # Remove unnecessary columns
+      data <- data[,c("person_id","index_year", "cohort_id.x", "start_date.x", "end_date.x")]
+      colnames(data) <- c("person_id","index_year", "event_cohort_id", "event_start_date", "event_end_date")
+      
+      # Calculate duration and gap same
+      data[,duration_era:=difftime(event_end_date, event_start_date, units = "days")]
+      
+      data <- data[order(event_start_date, event_end_date),]
+      data[,lag_variable:=shift(event_end_date, type = "lag"), by=c("person_id", "event_cohort_id")]
+      data[,gap_same:=difftime(event_start_date, lag_variable, units = "days"),]
+      data$lag_variable <- NULL
+      
       # Apply analysis settings
       ParallelLogger::logInfo("Construct combinations, this may take a while for larger datasets.")
       writeLines(paste0("Original: ", nrow(data)))
@@ -266,16 +273,16 @@ execute <- function(OMOP_CDM = TRUE,
       
       # Order the combinations
       ParallelLogger::logInfo("Order the combinations.")
-      combi <- grep("+", data$DRUG_CONCEPT_ID, fixed=TRUE)
-      concept_ids <- strsplit(data$DRUG_CONCEPT_ID[combi], split="+", fixed=TRUE)
-      data$DRUG_CONCEPT_ID[combi] <- sapply(concept_ids, function(x) paste(sort(x), collapse = "+"))
+      combi <- grep("+", data$event_cohort_id, fixed=TRUE)
+      concept_ids <- strsplit(data$event_cohort_id[combi], split="+", fixed=TRUE)
+      data$event_cohort_id[combi] <- sapply(concept_ids, function(x) paste(sort(x), collapse = "+"))
       
       data <- doFilterTreatments(data, filterTreatments)
       
       # Add drug_seq
       ParallelLogger::logInfo("Adding drug sequence number.")
-      data <- data[order(PERSON_ID, DRUG_START_DATE, DRUG_END_DATE),]
-      data[, DRUG_SEQ:=seq_len(.N), by= .(PERSON_ID)]
+      data <- data[order(person_id, event_start_date, event_end_date),]
+      data[, drug_seq:=seq_len(.N), by= .(person_id)]
       
       # Add concept_name
       ParallelLogger::logInfo("Adding concept names.")
@@ -283,49 +290,37 @@ execute <- function(OMOP_CDM = TRUE,
       
       # Order the combinations
       ParallelLogger::logInfo("Ordering the combinations.")
-      combi <- grep("+", data$DRUG_CONCEPT_NAME, fixed=TRUE)
-      concept_names <- strsplit(data$CONCEPT_NAME[combi], split="+", fixed=TRUE)
-      data$CONCEPT_NAME[combi] <- sapply(concept_names, function(x) paste(sort(x), collapse = "+"))
+      combi <- grep("+", data$concept_name, fixed=TRUE)
+      concept_names <- strsplit(data$concept_name[combi], split="+", fixed=TRUE)
+      data$concept_name[combi] <- sapply(concept_names, function(x) paste(sort(x), collapse = "+"))
       
-      # Group
-      # TODO: check/adjust
-      data <- reshape2::dcast(data = data, person_id + index_year ~ drug_seq, value.var = "outcome_cohort_name")
-      data <- data.table(data)
+      # Reformat and save counts target cohort/treatment pathways 
+      data$concept_name <- unlist(data$concept_name)
+      write.csv(data, paste0(getwd(),"/temp/",  databaseName, "/", studyName, "/", databaseName, "_", studyName, "_drug_seq_processed.csv"), row.names = FALSE) 
       
-      layers <- as.vector(colnames(data)[!grepl("CONCEPT_ID|INDEX_YEAR|NUM_PERSONS", colnames(data))])
-      data <- data[, .(freq=sum(unique(person_id))), .BY = layers]
+      # Group based on treatments and rename columns
+      data <- as.data.table(reshape2::dcast(data = data, person_id + index_year ~ drug_seq, value.var = "concept_name"))
+      colnames(data)[3:ncol(data)] <- paste0("event_cohort_name", colnames(data)[3:ncol(data)])
       
-      # TODO: calculate number of persons in target cohort / with pathways, in total / per year
-      counts <- rollup(data, sum(freq), by = c("1", "index_year"))
+      layers <- c(colnames(data))[3:min(7,ncol(data))] # max first 5
+      data <- data[, .(freq=length((person_id))), by = c(layers, "index_year")]
+      write.csv(data, paste0(getwd(),"/temp/",  databaseName, "/", studyName, "/", databaseName, "_", studyName, "_paths.csv"), row.names = FALSE) 
       
-      # Move table back to SQL
-      # ParallelLogger::logInfo("Move data back to SQL and final processing, this may take longer for larger datasets.")
-      # time3 <- Sys.time()
-      # DatabaseConnector::insertTable(connection = connection,
-      #                               tableName = paste0(cohortDatabaseSchema,".", databaseName, "_", studyName, "_drug_seq_processed"),
-      #                               data = data,
-      #                               dropTableIfExists = TRUE,
-      #                               createTable = TRUE,
-      #                               tempTable = FALSE)
+      # Number of pathways (in total + per year)
+      counts_pathways <- rollup(data, sum(freq), by = c("index_year"))
+      counts_pathways$index_year <- paste0("Number of pathways (before minCellCount) in  ", counts_pathways$index_year)
       
-      # Post-processing in SQL
-      # sql <- loadRenderTranslateSql(sql = "SummarizeTreatmentSequence.sql",
-      #                              dbms = connectionDetails$dbms,
-      #                              oracleTempSchema = oracleTempSchema,
-      #                              resultsSchema=cohortDatabaseSchema,
-      #                              cdmDatabaseSchema = cdmDatabaseSchema,
-      #                              studyName=studyName,
-      #                              databaseName=databaseName)
-      # DatabaseConnector::executeSql(connection, sql, progressBar = FALSE, reportOverallTime = FALSE)
-      time4 <- Sys.time()
+      # Calculate number of persons in target cohort / with pathways, in total / per year
+      colnames(counts_pathways) <- colnames(counts_targetcohort)
+      counts <- rbind(counts_targetcohort, counts_pathways)
       
-      ParallelLogger::logInfo(paste0("Time needed to move data back to SQL and final processing ", difftime(time4, time3, units = "mins")))
+      write.csv(counts, paste0(outputFolder, "/",studyName, "/", databaseName, "_", studyName, "_summary_cnt.csv"), row.names = FALSE)
     }
   }
   
   # Output is generated
   if (outputResults) {
-    ParallelLogger::logInfo("outputResults TRUE")
+    ParallelLogger::logInfo(print("outputResults TRUE"))
     
     # For all different study settings
     settings <- colnames(study_settings)[grepl("analysis", colnames(study_settings))]
@@ -333,8 +328,7 @@ execute <- function(OMOP_CDM = TRUE,
     for (s in settings) {
       studyName <- study_settings[study_settings$param == "studyName",s]
       
-      if (!file.exists(paste0(outputFolder, "/", studyName)))
-        dir.create(paste0(outputFolder, "/",studyName), recursive = TRUE)
+      ParallelLogger::logInfo(print(paste0("Creating output: ", studyName)))
       
       # Select cohorts included
       targetCohortId <- study_settings[study_settings$param == "targetCohortId",s]
@@ -347,13 +341,11 @@ execute <- function(OMOP_CDM = TRUE,
       groupCombinations  <-  study_settings[study_settings$param == "groupCombinations",s] # Select to group all non-fixed combinations in one category 'other’ in the sunburst plot
       addNoPaths  <-  study_settings[study_settings$param == "addNoPaths",s] # Select to include untreated persons without treatment pathway in the sunburst plot
       
-      path = paste0(outputFolder, "/",studyName, "/", databaseName, "_", studyName)
-      
-      # Numbers study population
-      extractAndWriteToFile(connection, tableName = "summary_cnt", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, path = path, dbms = connectionDetails$dbms)
+      path <- paste0(outputFolder, "/",studyName, "/", databaseName, "_", studyName)
+      temp_path <- paste0(getwd(),"/temp/",  databaseName, "/", studyName, "/", databaseName, "_", studyName)
       
       # Transform results for output
-      transformed_data <- transformTreatmentSequence(studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, minCellCount = minCellCount)
+      transformed_data <- transformTreatmentSequence(studyName = studyName,  path = path, temp_path = temp_path, maxPathLength = maxPathLength, minCellCount = minCellCount)
       
       if (!is.null(transformed_data)) {
         file_noyear <- as.data.table(transformed_data[[1]])
@@ -367,10 +359,10 @@ execute <- function(OMOP_CDM = TRUE,
         outputStepUpDown(file_noyear = file_noyear, path = path, targetCohortId = targetCohortId)
         
         # Duration of era's
-        transformDuration(connection = connection, outputFolder = outputFolder, cohortDatabaseSchema = cohortDatabaseSchema, dbms = dbms, studyName = studyName, databaseName = databaseName, path = path, maxPathLength = maxPathLength, groupCombinations = TRUE, minCellCount = minCellCount)
+        transformDuration(outputFolder = outputFolder, studyName = studyName, databaseName = databaseName, path = path, temp_path = temp_path, maxPathLength = maxPathLength, groupCombinations = TRUE, minCellCount = minCellCount)
         
         # Save (censored) results file_noyear and file_year
-        saveTreatmentSequence(file_noyear = file_noyear, file_withyear = file_withyear, path = path, groupCombinations = FALSE, minCellCount = minCellCount, minCellMethod = minCellMethod)
+        saveTreatmentSequence(file_noyear = file_noyear, file_withyear = file_withyear, path = path, groupCombinations = groupCombinations, minCellCount = minCellCount, minCellMethod = minCellMethod)
         
         file_noyear <- as.data.table(read.csv(paste(path,"_file_noyear.csv",sep=''), stringsAsFactors = FALSE))
         file_withyear <- as.data.table(read.csv(paste(path,"_file_withyear.csv",sep=''), stringsAsFactors = FALSE))
@@ -379,11 +371,16 @@ execute <- function(OMOP_CDM = TRUE,
         createSankeyDiagram(data = file_noyear, databaseName = databaseName, studyName = studyName)
         
         # Treatment pathways sunburst plot 
-        outputSunburstPlot(data = file_noyear, databaseName = databaseName, eventCohortIds = eventCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, groupCombinations=groupCombinations, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
-        outputSunburstPlot(data = file_withyear, databaseName = databaseName, eventCohortIds = eventCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, groupCombinations=groupCombinations, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
-      
-        }
+        outputSunburstPlot(data = file_noyear, databaseName = databaseName, eventCohortIds = eventCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
+        outputSunburstPlot(data = file_withyear, databaseName = databaseName, eventCohortIds = eventCohortIds, studyName = studyName, outputFolder=outputFolder, path=path, addNoPaths=addNoPaths, maxPathLength=maxPathLength, createInput=TRUE, createPlot=TRUE)
+        
+      }
     }
+    
+    # Zip output folder
+    zipName <- file.path(getwd(), paste0(databaseName, ".zip"))
+    OhdsiSharing::compressFolder(file.path(outputFolder), zipName)
+    
   }
   
   invisible(NULL)

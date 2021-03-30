@@ -9,7 +9,7 @@ OMOP_CDM <- TRUE
 debugSqlFile <- "treatment_patterns.dsql"
 cohortTable <- "treatment_patterns_cohorts"
 
-runCreateCohorts <- TRUE # functionality only available for OMOP_CDM
+runCreateCohorts <- TRUE
 runCohortCharacterization <- TRUE # functionality only available for OMOP_CDM
 runTreatmentPathways <- TRUE
 outputResults <- TRUE
@@ -56,7 +56,7 @@ if (OMOP_CDM) {
   oracleTempSchema <- NULL
   
   databaseName <- 'todo'
-  cohortLocation = "inst/Settings/input_cohorts.csv"
+  cohortLocation <- "inst/Settings/input_cohorts.csv"
 }
 
 # ------------------------------------------------------------------------
