@@ -644,9 +644,9 @@ inputSunburstPlot <- function(data, path, addNoPaths, index_year) {
     summary_counts <- read.csv(paste(path,"_summary_cnt.csv",sep=''), stringsAsFactors = FALSE)
     
     if (index_year == "all") {
-      noPath <- as.integer(summary_counts[summary_counts$COUNT_TYPE == "Number of persons in target cohort NA", "N"]) - sum(transformed_file$freq)
+      noPath <- as.integer(summary_counts[summary_counts$index_year == "Number of persons in target cohort NA", "N"]) - sum(transformed_file$freq)
     } else {
-      noPath <- as.integer(summary_counts[summary_counts$COUNT_TYPE == paste0("Number of persons in target cohort ", index_year), "N"]) - sum(transformed_file$freq)
+      noPath <- as.integer(summary_counts[summary_counts$index_year == paste0("Number of persons in target cohort ", index_year), "N"]) - sum(transformed_file$freq)
     }
     
     transformed_file <- rbind(transformed_file, c("End", noPath))
