@@ -1,3 +1,18 @@
+
+#' Title
+#'
+#' @param sql 
+#' @param oracleTempSchema 
+#' @param dbms 
+#' @param warnOnMissingParameters 
+#' @param output 
+#' @param outputFile 
+#' @param ... 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 loadRenderTranslateSql <- function(sql,
                                    oracleTempSchema = oracleTempSchema,
                                    dbms = "postgresql",
@@ -24,6 +39,19 @@ loadRenderTranslateSql <- function(sql,
   return(renderedSql)
 }
 
+#' Title
+#'
+#' @param connection 
+#' @param tableName 
+#' @param resultsSchema 
+#' @param studyName 
+#' @param databaseName 
+#' @param dbms 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 extractFile <- function(connection, tableName, resultsSchema, studyName, databaseName, dbms){
   parameterizedSql <- "SELECT * FROM @resultsSchema.@databaseName_@studyName_@tableName"
   renderedSql <- SqlRender::render(parameterizedSql, resultsSchema=resultsSchema, studyName=studyName, databaseName=databaseName, tableName=tableName)
@@ -32,6 +60,20 @@ extractFile <- function(connection, tableName, resultsSchema, studyName, databas
 }
 
 
+#' Title
+#'
+#' @param connection 
+#' @param tableName 
+#' @param resultsSchema 
+#' @param studyName 
+#' @param databaseName 
+#' @param path 
+#' @param dbms 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 extractAndWriteToFile <- function(connection, tableName, resultsSchema, studyName, databaseName, path, dbms){
   parameterizedSql <- "SELECT * FROM @resultsSchema.@databaseName_@studyName_@tableName"
   renderedSql <- SqlRender::render(parameterizedSql, resultsSchema=resultsSchema, studyName=studyName, databaseName=databaseName, tableName=tableName)
@@ -42,6 +84,18 @@ extractAndWriteToFile <- function(connection, tableName, resultsSchema, studyNam
   writeLines(paste("Created file '",outputFile,"'",sep=""))
 }
 
+#' Title
+#'
+#' @param targetCohortIds 
+#' @param targetCohortNames 
+#' @param outcomeIds 
+#' @param outcomeNames 
+#' @param baseUrl 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 populatePackageCohorts <- function(targetCohortIds,
                                    targetCohortNames,
                                    outcomeIds,
@@ -67,6 +121,17 @@ populatePackageCohorts <- function(targetCohortIds,
   
 }
 
+#' Title
+#'
+#' @param data 
+#' @param fileName 
+#' @param incremental 
+#' @param ... 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 writeToCsv <- function(data, fileName, incremental = FALSE, ...) {
   colnames(data) <- SqlRender::camelCaseToSnakeCase(colnames(data))
   if (incremental) {
@@ -91,6 +156,15 @@ writeToCsv <- function(data, fileName, incremental = FALSE, ...) {
 }
 
 # recursive function to remove name from all levels of list
+#' Title
+#'
+#' @param x 
+#' @param name 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 stripname <- function(x, name) {
   thisdepth <- depth(x)
   if (thisdepth == 0) {
@@ -103,6 +177,15 @@ stripname <- function(x, name) {
 }
 
 # function to find depth of a list element
+#' Title
+#'
+#' @param this 
+#' @param thisdepth 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 depth <- function(this, thisdepth=0){
   if (!is.list(this)) {
     return(thisdepth)
@@ -112,6 +195,12 @@ depth <- function(this, thisdepth=0){
 }
 
 # function to save sunburst plots (TODO: fix it, not working )
+#' Title
+#'
+#' @return
+#' @export
+#'
+#' @examples
 screenshotHTML <- function() {
   library(webshot)
   
@@ -128,6 +217,18 @@ screenshotHTML <- function() {
 }
 
 # borrowed function from CohortDiagnostics
+#' Title
+#'
+#' @param connectionDetails 
+#' @param connection 
+#' @param cohortDatabaseSchema 
+#' @param cohortTable 
+#' @param cohortIds 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 getCohortCounts <- function(connectionDetails = NULL,
                             connection = NULL,
                             cohortDatabaseSchema,
@@ -157,6 +258,23 @@ getCohortCounts <- function(connectionDetails = NULL,
 }
 
 # borrowed function from CohortDiagnostics
+#' Title
+#'
+#' @param connectionDetails 
+#' @param connection 
+#' @param cdmDatabaseSchema 
+#' @param oracleTempSchema 
+#' @param cohortDatabaseSchema 
+#' @param cohortTable 
+#' @param cohortIds 
+#' @param cdmVersion 
+#' @param covariateSettings 
+#' @param batchSize 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 getCohortCharacteristics <- function(connectionDetails = NULL,
                                      connection = NULL,
                                      cdmDatabaseSchema,
@@ -260,6 +378,22 @@ getCohortCharacteristics <- function(connectionDetails = NULL,
 }
 
 # borrowed function from CohortDiagnostics
+#' Title
+#'
+#' @param characteristics 
+#' @param databaseId 
+#' @param incremental 
+#' @param covariateValueFileName 
+#' @param covariateRefFileName 
+#' @param analysisRefFileName 
+#' @param timeRefFileName 
+#' @param counts 
+#' @param minCellCount 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 exportCharacterization <- function(characteristics,
                                    databaseId,
                                    incremental,
@@ -309,6 +443,16 @@ exportCharacterization <- function(characteristics,
 }
 
 # borrowed function from CohortDiagnostics
+#' Title
+#'
+#' @param data 
+#' @param fileName 
+#' @param incremental 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 writeCovariateDataAndromedaToCsv <- function(data, fileName, incremental = FALSE) {
   if (incremental && file.exists(fileName)) {
     ParallelLogger::logDebug("Appending records to ", fileName)

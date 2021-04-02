@@ -49,7 +49,7 @@ createCohorts <- function(connectionDetails,
   
   connection <- DatabaseConnector::connect(connectionDetails)
   
-  # Load cohorts to create
+  # Load information cohorts to create
   # (One can add ATLAS cohorts to package using populatePackageCohorts())
   pathToCsv <- "inst/Settings/cohorts_to_create.csv"
   cohortsToCreate <- readr::read_csv(pathToCsv, col_types = readr::cols())
@@ -132,6 +132,42 @@ createCohorts <- function(connectionDetails,
     warning(paste0("Cohort definition ", paste0(checkCohorts, collapse = ","), " has zero count. "))
   }
   
+  # TODO: flowchart inclusion/exclusion criteria
+  
   DatabaseConnector::disconnect(connection)
+}
+
+
+importCohorts <- function(cohortLocation, outputFolder) {
+  
+  # Load cohorts in from file
+  # Required columns: cohort_id, person_id, start_date, end_date
+  data <- data.table(read.csv(cohortLocation, sep=";"))
+  
+  # Load information cohorts to create
+  pathToCsv <- "inst/Settings/cohorts_to_create.csv"
+  cohortsToCreate <- readr::read_csv(pathToCsv, col_types = readr::cols())
+  write.csv(cohortsToCreate, file.path(outputFolder, "cohort.csv"), row.names = FALSE)
+  
+  # Check number of subjects per cohort
+  ParallelLogger::logInfo("Counting cohorts")
+  counts <- data.frame(cohortDefinitionId = cohortsToCreate$cohortId)
+  
+  counts$cohortCount <- sapply(counts$cohortDefinitionId, function(c) {
+    length(data$person_id[data$outcome_cohort_id == c])
+  })
+  
+  counts$personCount <- sapply(counts$cohortDefinitionId, function(c) {
+    length(unique(data$person_id[data$outcome_cohort_id == c])) # TODO: check
+  })
+  
+  write.csv(counts, file.path(outputFolder, "cohort_counts.csv"), row.names = FALSE)
+  
+  # Check if all cohorts have non-zero count
+  checkCohorts <- setdiff(cohortsToCreate$cohortId,counts$cohortDefinitionId)
+  
+  if(length(checkCohorts) != 0) {
+    warning(paste0("Cohort definition ", paste0(checkCohorts, collapse = ","), " has zero count. "))
+  }
 }
 

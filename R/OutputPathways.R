@@ -1,13 +1,26 @@
 
-transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLength, minCellCount) {
+
+#' Title
+#'
+#' @param studyName 
+#' @param databaseName 
+#' @param path 
+#' @param maxPathLength 
+#' @param minCellCount 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+transformTreatmentSequence <- function(studyName, path, temp_path, maxPathLength, minCellCount) {
   
-  file <- data.table(extractFile(connection, tableName = "drug_seq_summary", resultsSchema = cohortDatabaseSchema, studyName = studyName, databaseName = databaseName, dbms = connectionDetails$dbms))
+  file <- data.table(read.csv(paste(temp_path,"_paths.csv",sep=''), stringsAsFactors = FALSE))
   
   # Apply maxPathLength and remove unnessary columns
-  layers <- as.vector(colnames(file)[!grepl("CONCEPT_ID|INDEX_YEAR|NUM_PERSONS", colnames(file))])
+  layers <- as.vector(colnames(file)[!grepl("index_year|freq", colnames(file))])
   layers <- layers[1:maxPathLength]
   
-  columns <- c(layers, "INDEX_YEAR", "NUM_PERSONS")
+  columns <- c(layers, "index_year", "freq")
   
   file <- file[,..columns]
   
@@ -20,8 +33,8 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
   findCombinations <- apply(file, 2, function(x) grepl("+", x, fixed = TRUE))
   
   combinations <- as.matrix(file)[findCombinations == TRUE]
-  num_columns <-  sum(grepl("CONCEPT_NAME", colnames(file)))
-  freqCombinations <- matrix(rep(file$NUM_PERSONS, times = num_columns), ncol = num_columns)[findCombinations == TRUE]
+  num_columns <-  sum(grepl("concept_name", colnames(file)))
+  freqCombinations <- matrix(rep(file$freq, times = num_columns), ncol = num_columns)[findCombinations == TRUE]
   
   summaryCombinations <- data.table(combination = combinations, freq = freqCombinations)
   summaryCombinations <- summaryCombinations[,.(freq=sum(freq)), by=combination][order(-freq)]
@@ -30,27 +43,40 @@ transformTreatmentSequence <- function(studyName, databaseName, path, maxPathLen
   write.csv(summaryCombinations, file=paste(path,"_combinations.csv",sep=''), row.names = FALSE)
   
   # Group the resulting treatment paths
-  file_noyear <- file[,.(freq=sum(NUM_PERSONS)), by=layers]
-  file_withyear <- file[,.(freq=sum(NUM_PERSONS)), by=c(layers, "INDEX_YEAR")]
+  file_noyear <- file[,.(freq=sum(freq)), by=layers]
+  file_withyear <- file[,.(freq=sum(freq)), by=c(layers, "index_year")]
 
   ParallelLogger::logInfo("transformTreatmentSequence done")
   
   return(list(file_noyear, file_withyear))
 }
 
+#' Title
+#'
+#' @param file_noyear 
+#' @param file_withyear 
+#' @param path 
+#' @param groupCombinations 
+#' @param minCellCount 
+#' @param minCellMethod 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 saveTreatmentSequence <- function(file_noyear, file_withyear, path, groupCombinations, minCellCount, minCellMethod) {
   
   # Group non-fixed combinations in one group according to groupCobinations
   file_noyear <- groupInfrequentCombinations(file_noyear, groupCombinations)
   file_withyear <- groupInfrequentCombinations(file_withyear, groupCombinations)
   
-  layers <- as.vector(colnames(file_noyear)[!grepl("INDEX_YEAR|freq", colnames(file_noyear))])
+  layers <- as.vector(colnames(file_noyear)[!grepl("index_year|freq", colnames(file_noyear))])
   
   # Apply minCellCount by adjusting to other most similar path (removing last treatment in path) or else remove complete path
   if (minCellMethod == "Adjust") {
     col <- ncol(file_noyear) - 1
     while (sum(file_noyear$freq < minCellCount) > 0 & col !=0) {
-      writeLines(paste("Change col ", col, " to NA for ", sum(file_noyear$freq < minCellCount), " paths with too low frequency (without year)"))
+      ParallelLogger::logInfo(paste("Change col ", col, " to NA for ", sum(file_noyear$freq < minCellCount), " paths with too low frequency (without year)"))
       
       file_noyear[freq < minCellCount,col] <- NA
       file_noyear <- file_noyear[,.(freq=sum(freq)), by=layers]
@@ -60,34 +86,34 @@ saveTreatmentSequence <- function(file_noyear, file_withyear, path, groupCombina
     
     col <- ncol(file_withyear) - 2
     while (sum(file_withyear$freq < minCellCount) > 0 & col !=0) {
-      writeLines(paste("Change col ", col, " to NA for ", sum(file_withyear$freq < minCellCount), " paths with too low frequency (with year)"))
+      ParallelLogger::logInfo(paste("Change col ", col, " to NA for ", sum(file_withyear$freq < minCellCount), " paths with too low frequency (with year)"))
       
       file_withyear[freq < minCellCount,col] <- NA
-      file_withyear <- file_withyear[,.(freq=sum(freq)), by=c(layers, "INDEX_YEAR")]
+      file_withyear <- file_withyear[,.(freq=sum(freq)), by=c(layers, "index_year")]
       
       col <- col - 1
     }
     
     # If path becomes completely NA -> add to "Other" group to distinguish from non-treated
-    file_noyear$D1_CONCEPT_NAME[is.na(file_noyear$D1_CONCEPT_NAME)] <- "Other"
+    file_noyear$event_cohort_name1[is.na(file_noyear$event_cohort_name1)] <- "Other"
     file_noyear <- file_noyear[,.(freq=sum(freq)), by=layers]
     
-    file_withyear$D1_CONCEPT_NAME[is.na(file_withyear$D1_CONCEPT_NAME)] <- "Other"
-    file_withyear <- file_withyear[,.(freq=sum(freq)), by=c(layers, "INDEX_YEAR")]
+    file_withyear$event_cohort_name1[is.na(file_withyear$event_cohort_name1)] <- "Other"
+    file_withyear <- file_withyear[,.(freq=sum(freq)), by=c(layers, "index_year")]
   
   }
   
-  writeLines(paste("Remove ", sum(file_noyear$freq < minCellCount), " paths with too low frequency (without year)"))
+  ParallelLogger::logInfo(paste("Remove ", sum(file_noyear$freq < minCellCount), " paths with too low frequency (without year)"))
   file_noyear <- file_noyear[freq >= minCellCount,]
   
-  writeLines(paste("Remove ", sum(file_withyear$freq < minCellCount), " paths with too low frequency (with year)"))
+  ParallelLogger::logInfo(paste("Remove ", sum(file_withyear$freq < minCellCount), " paths with too low frequency (with year)"))
   file_withyear <- file_withyear[freq >= minCellCount,]
   
   summary_counts <- read.csv(paste(path,"_summary_cnt.csv",sep=''), stringsAsFactors = FALSE)
   summary_counts <- rbind(summary_counts, c("Total number of pathways (after minCellCount)", sum(file_noyear$freq)))
   
-  for (y in unique(file_withyear$INDEX_YEAR)) {
-    summary_counts <- rbind(summary_counts, c(paste0("Number of pathways (after minCellCount) in ", y), sum(file_withyear$freq[file_withyear$INDEX_YEAR == y])))
+  for (y in unique(file_withyear$index_year)) {
+    summary_counts <- rbind(summary_counts, c(paste0("Number of pathways (after minCellCount) in ", y), sum(file_withyear$freq[file_withyear$index_year == y])))
   }
   
   write.table(summary_counts,file=paste(path,"_summary_cnt.csv",sep=''), sep = ",", row.names = FALSE, col.names = TRUE)
@@ -100,17 +126,30 @@ saveTreatmentSequence <- function(file_noyear, file_withyear, path, groupCombina
 }
 
 
+#' Title
+#'
+#' @param data 
+#' @param eventCohortIds 
+#' @param groupCombinations 
+#' @param path 
+#' @param outputFolder 
+#' @param outputFile 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 outputPercentageGroupTreated <- function(data, eventCohortIds, groupCombinations, path, outputFolder, outputFile) {
-  if (is.null(data$INDEX_YEAR)) {
+  if (is.null(data$index_year)) {
     # For file_noyear compute once
     result <- computePercentageGroupTreated(data, eventCohortIds, groupCombinations, outputFolder)
     
   } else {
     # For file_withyear compute per year
-    years <- unlist(unique(data[,"INDEX_YEAR"]))
+    years <- unlist(unique(data[,"index_year"]))
     
     results <- lapply(years, function(y) {
-      subset_data <- data[INDEX_YEAR == as.character(y),]
+      subset_data <- data[index_year == as.character(y),]
       
       subset_result <- cbind(y, computePercentageGroupTreated(subset_data, eventCohortIds, groupCombinations, outputFolder))
     }) 
@@ -123,6 +162,16 @@ outputPercentageGroupTreated <- function(data, eventCohortIds, groupCombinations
   ParallelLogger::logInfo("outputPercentageGroupTreated done")
 }
 
+#' Title
+#'
+#' @param file_noyear 
+#' @param path 
+#' @param targetCohortId 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 outputStepUpDown <- function(file_noyear, path, targetCohortId) { 
   
   # Replace & signs by + (so that definitions match both)
@@ -149,6 +198,17 @@ outputStepUpDown <- function(file_noyear, path, targetCohortId) {
 } 
 
 
+#' Title
+#'
+#' @param file 
+#' @param path 
+#' @param targetCohortId 
+#' @param input 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 stepUpDown <- function(file, path, targetCohortId, input) {
   
   if (input == "manual rules") {
@@ -201,14 +261,15 @@ stepUpDown <- function(file, path, targetCohortId, input) {
         result <- result[!is.na(result$from),]
         
         # Define stop treatment
-        result$category[is.na(result$to)] <- 'stopped'
+        result$group[is.na(result$to)] <- 'stopped'
         
         # Fill NA's with 'undefined'
-        result$category[is.na(result$category)] <- 'undefined'
+        result$group[is.na(result$group)] <- 'undefined'
         
         # Compute augment/switch
+        result$freq <- as.integer(result$freq)
         total <- sum(result$freq)
-        result <- result[,.(count = sum(freq), perc = round(sum(freq)*100/total,4)), by = "category"]
+        result <- result[,.(count = sum(freq), perc = round(sum(freq)*100/total,4)), by = "group"]
         result$layer <- l
         
         all_results <- rbind(all_results, result)
@@ -219,19 +280,23 @@ stepUpDown <- function(file, path, targetCohortId, input) {
     
   } else if (input == "generalized rules") {
     
+    
+    # Drug class levels
     if (targetCohortId %in% c(1,4,5,3)) { # Asthma, ACO
       class_level <- list("SABA" = 1,
                           "SAMA" = 1,
                           "Systemic B2" = 1,
                           "ICS" = 2,
                           "LTRA" = 2,
+                          "PDE4" = 2,
+                          "Xanthines" = 2,
                           "LABA" = 3,
                           "LAMA" = 3,
-                          "Xanthines" = 3,
                           "Systemic glucocorticoids (therapy)" = 4,
                           "Systemic glucocorticoids (acute)" = 4,
                           "Anti IL5" = 4,
-                          "Anti Ig5" = 4) 
+                          "Anti Ig5" = 4,
+                          "Anti IL4R" = 4) 
       
     } else if (targetCohortId %in% c(2)) { # COPD
       class_level <- list("SABA" = 1,
@@ -242,16 +307,18 @@ stepUpDown <- function(file, path, targetCohortId, input) {
                           "Xanthines" = 2,
                           "ICS" = 3,
                           "LTRA" = 3,
+                          "PDE4" = 3,
                           "Systemic glucocorticoids (therapy)" = 4,
                           "Systemic glucocorticoids (acute)" = 4,
                           "Anti IL5" = 4,
-                          "Anti Ig5" = 4)
+                          "Anti Ig5" = 4,
+                          "Anti IL4R" = 4)
     }
     
     all_results <- data.frame()
     
     # For each treament layer determine total: step up / step down / switching / undefined
-    for (l in 1:(ncol(file)-2)) {
+    for (l in 1:(ncol(file)-2)) { # l <- 1
       
       cols <- c(l, l+1, ncol(file))
       subfile <- file[, ..cols]
@@ -259,66 +326,59 @@ stepUpDown <- function(file, path, targetCohortId, input) {
       
       subfile[is.na(subfile)] <- "End"
       
-      # Add columns with # from and # to
-      subfile$from_num <- stringr::str_count(subfile$from, stringr::fixed("+")) + 1
-      subfile$to_num <- stringr::str_count(subfile$to, stringr::fixed("+")) + 1
+      # Start with NA labels
+      subfile$group <- "NA"
       
-      # Add "level" score
+      # Compute patient treatment level (sum of drug class levels)
       subfile$from_level <- sapply(subfile$from, function(r) sum(unlist(sapply(unlist(strsplit(r, split="+", fixed=TRUE)), function(r_s) class_level[[r_s]]))))
       subfile$to_level <- sapply(subfile$to, function(r) sum(unlist(sapply(unlist(strsplit(r, split="+", fixed=TRUE)), function(r_s) class_level[[r_s]]))))
       
-      subfile$group <- "NA"
+      # Cap at level 4 (above everything is considered switching)
+      subfile$from_level[subfile$from_level > 4] <- 4
+      subfile$to_level[subfile$to_level > 4] <- 4
       
-      ### Same number
-      selection <- subfile$from_num == subfile$to_num
-      print(paste0("Same number: ", sum(selection)))
+      # Assign labels based on higher/lower/same patient treatment level 
+      subfile$group[subfile$from_level < subfile$to_level] <- "step_up_broad"
+      subfile$group[subfile$from_level > subfile$to_level] <- "step_down_broad"
+      subfile$group[subfile$from_level == subfile$to_level] <- "switching_broad"
       
-      subfile$group[selection] <- "switching"
-      subfile$group[selection & subfile$from_num == 1 & subfile$from_level > subfile$to_level] <- "step_down_broad"
-      subfile$group[selection & subfile$from_num == 1 & subfile$from_level < subfile$to_level] <- "step_up_broad"
-      
-      # Consider level 1/2 as one for from_num 2
-      subfile$from_level_2 <- subfile$from_level + stringr::str_count(subfile$from, stringr::fixed("LA")) + stringr::str_count(subfile$from, stringr::fixed("Xa"))
-      subfile$to_level_2 <- subfile$to_level + stringr::str_count(subfile$to, stringr::fixed("LA")) + stringr::str_count(subfile$to, stringr::fixed("Xa"))
-      
-      subfile$group[selection & subfile$from_num == 2 & subfile$from_level_2 > subfile$to_level_2] <- "step_down_broad"
-      subfile$group[selection & subfile$from_num == 2 & subfile$from_level_2 < subfile$to_level_2] <- "step_up_broad"
-      
-      subfile$group[selection & subfile$from_num == 2 & subfile$to_num == 2 & stringr::str_detect(subfile$from, stringr::fixed("Systemic glucocorticoids (therapy)")) & !stringr::str_detect(subfile$to, stringr::fixed("Systemic glucocorticoids (therapy)"))] <- "step_down_broad"
-      subfile$group[selection & subfile$from_num == 2 & subfile$to_num == 2 & !stringr::str_detect(subfile$from, stringr::fixed("Systemic glucocorticoids (therapy)")) & stringr::str_detect(subfile$to, stringr::fixed("Systemic glucocorticoids (therapy)"))] <- "step_up_broad"
-      
-      ### Higher number
-      selection <- subfile$from_num < subfile$to_num
-      print(paste0("Higher number: ", sum(selection)))
-      
-      subfile$group[selection] <- "step_up_broad"
-      subfile$group[selection & subfile$from_num == 1 & subfile$to_num %in% c(2,3) & stringr::str_detect(subfile$from, stringr::fixed("Systemic glucocorticoids (therapy)")) & !stringr::str_detect(subfile$to, stringr::fixed("Systemic glucocorticoids (therapy)"))] <- "step_down_broad"
-      
-      ### Lower number
-      selection <- subfile$from_num > subfile$to_num
-      print(paste0("Lower number: ", sum(selection)))
-      
-      subfile$group[selection] <- "step_down_broad"
-      subfile$group[selection & subfile$from_num %in% c(2,3) & subfile$to_num == 1 & !stringr::str_detect(subfile$from, stringr::fixed("Systemic glucocorticoids (therapy)")) & stringr::str_detect(subfile$to, stringr::fixed("Systemic glucocorticoids (therapy)"))] <- "step_up_broad"
-      
+      # Exceptions: short period of systemic glucocorticoids (acute)
       # Start exacerbation (from NO acute, to YES acute)
       selection <- !stringr::str_detect(subfile$from, stringr::fixed("Systemic glucocorticoids (acute)")) & stringr::str_detect(subfile$to, stringr::fixed("Systemic glucocorticoids (acute)"))
-      print(paste0("Start exacerbation: ", sum(selection)))
+      ParallelLogger::logInfo(paste0("Start exacerbation: ", sum(selection)))
       subfile$group[selection] <- "acute_exacerbation"
       
       # End exacerbation (from YES acute, to NO acute)
       selection <- stringr::str_detect(subfile$from, stringr::fixed("Systemic glucocorticoids (acute)")) & !stringr::str_detect(subfile$to, stringr::fixed("Systemic glucocorticoids (acute)"))
-      print(paste0("End exacerbation: ", sum(selection)))
+      ParallelLogger::logInfo(paste0("End exacerbation: ", sum(selection)))
       subfile$group[selection] <- "end_of_acute_exacerbation"
       
+      # Exceptions: some off label use
       if (targetCohortId %in% c(1,4,5)) { # Asthma
-          # Non conform (to monotherapy LABA/LAMA)
-          selection <- subfile$to == "LABA" |  subfile$to == "LAMA" | subfile$to == "LABA+LAMA"
-  
-          print(paste0("Non conform: ", sum(selection)))
-          subfile$group[selection] <- "non_conform"
+        # Off label (PDE4)
+        selection <- stringr::str_detect(subfile$to, stringr::fixed("PDE4"))
+        
+        ParallelLogger::logInfo(paste0("Off label (asthma): ", sum(selection)))
+        subfile$group[selection] <- "off_label"
+      } else if (targetCohortId %in% c(2)) { # COPD
+        # Off label (LTRA, Anti IL5, Anti IgE)
+        selection <- stringr::str_detect(subfile$to, stringr::fixed("Anti IL5")) |
+          stringr::str_detect(subfile$to, stringr::fixed("Anti IgE")) |
+          stringr::str_detect(subfile$to, stringr::fixed("Anti IL4R"))
+        
+        ParallelLogger::logInfo(paste0("Off label (COPD): ", sum(selection)))
+        subfile$group[selection] <- "off_label"
       }
       
+      # Exceptions: non conform treatment
+      if (targetCohortId %in% c(1,4,5)) { # Asthma
+        # Non conform (therapy LABA/LAMA without ICS)
+        selection <-  (stringr::str_detect(subfile$to, stringr::fixed("LABA"))  & !stringr::str_detect(subfile$to, stringr::fixed("ICS")))  |
+          (stringr::str_detect(subfile$to, stringr::fixed("LAMA"))  & !stringr::str_detect(subfile$to, stringr::fixed("ICS")))
+        
+        ParallelLogger::logInfo(paste0("Non conform: ", sum(selection)))
+        subfile$group[selection] <- "non_conform"
+      }
       
       # Remove paths of inviduals who already stopped treatment
       subfile <- subfile[subfile$from != "End",]
@@ -334,16 +394,28 @@ stepUpDown <- function(file, path, targetCohortId, input) {
       subfile <- subfile[,.(count = sum(freq), perc = round(sum(freq)*100/total,4)), by = "group"]
       subfile$layer <- l
       
-    
       all_results <- rbind(all_results, subfile)
     }
-   
+    
     write.csv(all_results, paste(path,"_augmentswitch_generalized.csv",sep=''), row.names = FALSE) 
+    
+    
   }
 }
 
+#' Title
+#'
+#' @param data 
+#' @param eventCohortIds 
+#' @param groupCombinations 
+#' @param outputFolder 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 computePercentageGroupTreated <- function(data, eventCohortIds, groupCombinations, outputFolder) {
-  layers <- as.vector(colnames(data)[!grepl("INDEX_YEAR|freq", colnames(data))])
+  layers <- as.vector(colnames(data)[!grepl("index_year|freq", colnames(data))])
   cohorts <- read.csv(paste(outputFolder, "/cohort.csv",sep=''), stringsAsFactors = FALSE)
   outcomes <- c(cohorts$cohortName[cohorts$cohortType == "outcome"], "Other")
   
@@ -381,46 +453,65 @@ computePercentageGroupTreated <- function(data, eventCohortIds, groupCombination
   return(result)
 }
 
-transformDuration <- function(connection, cohortDatabaseSchema, outputFolder, dbms, studyName, databaseName, path, maxPathLength, groupCombinations, minCellCount, removePaths) {
+#' Title
+#'
+#' @param connection 
+#' @param cohortDatabaseSchema 
+#' @param outputFolder 
+#' @param dbms 
+#' @param studyName 
+#' @param databaseName 
+#' @param path 
+#' @param maxPathLength 
+#' @param groupCombinations 
+#' @param minCellCount 
+#' @param removePaths 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+transformDuration <- function(outputFolder, studyName, databaseName, path, temp_path, maxPathLength, groupCombinations, minCellCount, removePaths) {
   
-  file <- data.table(extractFile(connection, tableName = "drug_seq_processed", resultsSchema = cohortDatabaseSchema, studyName = studyName,databaseName = databaseName, dbms = connectionDetails$dbms))
+  # file <- data.table(extractFile(connection, tableName = "drug_seq_processed", resultsSchema = cohortDatabaseSchema, studyName = studyName,databaseName = databaseName, dbms = connectionDetails$dbms))
+  file <- data.table(read.csv(paste(temp_path,"_drug_seq_processed.csv",sep=''), stringsAsFactors = FALSE))
   
   # Remove unnessary columns
-  columns <- c("DURATION_ERA", "DRUG_SEQ", "CONCEPT_NAME" )
+  columns <- c("duration_era", "drug_seq", "concept_name")
   file <- file[,..columns]
-  file$DURATION_ERA <- as.numeric(file$DURATION_ERA)
+  file$duration_era <- as.numeric(file$duration_era)
   
   # Apply maxPathLength
-  file <- file[DRUG_SEQ <= maxPathLength,]
+  file <- file[drug_seq <= maxPathLength,]
   
   # Group non-fixed combinations in one group according to groupCobinations
   # TODO: change to function
   findCombinations <- apply(file, 2, function(x) grepl("+", x, fixed = TRUE))
   file[findCombinations] <- "Other"
   
-  result <- file[,.(AVG_DURATION=round(mean(DURATION_ERA),3), COUNT = .N), by = c("CONCEPT_NAME", "DRUG_SEQ")][order(CONCEPT_NAME, DRUG_SEQ)]
+  result <- file[,.(AVG_DURATION=round(mean(duration_era),3), COUNT = .N), by = c("concept_name", "drug_seq")][order(concept_name, drug_seq)]
   
   # Add column for total treated, fixed combinations, all combinations
   file$total <- 1
-  file$fixed_combinations[grepl("\\&", file$CONCEPT_NAME)] <- 1
-  file$all_combinations[grepl("Other|\\+|\\&", file$CONCEPT_NAME)] <- 1
-  file$monotherapy[!grepl("Other|\\+|\\&", file$CONCEPT_NAME)] <- 1
+  file$fixed_combinations[grepl("\\&", file$concept_name)] <- 1
+  file$all_combinations[grepl("Other|\\+|\\&", file$concept_name)] <- 1
+  file$monotherapy[!grepl("Other|\\+|\\&", file$concept_name)] <- 1
   
-  result_total_seq <- file[,.(DRUG_SEQ = "Overall", AVG_DURATION= round(mean(DURATION_ERA),2), COUNT = .N), by = c("CONCEPT_NAME", "total")]
+  result_total_seq <- file[,.(drug_seq = "Overall", AVG_DURATION= round(mean(duration_era),2), COUNT = .N), by = c("concept_name", "total")]
   result_total_seq$total <- NULL
   
-  result_total_concept <- file[,.(CONCEPT_NAME = "Total treated", AVG_DURATION= round(mean(DURATION_ERA),2), COUNT = .N), by = c("DRUG_SEQ", "total")]
+  result_total_concept <- file[,.(concept_name = "Total treated", AVG_DURATION= round(mean(duration_era),2), COUNT = .N), by = c("drug_seq", "total")]
   result_total_concept$total <- NULL
   
-  result_fixed_combinations <- file[,.(CONCEPT_NAME = "Fixed combinations", AVG_DURATION= round(mean(DURATION_ERA),2), COUNT = .N), by = c("DRUG_SEQ", "fixed_combinations")]
+  result_fixed_combinations <- file[,.(concept_name = "Fixed combinations", AVG_DURATION= round(mean(duration_era),2), COUNT = .N), by = c("drug_seq", "fixed_combinations")]
   result_fixed_combinations <- result_fixed_combinations[!is.na(fixed_combinations),]
   result_fixed_combinations$fixed_combinations <- NULL
   
-  result_all_combinations <- file[,.(CONCEPT_NAME = "All combinations", AVG_DURATION=round(mean(DURATION_ERA),2), COUNT = .N), by = c("DRUG_SEQ", "all_combinations")]
+  result_all_combinations <- file[,.(concept_name = "All combinations", AVG_DURATION=round(mean(duration_era),2), COUNT = .N), by = c("drug_seq", "all_combinations")]
   result_all_combinations <- result_all_combinations[!is.na(all_combinations),]
   result_all_combinations$all_combinations <- NULL
   
-  result_monotherapy <- file[,.(CONCEPT_NAME = "Monotherapy", AVG_DURATION=round(mean(DURATION_ERA),2), COUNT = .N), by = c("DRUG_SEQ", "monotherapy")]
+  result_monotherapy <- file[,.(concept_name = "Monotherapy", AVG_DURATION=round(mean(duration_era),2), COUNT = .N), by = c("drug_seq", "monotherapy")]
   result_monotherapy <- result_monotherapy[!is.na(monotherapy),]
   result_monotherapy$monotherapy <- NULL
   
@@ -430,7 +521,7 @@ transformDuration <- function(connection, cohortDatabaseSchema, outputFolder, db
   cohorts <- read.csv(paste(outputFolder, "/cohort.csv",sep=''), stringsAsFactors = FALSE)
   outcomes <- c(cohorts$cohortName[cohorts$cohortType == "outcome"], "Other")
   
-  for (o in outcomes[!(outcomes %in% results$CONCEPT_NAME)]) {
+  for (o in outcomes[!(outcomes %in% results$concept_name)]) {
     results <- rbind(results, list(o, "Overall", 0.0, 0))
   }
 
@@ -442,28 +533,65 @@ transformDuration <- function(connection, cohortDatabaseSchema, outputFolder, db
   ParallelLogger::logInfo("transformDuration done")
 }
 
-outputSunburstPlot <- function(data, databaseName, eventCohortIds, studyName, outputFolder, path, groupCombinations, addNoPaths, maxPathLength, createInput, createPlot) {
-  if (is.null(data$INDEX_YEAR)) {
+#' Title
+#'
+#' @param data 
+#' @param databaseName 
+#' @param eventCohortIds 
+#' @param studyName 
+#' @param outputFolder 
+#' @param path 
+#' @param groupCombinations 
+#' @param addNoPaths 
+#' @param maxPathLength 
+#' @param createInput 
+#' @param createPlot 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+outputSunburstPlot <- function(data, databaseName, eventCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, createInput, createPlot) {
+  if (is.null(data$index_year)) {
     # For file_noyear compute once
-     createSunburstPlot(data, databaseName, eventCohortIds, studyName, outputFolder, path, groupCombinations, addNoPaths, maxPathLength, index_year = 'all', createInput, createPlot)
+     createSunburstPlot(data, databaseName, eventCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year = 'all', createInput, createPlot)
     
   } else {
     # For file_withyear compute per year
-    years <- unlist(unique(data[,"INDEX_YEAR"]))
+    years <- unlist(unique(data[,"index_year"]))
     
     for (y in years) {
-      subset_data <- data[INDEX_YEAR == as.character(y),]
-      createSunburstPlot(subset_data, databaseName, eventCohortIds, studyName, outputFolder, path, groupCombinations, addNoPaths, maxPathLength, index_year = y, createInput, createPlot)
+      subset_data <- data[index_year == as.character(y),]
+      createSunburstPlot(subset_data, databaseName, eventCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year = y, createInput, createPlot)
     }
   }
   
   ParallelLogger::logInfo("outputSunburstPlot done")
 }
 
-createSunburstPlot <- function(data, databaseName, eventCohortIds, studyName, outputFolder, path, groupCombinations, addNoPaths, maxPathLength, index_year, createInput, createPlot){
+#' Title
+#'
+#' @param data 
+#' @param databaseName 
+#' @param eventCohortIds 
+#' @param studyName 
+#' @param outputFolder 
+#' @param path 
+#' @param groupCombinations 
+#' @param addNoPaths 
+#' @param maxPathLength 
+#' @param index_year 
+#' @param createInput 
+#' @param createPlot 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+createSunburstPlot <- function(data, databaseName, eventCohortIds, studyName, outputFolder, path, addNoPaths, maxPathLength, index_year, createInput, createPlot){
   
   if (createInput) {
-    inputSunburstPlot(data, path, groupCombinations, addNoPaths, index_year)
+    inputSunburstPlot(data, path, addNoPaths, index_year)
   }
   
   if (createPlot) {
@@ -471,7 +599,7 @@ createSunburstPlot <- function(data, databaseName, eventCohortIds, studyName, ou
     transformCSVtoJSON(eventCohortIds, outputFolder, path, index_year, maxPathLength)
     
     # Load template HTML file
-    html <- paste(readLines("shiny/plots/sunburst.html"), collapse="\n")
+    html <- paste(readLines("shiny/sunburst/sunburst.html"), collapse="\n")
     
     # Replace @insert_data
     input_plot <- readLines(paste(path,"_inputsunburst_", index_year, ".txt",sep=''))
@@ -482,7 +610,7 @@ createSunburstPlot <- function(data, databaseName, eventCohortIds, studyName, ou
     
     # Save HTML file as sunburst_@studyName
     write.table(html, 
-                file=paste0("shiny/plots/sunburst_", databaseName, "_", studyName,"_", index_year,".html"), 
+                file=paste0(outputFolder, "/", studyName, "/", "sunburst_", databaseName, "_", studyName,"_", index_year,".html"), 
                 quote = FALSE,
                 col.names = FALSE,
                 row.names = FALSE)
@@ -491,10 +619,19 @@ createSunburstPlot <- function(data, databaseName, eventCohortIds, studyName, ou
 }
 
 
-inputSunburstPlot <- function(data, path, groupCombinations, addNoPaths, index_year) {
-  
-  # Group non-fixed combinations in one group according to groupCobinations
-  data <- groupInfrequentCombinations(data, groupCombinations)
+#' Title
+#'
+#' @param data 
+#' @param path 
+#' @param groupCombinations 
+#' @param addNoPaths 
+#' @param index_year 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+inputSunburstPlot <- function(data, path, addNoPaths, index_year) {
   
   layers <- as.vector(colnames(data)[!grepl("INDEX_YEAR|freq", colnames(data))])
   
@@ -507,9 +644,9 @@ inputSunburstPlot <- function(data, path, groupCombinations, addNoPaths, index_y
     summary_counts <- read.csv(paste(path,"_summary_cnt.csv",sep=''), stringsAsFactors = FALSE)
     
     if (index_year == "all") {
-      noPath <- as.integer(summary_counts[summary_counts$COUNT_TYPE == "Number of persons in target cohort", "NUM_PERSONS"]) - sum(transformed_file$freq)
+      noPath <- as.integer(summary_counts[summary_counts$index_year == "Number of persons in target cohort NA", "N"]) - sum(transformed_file$freq)
     } else {
-      noPath <- as.integer(summary_counts[summary_counts$COUNT_TYPE == paste0("Number of persons in target cohort in ", index_year), "NUM_PERSONS"]) - sum(transformed_file$freq)
+      noPath <- as.integer(summary_counts[summary_counts$index_year == paste0("Number of persons in target cohort ", index_year), "N"]) - sum(transformed_file$freq)
     }
     
     transformed_file <- rbind(transformed_file, c("End", noPath))
@@ -522,6 +659,18 @@ inputSunburstPlot <- function(data, path, groupCombinations, addNoPaths, index_y
   write.table(transformed_file, file=paste(path,"_inputsunburst_", index_year, ".csv",sep=''), sep = ",", row.names = FALSE)
 }
 
+#' Title
+#'
+#' @param eventCohortIds 
+#' @param outputFolder 
+#' @param path 
+#' @param index_year 
+#' @param maxPathLength 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 transformCSVtoJSON <- function(eventCohortIds, outputFolder, path, index_year, maxPathLength) {
   data <- read.csv(paste(path,"_inputsunburst_", index_year, ".csv",sep=''))
   
@@ -569,6 +718,15 @@ transformCSVtoJSON <- function(eventCohortIds, outputFolder, path, index_year, m
   close(file)
 }
 
+#' Title
+#'
+#' @param csv 
+#' @param maxPathLength 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 buildHierarchy <- function(csv, maxPathLength) {
   
   if (maxPathLength > 5) {
@@ -654,6 +812,16 @@ buildHierarchy <- function(csv, maxPathLength) {
   return(json)
 }
 
+#' Title
+#'
+#' @param data 
+#' @param databaseName 
+#' @param studyName 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 createSankeyDiagram <- function(data, databaseName, studyName) {
   
   # Group all non-fixed combinations in one group
@@ -703,23 +871,32 @@ createSankeyDiagram <- function(data, databaseName, studyName) {
 }
 
 
+#' Title
+#'
+#' @param data 
+#' @param groupCombinations 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 groupInfrequentCombinations <- function(data, groupCombinations)  {
   
   # Find all non-fixed combinations occurring
   findCombinations <- apply(data, 2, function(x) grepl("+", x, fixed = TRUE))
-  
-  combinations <- as.matrix(data)[findCombinations == TRUE]
-  num_columns <-  sum(grepl("CONCEPT_NAME", colnames(data)))
-  freqCombinations <- matrix(rep(data$freq, times = num_columns), ncol = num_columns)[findCombinations == TRUE]
-  
-  summaryCombinations <- data.table(combination = combinations, freq = freqCombinations)
-  summaryCombinations <- summaryCombinations[,.(freq=sum(freq)), by=combination][order(-freq)]
   
   # Group all non-fixed combinations in one group if TRUE
   if (groupCombinations == "TRUE") {
     data[findCombinations] <- "Other"
   } else {
     # Otherwise: group infrequent treatments below groupCombinations as "other"
+    combinations <- as.matrix(data)[findCombinations == TRUE]
+    num_columns <-  sum(grepl("cohort_name", colnames(data)))
+    freqCombinations <- matrix(rep(data$freq, times = num_columns), ncol = num_columns)[findCombinations == TRUE]
+    
+    summaryCombinations <- data.table(combination = combinations, freq = freqCombinations)
+    summaryCombinations <- summaryCombinations[,.(freq=sum(freq)), by=combination][order(-freq)]
+    
     summarizeCombinations <- summaryCombinations$combination[summaryCombinations$freq <= groupCombinations]
     selectedCombinations <- apply(data, 2, function(x) x %in% summarizeCombinations)
     data[selectedCombinations] <- "Other"

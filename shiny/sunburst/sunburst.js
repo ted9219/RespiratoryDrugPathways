@@ -156,8 +156,6 @@ var colors = {
   "SAMA": "#76448A  ", 
  "Systemic glucocorticoids (acute)": "#FBD780", 
   "Systemic glucocorticoids (therapy)": "#F3AE08", 
-   "Systemic glucocorticosteroids (acute)": "#FBD780", // remove this old label
-  "Systemic glucocorticosteroids (therapy)": "#F3AE08", // remove this old label
        "Xanthines": "#1D493C",
        "Anti IgE": "#FB7476",
    "Anti IL5": "#FFA07A", 

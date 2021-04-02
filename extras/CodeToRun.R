@@ -1,64 +1,84 @@
-
 # ------------------------------------------------------------------------
-# Settings and database credentials
-# ------------------------------------------------------------------------
-user <- 'todo'
-password <- 'todo'
-cdmDatabaseSchemaList <- 'todo'
-cohortSchema <- 'todo'
-oracleTempSchema <- NULL
-databaseList <- 'todo' # name of the data source
-
-dbms <- 'todo'
-server <- 'todo'
-port <- 'todo'
-outputFolder <- paste0(getwd(),"/shiny/output")
-
-# Optional: specify where the temporary files will be created:
-# options(andromedatempdir = "")
-
-# Connect to the server
-connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = dbms,
-                                                                server = server,
-                                                                user = user,
-                                                                password = password,
-                                                                port = port)
-
-connection <- DatabaseConnector::connect(dbms = dbms,connectionDetails = connectionDetails)
-
-# ------------------------------------------------------------------------
-# Hard-coded settings
+# Study settings
 # ------------------------------------------------------------------------
 
-## Analysis Settings
-debugSqlFile <- "resp_drug_study.dsql"
-cohortTable <- "resp_drug_study_cohorts"
+## Select database format (Format of 'Observational Medical Outcomes Partnership Common Data Model' = TRUE or 'Other' = FALSE)
+OMOP_CDM <- TRUE 
+
+## Analysis settings
+debugSqlFile <- "treatment_patterns.dsql"
+cohortTable <- "treatment_patterns_cohorts"
 
 runCreateCohorts <- TRUE
-runCohortCharacterization <- TRUE
+runCohortCharacterization <- TRUE # functionality only available for OMOP_CDM
 runTreatmentPathways <- TRUE
 outputResults <- TRUE
 
+## Load settings
 study_settings <- data.frame(readr::read_csv("inst/Settings/study_settings.csv", col_types = readr::cols()))
 study_settings <- study_settings[,c("param", "analysis1", "analysis2", "analysis3", "analysis4", "analysis5")]
+
+# ------------------------------------------------------------------------
+# If OMOP-CDM = TRUE -> enter all database credentials, ELSE enter database name
+# ------------------------------------------------------------------------
+
+if (OMOP_CDM) {
+  user <- 'todo'
+  password <- 'todo'
+  cdmDatabaseSchemaList <- 'todo'
+  cohortSchema <- 'todo'
+  oracleTempSchema <- NULL
+  databaseList <- 'todo' # name of the data source
+  
+  dbms <- 'todo'
+  server <- 'todo'
+  port <- 'todo'
+  outputFolder <- paste0(getwd(),"/shiny/output")
+  cohortLocation <- NULL
+  
+  # Optional: specify where the temporary files will be created:
+  # options(andromedatempdir = "")
+  
+  # Connect to the server
+  connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = dbms,
+                                                                  server = server,
+                                                                  user = user,
+                                                                  password = password,
+                                                                  port = port)
+  
+  connection <- DatabaseConnector::connect(dbms = dbms,connectionDetails = connectionDetails)
+  
+} else {
+  connection <- NULL
+  connectionDetails <- NULL
+  cdmDatabaseSchema <- NULL
+  cohortDatabaseSchema <- NULL
+  oracleTempSchema <- NULL
+  
+  databaseName <- 'todo'
+  cohortLocation <- "inst/Settings/input_cohorts.csv"
+}
 
 # ------------------------------------------------------------------------
 # Run the study
 # ------------------------------------------------------------------------
 
 for (sourceId in 1:length(cdmDatabaseSchemaList)) {
-  cdmDatabaseSchema <- cdmDatabaseSchemaList[sourceId]
-  cohortDatabaseSchema <- cohortSchema
-  databaseName <- databaseList[sourceId]
+  
+  if (OMOP_CDM) {
+    cdmDatabaseSchema <- cdmDatabaseSchemaList[sourceId]
+    cohortDatabaseSchema <- cohortSchema
+    databaseName <- databaseList[sourceId]
+  }
+  
   databaseId <- databaseName
-  databaseDescription <- databaseName
-
   print(paste("Executing against", databaseName))
-
+  
   outputFolderDB <- paste0(outputFolder, "/", databaseName)
-
+  
   time0 <- Sys.time()
   execute(
+    OMOP_CDM = OMOP_CDM,
     connection = connection,
     connectionDetails = connectionDetails,
     cdmDatabaseSchema = cdmDatabaseSchema,
@@ -68,6 +88,7 @@ for (sourceId in 1:length(cdmDatabaseSchemaList)) {
     outputFolder = outputFolderDB,
     databaseId = databaseId,
     databaseName = databaseName,
+    cohortLocation = cohortLocation,
     runCreateCohorts = runCreateCohorts,
     runCohortCharacterization = runCohortCharacterization,
     runTreatmentPathways = runTreatmentPathways,
